@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/views/customer_form.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -13,11 +14,8 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      "Index 1: Agregar cliente",
-      style: optionStyle,
-    ),
+  static  final List<Widget> _widgetOptions = <Widget>[
+    CustomerForm(),
     Text(
       'Index 2: Agregar obra y residente',
       style: optionStyle,
