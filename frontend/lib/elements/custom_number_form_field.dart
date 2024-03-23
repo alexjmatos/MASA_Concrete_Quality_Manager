@@ -4,14 +4,14 @@ class CustomNumberFormField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
   final int maxLength;
-  final String validationText;
+  final String validatorText;
 
   const CustomNumberFormField(
       {super.key,
       required this.controller,
       required this.labelText,
       this.maxLength = 5,
-      required this.validationText});
+      required this.validatorText});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class CustomNumberFormField extends StatelessWidget {
       ),
       validator: (value) {
         if (value!.isEmpty) {
-          return validationText;
+          return validatorText;
         }
         return null;
       },
