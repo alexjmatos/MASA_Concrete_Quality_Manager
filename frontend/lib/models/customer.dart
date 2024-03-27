@@ -1,5 +1,4 @@
 import 'package:masa_epico_concrete_manager/models/manager.dart';
-import 'package:masa_epico_concrete_manager/utils/uuid_utils.dart';
 
 import 'location.dart';
 import 'project_site.dart';
@@ -33,4 +32,33 @@ class Customer {
         "direccion_id": mainLocation.id,
         "gerente_id": manager.id,
       };
+
+  static Customer toModel(Map<String, dynamic> json) {
+    String id = json['id'];
+    String identifier = json['nombre_identificador'];
+    String companyName = json['razon_social'];
+    String direccionId = json['direccion_id'];
+    String gerenteId = json['gerente_id'];
+
+    // EMPTY LOCATION
+    Location location = Location(
+        id: direccionId,
+        district: "",
+        street: "",
+        number: "",
+        city: "",
+        state: "",
+        zipCode: "");
+
+    // EMPTY MANAGER
+    Manager manager =
+        Manager(id: gerenteId, lastName: "", jobPosition: "", firstName: '');
+
+    return Customer(
+        id: id,
+        identifier: identifier,
+        companyName: companyName,
+        mainLocation: location,
+        manager: manager);
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/constants/constants.dart';
+import 'package:masa_epico_concrete_manager/elements/autocomplete.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_email_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_number_form_field.dart';
@@ -7,26 +8,33 @@ import 'package:masa_epico_concrete_manager/elements/custom_phone_number_form_fi
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
 import 'package:masa_epico_concrete_manager/models/location.dart';
-import 'package:masa_epico_concrete_manager/models/manager.dart';
+import 'package:masa_epico_concrete_manager/models/project_site.dart';
+import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
+import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
 
-class CustomerForm extends StatefulWidget {
-  const CustomerForm({super.key});
+class ProjectSiteAndResidentForm extends StatefulWidget {
+  const ProjectSiteAndResidentForm({super.key});
 
   @override
-  State<CustomerForm> createState() => _CustomerFormState();
+  State<ProjectSiteAndResidentForm> createState() =>
+      _ProjectSiteAndResidentFormState();
 }
 
-class _CustomerFormState extends State<CustomerForm> {
+class _ProjectSiteAndResidentFormState
+    extends State<ProjectSiteAndResidentForm> {
   final _formKey = GlobalKey<FormState>();
 
+  final ProjectSiteDao projectSiteDao = ProjectSiteDao();
   final CustomerDao customerDao = CustomerDao();
 
-  // Data for General Customer Info
-  final TextEditingController _clienteController = TextEditingController();
-  final TextEditingController _razonSocialController = TextEditingController();
+  // Data for General Site Project Info
+  final TextEditingController _obraController = TextEditingController();
 
-  // Data for Manager
+  // Data for Customer
+  String? _selectedCustomer;
+
+  // Data for Site Resident
   final TextEditingController _nombresController = TextEditingController();
   final TextEditingController _apellidosController = TextEditingController();
   final TextEditingController _puestoController = TextEditingController();
@@ -41,12 +49,29 @@ class _CustomerFormState extends State<CustomerForm> {
   final TextEditingController _codigoPostalController = TextEditingController();
   String _selectedEstado = "Quintana Roo";
 
+  static List<Customer> customers = [];
+  static List<String> selectionCustomers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getDataFromBackend();
+  }
+
+  void _getDataFromBackend() async {
+    customers = await customerDao.getAllCustomers();
+    setState(() {
+      selectionCustomers =
+          customers.map((e) => "${e.companyName} - ${e.identifier}").toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Cliente',
+          'Datos de la obra',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
@@ -59,58 +84,20 @@ class _CustomerFormState extends State<CustomerForm> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 CustomTextFormField(
-                  controller: _clienteController,
-                  labelText: "Nombre o Razón Social",
+                  controller: _obraController,
+                  labelText: "Identificador",
                   validatorText:
-                      "El nombre o razon social del cliente no puede quedar vacio",
+                      "El identificador de la obra no puede quedar vacio",
                 ),
                 const SizedBox(height: 20),
-                CustomTextFormField(
-                  controller: _razonSocialController,
-                  labelText: "RFC",
-                  validatorText:
-                      "El RFC del cliente no puede quedar vacio o no es valido",
+                AutoCompleteElement(
+                  fieldName: "Cliente asignado",
+                  options: selectionCustomers,
+                  onChanged: (p0) => _selectedCustomer = p0,
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  'Informacion de encargado o gerente',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const Divider(),
-                const SizedBox(height: 20),
-                CustomTextFormField(
-                  controller: _nombresController,
-                  labelText: "Nombre",
-                  validatorText: "El nombre del gerente no puede quedar vacio",
-                ),
-                const SizedBox(height: 20),
-                CustomTextFormField(
-                  controller: _apellidosController,
-                  labelText: "Apellidos",
-                  validatorText:
-                      "Los apellidos del gerente no pueden quedar vacios",
-                ),
-                const SizedBox(height: 20),
-                CustomTextFormField(
-                  controller: _puestoController,
-                  labelText: "Puesto",
-                  validatorText: "El puesto no puede quedar vacio",
-                ),
-                const SizedBox(height: 20),
-                CustomPhoneNumberFormField(
-                  controller: _telefonoController,
-                  labelText: "Telefono",
-                  hintText: "(555) 555-5555",
-                ),
-                const SizedBox(height: 20),
-                CustomEmailFormField(
-                  controller: _emailController,
-                  labelText: "Correo electronico",
-                  hintText: "sssssss@ssss.com",
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Dirección fiscal',
+                  'Dirección',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const Divider(),
@@ -136,10 +123,11 @@ class _CustomerFormState extends State<CustomerForm> {
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField(
-                    controller: _municipioController,
-                    labelText: "Municipio",
-                    validatorText:
-                        "El municipio no puede quedar vacio (Introducir 'NA' en caso que no aplique)"),
+                  controller: _municipioController,
+                  labelText: "Municipio",
+                  validatorText:
+                      "El municipio no puede quedar vacio (Introducir 'NA' en caso que no aplique)",
+                ),
                 const SizedBox(height: 20),
                 CustomNumberFormField(
                   controller: _codigoPostalController,
@@ -156,18 +144,55 @@ class _CustomerFormState extends State<CustomerForm> {
                   },
                 ),
                 const SizedBox(height: 20),
+                const Text(
+                  'Residente de obra',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const Divider(),
+                CustomTextFormField(
+                  controller: _nombresController,
+                  labelText: "Nombre",
+                  validatorText: "El nombre no puede quedar vacio",
+                ),
+                const SizedBox(height: 20),
+                CustomTextFormField(
+                  controller: _apellidosController,
+                  labelText: "Apellidos",
+                  validatorText: "Los apellidos no pueden quedar vacios",
+                ),
+                const SizedBox(height: 20),
+                CustomTextFormField(
+                  controller: _puestoController,
+                  labelText: "Puesto",
+                  validatorText: "El puesto no puede quedar vacio",
+                ),
+                const SizedBox(height: 20),
+                CustomPhoneNumberFormField(
+                  controller: _telefonoController,
+                  labelText: "Telefono",
+                  hintText: "(555) 555-5555",
+                ),
+                const SizedBox(height: 20),
+                CustomEmailFormField(
+                  controller: _emailController,
+                  labelText: "Correo electronico",
+                  hintText: "sssssss@ssss.com",
+                ),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       // Process data
-                      String razonSocial = _clienteController.text;
-                      String rfc = _razonSocialController.text;
+                      String obra = _obraController.text;
+                      Customer customerAssigned = customers.firstWhere((element) =>
+                          "${element.companyName.toUpperCase()} - ${element.identifier}" ==
+                          _selectedCustomer);
 
-                      String nombreGerente = _nombresController.text;
-                      String apellidosGerente = _apellidosController.text;
-                      String puestoGerente = _puestoController.text;
-                      String telefonoGerente = _telefonoController.text;
-                      String emailGerente = _emailController.text;
+                      String nombreResidente = _nombresController.text;
+                      String apellidosResidente = _apellidosController.text;
+                      String puestoResidente = _puestoController.text;
+                      String telefonoResidente = _telefonoController.text;
+                      String emailResidente = _emailController.text;
 
                       String colonia = _coloniaController.text;
                       String calle = _calleController.text;
@@ -184,23 +209,23 @@ class _CustomerFormState extends State<CustomerForm> {
                           state: estado,
                           zipCode: codigoPostal);
 
-                      Manager manager = Manager(
-                          firstName: nombreGerente,
-                          lastName: apellidosGerente,
-                          jobPosition: puestoGerente,
-                          phoneNumber: telefonoGerente,
-                          email: emailGerente);
+                      SiteResident siteResident = SiteResident(
+                          firstName: nombreResidente,
+                          lastName: apellidosResidente,
+                          jobPosition: puestoResidente,
+                          phoneNumber: telefonoResidente,
+                          email: emailResidente);
 
-                      Customer customer = Customer(
-                          identifier: razonSocial,
-                          companyName: rfc,
-                          manager: manager,
-                          mainLocation: location);
+                      ProjectSite projectSite = ProjectSite(
+                          siteName: obra,
+                          location: location,
+                          residents: [siteResident],
+                          customers: [customerAssigned]);
 
-                      addCustomer(customer);
+                      addProjectSite(projectSite);
                     }
                   },
-                  child: const Text('Agregar cliente'),
+                  child: const Text('Agregar obra'),
                 ),
               ],
             ),
@@ -210,7 +235,7 @@ class _CustomerFormState extends State<CustomerForm> {
     );
   }
 
-  void addCustomer(Customer customer) {
-    customerDao.addCustomer(customer);
+  void addProjectSite(ProjectSite projectSite) {
+    projectSiteDao.addProjectSite(projectSite);
   }
 }

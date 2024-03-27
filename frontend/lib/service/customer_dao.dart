@@ -11,7 +11,7 @@ class CustomerDao {
   final ManagerDao managerDao = ManagerDao();
 
   Future<RecordModel> addCustomer(Customer customer) async {
-    final authData = await pb.admins.authWithPassword(
+    await pb.admins.authWithPassword(
         dotenv.get("ADMIN_USERNAME"), dotenv.get("ADMIN_PASSWORD"));
     // Add the manager
     Future<RecordModel> addManagerFuture =
@@ -36,5 +36,17 @@ class CustomerDao {
     return await pb
         .collection(Constants.CUSTOMERS)
         .create(body: customer.toMap());
+  }
+
+  Future<List<Customer>> getAllCustomers() async {
+    await pb.admins.authWithPassword(
+        dotenv.get("ADMIN_USERNAME"), dotenv.get("ADMIN_PASSWORD"));
+
+    List<RecordModel> models =
+        await pb.collection(Constants.CUSTOMERS).getFullList(sort: '-created');
+
+    return models.map((e) {
+      return Customer.toModel(e.toJson());
+    }).toList();
   }
 }

@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 class AutoCompleteElement extends StatefulWidget {
   final String fieldName;
   final List<String> options;
+  final Function(String) onChanged;
 
   const AutoCompleteElement(
-      {super.key, required this.fieldName, required this.options});
+      {super.key, required this.fieldName, required this.options, required this.onChanged});
 
   @override
   State<AutoCompleteElement> createState() => _AutoCompleteElementState();
@@ -24,7 +25,7 @@ class _AutoCompleteElementState extends State<AutoCompleteElement> {
         });
       },
       onSelected: (String selection) {
-        debugPrint('You just selected $selection');
+        widget.onChanged(selection); // Pass the selected value to the callback
       },
       fieldViewBuilder:
           (context, textEditingController, focusNode, onFieldSubmitted) {

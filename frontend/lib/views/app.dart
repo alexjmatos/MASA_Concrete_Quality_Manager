@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/views/customer_form.dart';
+import 'package:masa_epico_concrete_manager/views/project_site_form.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -15,11 +16,8 @@ class _HomePageState extends State<HomePage> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static  final List<Widget> _widgetOptions = <Widget>[
-    CustomerForm(),
-    Text(
-      'Index 2: Agregar obra y residente',
-      style: optionStyle,
-    ),
+    const CustomerForm(),
+    const ProjectSiteAndResidentForm(),
     Text(
       'Index 3: Muestreo y ensaye',
       style: optionStyle,
@@ -110,3 +108,5 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+
