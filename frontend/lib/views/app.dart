@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/views/concrete_quality_form.dart';
+import 'package:masa_epico_concrete_manager/views/concrete_quality_sample.dart';
+import 'package:masa_epico_concrete_manager/views/concrete_quality_search.dart';
 import 'package:masa_epico_concrete_manager/views/customer_form.dart';
 import 'package:masa_epico_concrete_manager/views/project_site_form.dart';
 
@@ -13,19 +16,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static  final List<Widget> _widgetOptions = <Widget>[
+  static final List<Widget> _widgetOptions = <Widget>[
     const CustomerForm(),
     const ProjectSiteAndResidentForm(),
-    Text(
-      'Index 3: Muestreo y ensaye',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 4 Administrador y buscador',
-      style: optionStyle,
-    ),
+    const ConcreteQualityForm(),
+    const ConcreteQualitySampleForm(),
+    const ConcreteQualitySearch(),
   ];
 
   void _onItemTapped(int index) {
@@ -83,7 +79,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: const Text('Muestreo y ensaye'),
+              title: const Text('Crear orden de muestreo'),
               selected: _selectedIndex == 2,
               onTap: () {
                 // Update the state of the app
@@ -93,11 +89,21 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: const Text('Administrador y buscador'),
+              title: const Text('Registrar ensayo'),
               selected: _selectedIndex == 3,
               onTap: () {
                 // Update the state of the app
                 _onItemTapped(3);
+                // Then close the drawer
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Buscar y modificar'),
+              selected: _selectedIndex == 4,
+              onTap: () {
+                // Update the state of the app
+                _onItemTapped(4);
                 // Then close the drawer
                 Navigator.pop(context);
               },
@@ -108,5 +114,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-

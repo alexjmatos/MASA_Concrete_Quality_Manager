@@ -1,4 +1,4 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:injector/injector.dart';
 import 'package:masa_epico_concrete_manager/constants/constants.dart';
 import 'package:masa_epico_concrete_manager/models/project_site.dart';
 import 'package:masa_epico_concrete_manager/service/location_dao.dart';
@@ -6,14 +6,16 @@ import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:pocketbase/pocketbase.dart';
 
 class ProjectSiteDao {
-  final pb = PocketBase(dotenv.get("BACKEND_URL"));
+  late final PocketBase pb;
   final LocationDao locationDao = LocationDao();
   final SiteResidentDao siteResidentDao = SiteResidentDao();
 
-  Future<RecordModel> addProjectSite(ProjectSite projectSite) async {
-    await pb.admins.authWithPassword(
-        dotenv.get("ADMIN_USERNAME"), dotenv.get("ADMIN_PASSWORD"));
+  ProjectSiteDao() {
+    final injector = Injector.appInstance;
+    pb = injector.get<PocketBase>();
+  }
 
+  Future<RecordModel> addProjectSite(ProjectSite projectSite) async {
     // Add Site Resident
     Future<RecordModel> addSiteResidentFuture =
         siteResidentDao.addSiteResident(projectSite.residents.first);

@@ -5,8 +5,12 @@ class AutoCompleteElement extends StatefulWidget {
   final List<String> options;
   final Function(String) onChanged;
 
-  const AutoCompleteElement(
-      {super.key, required this.fieldName, required this.options, required this.onChanged});
+  const AutoCompleteElement({
+    super.key,
+    required this.fieldName,
+    required this.options,
+    required this.onChanged,
+  });
 
   @override
   State<AutoCompleteElement> createState() => _AutoCompleteElementState();

@@ -1,6 +1,7 @@
 // Entidad - Gerente en backend
 class Manager {
   String? id;
+  int? sequence;
   String firstName;
   String lastName;
   String jobPosition;
@@ -9,6 +10,7 @@ class Manager {
 
   Manager({
     this.id,
+    this.sequence,
     required this.firstName,
     required this.lastName,
     required this.jobPosition,
@@ -22,10 +24,15 @@ class Manager {
   }
 
   Map<String, dynamic> toMap() => <String, dynamic>{
+        "consecutivo": sequence,
         "nombres": firstName,
         "apellidos": lastName,
         "puesto": jobPosition,
         "telefono": phoneNumber,
         "email": email,
       };
+
+  static Manager emptyModel() {
+    return Manager(lastName: "", jobPosition: "", firstName: '');
+  }
 }

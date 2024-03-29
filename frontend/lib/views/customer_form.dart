@@ -9,6 +9,7 @@ import 'package:masa_epico_concrete_manager/models/customer.dart';
 import 'package:masa_epico_concrete_manager/models/location.dart';
 import 'package:masa_epico_concrete_manager/models/manager.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
+import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 
 class CustomerForm extends StatefulWidget {
   const CustomerForm({super.key});
@@ -45,8 +46,9 @@ class _CustomerFormState extends State<CustomerForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text(
-          'Cliente',
+          'Datos del cliente',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),

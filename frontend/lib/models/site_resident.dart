@@ -28,4 +28,16 @@ class SiteResident {
         "telefono": phoneNumber,
         "email": email
       };
+
+  static SiteResident toModel(Map<String, dynamic> json) {
+    String id = json['id'];
+    String firstName = json['nombres'];
+    String lastName = json['apellidos'];
+    String jobPosition = json['puesto'];
+    return SiteResident(
+        id: id,
+        firstName: firstName,
+        lastName: lastName,
+        jobPosition: jobPosition);
+  }
 }

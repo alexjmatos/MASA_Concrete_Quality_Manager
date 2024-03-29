@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_dotenv: ^5.1.0
+  injector: ^3.0.0
   path: ^1.8.3
   pocketbase: ^0.18.1
   uuid: ^4.3.3
@@ -17,7 +18,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.2
+
 
 flutter:
   uses-material-design: true

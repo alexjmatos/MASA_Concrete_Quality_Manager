@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:injector/injector.dart';
 import 'package:masa_epico_concrete_manager/views/app.dart';
+import 'package:pocketbase/pocketbase.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "dev.env");
+  // Use this static instance
+  final injector = Injector.appInstance;
+
+  injector.registerSingleton(() {
+    final pb = PocketBase(dotenv.get("BACKEND_URL"));
+    final result = pb.admins.authWithPassword(
+        dotenv.get("ADMIN_USERNAME"), dotenv.get("ADMIN_PASSWORD"));
+    Future.wait([result]);
+    return pb;
+  });
+
   runApp(const MainApp());
 }
 
