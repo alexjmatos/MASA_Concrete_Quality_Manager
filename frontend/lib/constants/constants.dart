@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 class Constants {
   static const List<String> ESTADOS = [
     'Aguascalientes',
@@ -43,5 +45,20 @@ class Constants {
   static const String SEQUENCE_LOCATIONS = "consecutivo_direcciones";
   static const String SEQUENCE_CUSTOMERS = "consecutivo_clientes";
   static const String SEQUENCE_PROJECT_SITES = "consecutivo_obras";
-  static const String SEQUENCE_SITE_RESIDENTS = "consecutivo_residentes_de_obra";
+  static const String SEQUENCE_SITE_RESIDENTS =
+      "consecutivo_residentes_de_obra";
+
+  static const int LEADING_ZEROS = 5;
+
+  static const List<String> CONCRETE_COMPRESSION_RESISTANCES = [
+    "100",
+    "150",
+    "200",
+    "250",
+    "300",
+    "350",
+    "400",
+    "450",
+    "500"
+  ]; 
 }

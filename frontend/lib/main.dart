@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:injector/injector.dart';
+import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 import 'package:masa_epico_concrete_manager/views/app.dart';
 import 'package:pocketbase/pocketbase.dart';
 
@@ -17,6 +18,8 @@ void main() async {
     Future.wait([result]);
     return pb;
   });
+
+  injector.registerSingleton(() => SequentialIdGenerator());
 
   runApp(const MainApp());
 }

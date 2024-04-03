@@ -5,11 +5,11 @@ import 'package:masa_epico_concrete_manager/elements/custom_email_form_field.dar
 import 'package:masa_epico_concrete_manager/elements/custom_number_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_phone_number_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
+import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
 import 'package:masa_epico_concrete_manager/models/location.dart';
 import 'package:masa_epico_concrete_manager/models/manager.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
-import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 
 class CustomerForm extends StatefulWidget {
   const CustomerForm({super.key});
@@ -204,6 +204,11 @@ class _CustomerFormState extends State<CustomerForm> {
                   },
                   child: const Text('Agregar cliente'),
                 ),
+                ElevatedButtonDialog(
+                  title: "Agregar cliente",
+                  description: "Presiona OK para confirmar",
+                  onOkPressed: () => print("Hey"),
+                )
               ],
             ),
           ),

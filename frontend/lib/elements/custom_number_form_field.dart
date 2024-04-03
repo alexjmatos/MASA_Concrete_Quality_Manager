@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomNumberFormField extends StatelessWidget {
   final TextEditingController controller;
@@ -29,6 +30,7 @@ class CustomNumberFormField extends StatelessWidget {
         }
         return null;
       },
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
     );
   }
 }

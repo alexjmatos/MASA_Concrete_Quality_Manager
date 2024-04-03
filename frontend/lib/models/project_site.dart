@@ -10,6 +10,7 @@ class ProjectSite {
   static final SiteResidentDao siteResidentDao = SiteResidentDao();
 
   String? id;
+  int? sequence;
   String siteName;
   Location location;
   List<SiteResident> residents;
@@ -17,6 +18,7 @@ class ProjectSite {
 
   ProjectSite(
       {this.id,
+      this.sequence,
       required this.siteName,
       required this.location,
       required this.residents,
@@ -28,6 +30,7 @@ class ProjectSite {
   }
 
   Map<String, dynamic> toMap() => <String, dynamic>{
+        "consecutivo": sequence,
         "nombre_identificador": siteName,
         "direccion_id": location.id,
         "clientes_asignados": customers.map((e) => e.id).toList(),
@@ -36,17 +39,23 @@ class ProjectSite {
 
   static ProjectSite toModel(Map<String, dynamic> json) {
     String id = json['id'];
+    int sequence = json['consecutivo'];
     String siteName = json['nombre_identificador'];
     Map<String, Object?> expand = json['expand'];
     Map<String, dynamic> direccion =
         expand['direccion_id'] as Map<String, dynamic>;
     Location location = Location.toModel(direccion);
-    List<SiteResident> siteResidents = [];
+    List<Map<String, dynamic>> residentes =
+        expand['residentes_asignados'] as List<Map<String, dynamic>>;
+
+    List<SiteResident> siteResidents =
+        residentes.map((e) => SiteResident.toModel(e)).toList();
 
     List<Customer> customers = [];
 
     return ProjectSite(
         id: id,
+        sequence: sequence,
         siteName: siteName,
         location: location,
         residents: siteResidents,

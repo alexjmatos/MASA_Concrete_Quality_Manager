@@ -41,11 +41,14 @@ class Customer {
     int sequence = json['consecutivo'];
     String identifier = json['nombre_identificador'];
     String companyName = json['razon_social'];
-    Map<String, Object?> expand = json['expand'];
-    List<Map<String, dynamic>> obras =
-        expand['obras'] as List<Map<String, dynamic>>;
-    List<ProjectSite> projectSites =
-        obras.map((e) => ProjectSite.toModel(e)).toList();
+    Map<String, Object?> expand = json['expand'] ?? {};
+    List<Map<String, dynamic>> obras = (expand['obras'] != null)
+        ? expand['obras'] as List<Map<String, dynamic>>
+        : [];
+    List<ProjectSite> projectSites = [];
+    if (obras.isNotEmpty) {
+      projectSites = obras.map((e) => ProjectSite.toModel(e)).toList();
+    }
 
     // EMPTY LOCATION
     Location location = Location.emptyModel();

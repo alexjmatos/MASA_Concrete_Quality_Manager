@@ -32,7 +32,7 @@ class _ProjectSiteAndResidentFormState
   final TextEditingController _obraController = TextEditingController();
 
   // Data for Customer
-  String? _selectedCustomer;
+  String _selectedCustomer = '';
 
   // Data for Site Resident
   final TextEditingController _nombresController = TextEditingController();
@@ -61,8 +61,10 @@ class _ProjectSiteAndResidentFormState
   void _getDataFromBackend() async {
     customers = await customerDao.getAllCustomers();
     setState(() {
-      selectionCustomers =
-          customers.map((e) => "${e.companyName} - ${e.identifier}").toList();
+      selectionCustomers = customers
+          .map((e) =>
+              "${e.sequence.toString().padLeft(Constants.LEADING_ZEROS, '0')} - ${e.companyName} - ${e.identifier}")
+          .toList();
     });
   }
 
@@ -185,9 +187,12 @@ class _ProjectSiteAndResidentFormState
                     if (_formKey.currentState!.validate()) {
                       // Process data
                       String obra = _obraController.text;
-                      Customer customerAssigned = customers.firstWhere((element) =>
-                          "${element.companyName.toUpperCase()} - ${element.identifier}" ==
-                          _selectedCustomer);
+                      Customer customerAssigned = customers.firstWhere(
+                          (element) =>
+                              element.sequence
+                                  .toString()
+                                  .padLeft(Constants.LEADING_ZEROS, "0") ==
+                              _selectedCustomer.split("-")[0].trim());
 
                       String nombreResidente = _nombresController.text;
                       String apellidosResidente = _apellidosController.text;

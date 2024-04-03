@@ -1,6 +1,7 @@
 // Entidad - Residente en backend
 class SiteResident {
   String? id;
+  int? sequence;
   String firstName;
   String lastName;
   String jobPosition;
@@ -9,6 +10,7 @@ class SiteResident {
 
   SiteResident({
     this.id,
+    this.sequence,
     required this.firstName,
     required this.lastName,
     required this.jobPosition,
@@ -22,6 +24,7 @@ class SiteResident {
   }
 
   Map<String, dynamic> toMap() => <String, dynamic>{
+        "consecutivo": sequence,
         "nombres": firstName,
         "apellidos": lastName,
         "puesto": jobPosition,
@@ -31,11 +34,13 @@ class SiteResident {
 
   static SiteResident toModel(Map<String, dynamic> json) {
     String id = json['id'];
+    int sequence = json['consecutivo'];
     String firstName = json['nombres'];
     String lastName = json['apellidos'];
     String jobPosition = json['puesto'];
     return SiteResident(
         id: id,
+        sequence: sequence,
         firstName: firstName,
         lastName: lastName,
         jobPosition: jobPosition);
