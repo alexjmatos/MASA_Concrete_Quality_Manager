@@ -34,7 +34,7 @@ class _ConcreteQualityFormState extends State<ConcreteQualityForm> {
   String _selectedCustomer = '';
   String _selectedProjectSite = '';
   String _selectedResident = '';
-  String _selectedFc = '';
+  final String _selectedFc = '';
 
   final TextEditingController _direccionController = TextEditingController();
   final TextEditingController _residenteController = TextEditingController();

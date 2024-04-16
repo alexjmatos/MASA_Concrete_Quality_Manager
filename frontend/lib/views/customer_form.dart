@@ -158,56 +158,14 @@ class _CustomerFormState extends State<CustomerForm> {
                   },
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Process data
-                      String razonSocial = _clienteController.text;
-                      String rfc = _razonSocialController.text;
-
-                      String nombreGerente = _nombresController.text;
-                      String apellidosGerente = _apellidosController.text;
-                      String puestoGerente = _puestoController.text;
-                      String telefonoGerente = _telefonoController.text;
-                      String emailGerente = _emailController.text;
-
-                      String colonia = _coloniaController.text;
-                      String calle = _calleController.text;
-                      String numero = _numeroController.text;
-                      String municipio = _municipioController.text;
-                      String codigoPostal = _codigoPostalController.text;
-                      String estado = _selectedEstado;
-
-                      Location location = Location(
-                          district: colonia,
-                          street: calle,
-                          number: numero,
-                          city: municipio,
-                          state: estado,
-                          zipCode: codigoPostal);
-
-                      Manager manager = Manager(
-                          firstName: nombreGerente,
-                          lastName: apellidosGerente,
-                          jobPosition: puestoGerente,
-                          phoneNumber: telefonoGerente,
-                          email: emailGerente);
-
-                      Customer customer = Customer(
-                          identifier: razonSocial,
-                          companyName: rfc,
-                          manager: manager,
-                          mainLocation: location);
-
-                      addCustomer(customer);
-                    }
-                  },
-                  child: const Text('Agregar cliente'),
-                ),
                 ElevatedButtonDialog(
                   title: "Agregar cliente",
                   description: "Presiona OK para confirmar",
-                  onOkPressed: () => print("Hey"),
+                  onOkPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      addCustomer();
+                    }
+                  },
                 )
               ],
             ),
@@ -217,7 +175,45 @@ class _CustomerFormState extends State<CustomerForm> {
     );
   }
 
-  void addCustomer(Customer customer) {
+  void addCustomer() {
+    // Process data
+    String razonSocial = _clienteController.text;
+    String rfc = _razonSocialController.text;
+
+    String nombreGerente = _nombresController.text;
+    String apellidosGerente = _apellidosController.text;
+    String puestoGerente = _puestoController.text;
+    String telefonoGerente = _telefonoController.text;
+    String emailGerente = _emailController.text;
+
+    String colonia = _coloniaController.text;
+    String calle = _calleController.text;
+    String numero = _numeroController.text;
+    String municipio = _municipioController.text;
+    String codigoPostal = _codigoPostalController.text;
+    String estado = _selectedEstado;
+
+    Location location = Location(
+        district: colonia,
+        street: calle,
+        number: numero,
+        city: municipio,
+        state: estado,
+        zipCode: codigoPostal);
+
+    Manager manager = Manager(
+        firstName: nombreGerente,
+        lastName: apellidosGerente,
+        jobPosition: puestoGerente,
+        phoneNumber: telefonoGerente,
+        email: emailGerente);
+
+    Customer customer = Customer(
+        identifier: razonSocial,
+        companyName: rfc,
+        manager: manager,
+        mainLocation: location);
+
     customerDao.addCustomer(customer);
   }
 }
