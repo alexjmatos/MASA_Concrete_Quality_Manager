@@ -9,8 +9,8 @@ class Customer {
   int? sequence;
   String identifier;
   String companyName;
-  Manager manager;
-  Location mainLocation;
+  Manager? manager;
+  Location? mainLocation;
   List<ProjectSite> projects;
 
   Customer({
@@ -18,8 +18,8 @@ class Customer {
     this.sequence,
     required this.identifier,
     required this.companyName,
-    required this.manager,
-    required this.mainLocation,
+    this.manager,
+    this.mainLocation,
     List<ProjectSite>? projects,
   }) : projects = projects ?? [];
 
@@ -32,8 +32,8 @@ class Customer {
         "consecutivo": sequence,
         "nombre_identificador": identifier,
         "razon_social": companyName,
-        "direccion_id": mainLocation.id,
-        "gerente_id": manager.id,
+        "direccion_id": mainLocation?.id,
+        "gerente_id": manager?.id,
       };
 
   static Customer toModel(Map<String, dynamic> json) {

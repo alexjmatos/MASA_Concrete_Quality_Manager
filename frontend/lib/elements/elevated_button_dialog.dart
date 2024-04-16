@@ -5,7 +5,7 @@ class ElevatedButtonDialog extends StatelessWidget {
   final String description;
   final Function() onOkPressed;
 
-  const ElevatedButtonDialog( 
+  const ElevatedButtonDialog(
       {super.key,
       required this.title,
       required this.description,
@@ -22,16 +22,16 @@ class ElevatedButtonDialog extends StatelessWidget {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.pop(context, 'Cancel'),
-              child: const Text('Cancel'),
+              child: const Text('Cancelar'),
             ),
             TextButton(
               onPressed: onOkPressed,
-              child: const Text('OK'),
+              child: const Text('Confirmar'),
             ),
           ],
         ),
       ),
-      child: const Text('Show Dialog'),
+      child: Text(title),
     );
   }
 }

@@ -1,17 +1,14 @@
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/constants/constants.dart';
 import 'package:masa_epico_concrete_manager/elements/autocomplete.dart';
-import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
-import 'package:masa_epico_concrete_manager/elements/custom_email_form_field.dart';
-import 'package:masa_epico_concrete_manager/elements/custom_number_form_field.dart';
-import 'package:masa_epico_concrete_manager/elements/custom_phone_number_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
-import 'package:masa_epico_concrete_manager/models/location.dart';
 import 'package:masa_epico_concrete_manager/models/project_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
+import 'package:pocketbase/pocketbase.dart';
 
 class ProjectSiteAndResidentForm extends StatefulWidget {
   const ProjectSiteAndResidentForm({super.key});
@@ -38,16 +35,6 @@ class _ProjectSiteAndResidentFormState
   final TextEditingController _nombresController = TextEditingController();
   final TextEditingController _apellidosController = TextEditingController();
   final TextEditingController _puestoController = TextEditingController();
-  final TextEditingController _telefonoController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-
-  // Data for Location
-  final TextEditingController _coloniaController = TextEditingController();
-  final TextEditingController _calleController = TextEditingController();
-  final TextEditingController _numeroController = TextEditingController();
-  final TextEditingController _municipioController = TextEditingController();
-  final TextEditingController _codigoPostalController = TextEditingController();
-  String _selectedEstado = "Quintana Roo";
 
   static List<Customer> customers = [];
   static List<String> selectionCustomers = [];
@@ -63,7 +50,7 @@ class _ProjectSiteAndResidentFormState
     setState(() {
       selectionCustomers = customers
           .map((e) =>
-              "${e.sequence.toString().padLeft(Constants.LEADING_ZEROS, '0')} - ${e.companyName} - ${e.identifier}")
+              "${e.sequence.toString().padLeft(Constants.LEADING_ZEROS, '0')} - ${e.identifier}")
           .toList();
     });
   }
@@ -100,135 +87,29 @@ class _ProjectSiteAndResidentFormState
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  'Dirección',
+                  'Residente de obra (Opcional)',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const Divider(),
-                const SizedBox(height: 20),
-                CustomTextFormField(
-                    controller: _coloniaController,
-                    labelText: "Colonia",
-                    validatorText:
-                        "La colonia no puede quedar vacia (Introducir 'NA' en caso que no aplique)"),
-                const SizedBox(height: 20),
-                CustomTextFormField(
-                  controller: _calleController,
-                  labelText: "Calle",
-                  validatorText:
-                      "La calle no puede quedar vacia (Introducir 'NA' en caso que no aplique)",
-                ),
-                const SizedBox(height: 20),
-                CustomTextFormField(
-                  controller: _numeroController,
-                  labelText: "Numero exterior o lote",
-                  validatorText:
-                      "El numero exterior no puede quedar vacio (Introducir 'NA' en caso que no aplique)",
-                ),
-                const SizedBox(height: 20),
-                CustomTextFormField(
-                  controller: _municipioController,
-                  labelText: "Municipio",
-                  validatorText:
-                      "El municipio no puede quedar vacio (Introducir 'NA' en caso que no aplique)",
-                ),
-                const SizedBox(height: 20),
-                CustomNumberFormField(
-                  controller: _codigoPostalController,
-                  labelText: "Codigo Postal",
-                  validatorText:
-                      "El codigo postal no puede quedar vacio. (Introducir NNNNN en caso que no aplique)",
-                ),
-                const SizedBox(height: 20),
-                CustomDropdownFormField(
-                  labelText: "Estado",
-                  items: Constants.ESTADOS,
-                  onChanged: (p0) {
-                    _selectedEstado = p0;
-                  },
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Residente de obra',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const Divider(),
-                CustomTextFormField(
+                CustomTextFormField.noValidation(
                   controller: _nombresController,
                   labelText: "Nombre",
-                  validatorText: "El nombre no puede quedar vacio",
                 ),
                 const SizedBox(height: 20),
-                CustomTextFormField(
+                CustomTextFormField.noValidation(
                   controller: _apellidosController,
                   labelText: "Apellidos",
-                  validatorText: "Los apellidos no pueden quedar vacios",
                 ),
                 const SizedBox(height: 20),
-                CustomTextFormField(
+                CustomTextFormField.noValidation(
                   controller: _puestoController,
                   labelText: "Puesto",
-                  validatorText: "El puesto no puede quedar vacio",
-                ),
-                const SizedBox(height: 20),
-                CustomPhoneNumberFormField(
-                  controller: _telefonoController,
-                  labelText: "Telefono",
-                  hintText: "(555) 555-5555",
-                ),
-                const SizedBox(height: 20),
-                CustomEmailFormField(
-                  controller: _emailController,
-                  labelText: "Correo electronico",
-                  hintText: "sssssss@ssss.com",
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // Process data
-                      String obra = _obraController.text;
-                      Customer customerAssigned = customers.firstWhere(
-                          (element) =>
-                              element.sequence
-                                  .toString()
-                                  .padLeft(Constants.LEADING_ZEROS, "0") ==
-                              _selectedCustomer.split("-")[0].trim());
-
-                      String nombreResidente = _nombresController.text;
-                      String apellidosResidente = _apellidosController.text;
-                      String puestoResidente = _puestoController.text;
-                      String telefonoResidente = _telefonoController.text;
-                      String emailResidente = _emailController.text;
-
-                      String colonia = _coloniaController.text;
-                      String calle = _calleController.text;
-                      String numero = _numeroController.text;
-                      String municipio = _municipioController.text;
-                      String codigoPostal = _codigoPostalController.text;
-                      String estado = _selectedEstado;
-
-                      Location location = Location(
-                          district: colonia,
-                          street: calle,
-                          number: numero,
-                          city: municipio,
-                          state: estado,
-                          zipCode: codigoPostal);
-
-                      SiteResident siteResident = SiteResident(
-                          firstName: nombreResidente,
-                          lastName: apellidosResidente,
-                          jobPosition: puestoResidente,
-                          phoneNumber: telefonoResidente,
-                          email: emailResidente);
-
-                      ProjectSite projectSite = ProjectSite(
-                          siteName: obra,
-                          location: location,
-                          residents: [siteResident],
-                          customers: [customerAssigned]);
-
-                      addProjectSite(projectSite);
+                      addProjectSite();
                     }
                   },
                   child: const Text('Agregar obra'),
@@ -241,7 +122,57 @@ class _ProjectSiteAndResidentFormState
     );
   }
 
-  void addProjectSite(ProjectSite projectSite) {
-    projectSiteDao.addProjectSite(projectSite);
+  void addProjectSite() {
+    // Process data
+    String obra = _obraController.text;
+    List<SiteResident> residents = [];
+
+    Customer customerAssigned = customers.firstWhere((element) =>
+        element.sequence.toString().padLeft(Constants.LEADING_ZEROS, "0") ==
+        _selectedCustomer.split("-")[0].trim());
+
+    String nombreResidente = _nombresController.text;
+    String apellidosResidente = _apellidosController.text;
+    String puestoResidente = _puestoController.text;
+
+    if (nombreResidente.isNotEmpty || apellidosResidente.isNotEmpty) {
+      SiteResident siteResident = SiteResident(
+        firstName: nombreResidente,
+        lastName: apellidosResidente,
+        jobPosition: puestoResidente,
+      );
+      residents.add(siteResident);
+    }
+
+    ProjectSite projectSite = ProjectSite(
+        siteName: obra,
+        residents: residents,
+        customers: [customerAssigned]);
+
+    Future<RecordModel> future = projectSiteDao.addProjectSite(projectSite);
+
+    String name = "";
+    int consecutive = 0;
+
+    future.then((value) {
+      name = value.getStringValue("nombre_identificador");
+      consecutive = value.getIntValue("consecutivo");
+    }).then((value) {
+      CoolAlert.show(
+        context: context,
+        title: "Registro de obra añadido exitosamente",
+        type: CoolAlertType.success,
+        text:
+            'Se agrego la obra ${consecutive.toString().padLeft(Constants.LEADING_ZEROS, '0')} - $name',
+      );
+    }).onError((error, stackTrace) {
+      print(stackTrace);
+      CoolAlert.show(
+          context: context,
+          type: CoolAlertType.error,
+          title: "Error al agregar la obra",
+          text:
+              "Hubo un error al agregar el cliente. Verifica conexion a internet e intenta de nuevo");
+    });
   }
 }

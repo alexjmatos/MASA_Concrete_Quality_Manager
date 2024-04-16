@@ -48,7 +48,7 @@ class Constants {
   static const String SEQUENCE_SITE_RESIDENTS =
       "consecutivo_residentes_de_obra";
 
-  static const int LEADING_ZEROS = 5;
+  static const int LEADING_ZEROS = 4;
 
   static const List<String> CONCRETE_COMPRESSION_RESISTANCES = [
     "100",

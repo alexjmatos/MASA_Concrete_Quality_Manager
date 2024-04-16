@@ -1,18 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// ignore: must_be_immutable
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
   final String validatorText;
   final bool readOnly;
+  String? Function(String?)? validator;
 
-  const CustomTextFormField({
+  CustomTextFormField({
     super.key,
     this.readOnly = false,
     required this.controller,
     required this.labelText,
     required this.validatorText,
+  }) {
+    validator = (p0) {
+      if (p0!.isEmpty) {
+        return validatorText;
+      }
+      return null;
+    };
+  }
+
+  CustomTextFormField.withValidator({
+    super.key,
+    this.readOnly = false,
+    required this.controller,
+    required this.labelText,
+    required this.validatorText,
+    this.validator,
+  });
+
+  CustomTextFormField.noValidation({
+    super.key,
+    this.readOnly = false,
+    required this.controller,
+    required this.labelText,
+    this.validatorText = "",
   });
 
   @override
@@ -23,12 +49,7 @@ class CustomTextFormField extends StatelessWidget {
         labelText: labelText,
         border: const OutlineInputBorder(),
       ),
-      validator: (value) {
-        if (value!.isEmpty) {
-          return validatorText;
-        }
-        return null;
-      },
+      validator: validator,
       readOnly: readOnly,
       inputFormatters: [
         UppercaseInputFormatter(),

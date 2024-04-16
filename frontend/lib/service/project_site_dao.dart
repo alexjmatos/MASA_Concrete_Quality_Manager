@@ -31,25 +31,16 @@ class ProjectSiteDao {
     }
 
     // Add Site Resident
-    Future<RecordModel> addSiteResidentFuture =
-        siteResidentDao.addSiteResident(projectSite.residents.first);
+    if (projectSite.residents.firstOrNull != null) {
+      Future<RecordModel> addSiteResidentFuture =
+          siteResidentDao.addSiteResident(projectSite.residents.first);
 
-    addSiteResidentFuture.then((value) {
-      projectSite.residents.first.id = value.id;
-    });
+      addSiteResidentFuture.then((value) {
+        projectSite.residents.first.id = value.id;
+      });
 
-    // Add Location
-    // Generate a next sequence for customer
-    List<int> sequenceLocations = await Future.wait(
-        [sequentialIdGenerator.getNextSequence(Constants.LOCATIONS)]);
-    projectSite.location.sequence = sequenceLocations[0];
-
-    Future<RecordModel> addLocationFuture =
-        locationDao.addLocation(projectSite.location);
-
-    addLocationFuture.then((value) {
-      projectSite.location.id = value.id;
-    });
+      await Future.wait([addSiteResidentFuture]);
+    }
 
     // Add the project site
     // Wait for both futures to complete
@@ -57,8 +48,6 @@ class ProjectSiteDao {
     List<int> sequenceCustomer = await Future.wait(
         [sequentialIdGenerator.getNextSequence(Constants.PROJECT_SITES)]);
     projectSite.sequence = sequenceCustomer[0];
-
-    await Future.wait([addSiteResidentFuture, addLocationFuture]);
 
     return await pb
         .collection(Constants.PROJECT_SITES)

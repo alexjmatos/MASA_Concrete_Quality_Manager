@@ -12,17 +12,18 @@ class ProjectSite {
   String? id;
   int? sequence;
   String siteName;
-  Location location;
+  Location? location;
   List<SiteResident> residents;
   List<Customer> customers;
 
-  ProjectSite(
-      {this.id,
-      this.sequence,
-      required this.siteName,
-      required this.location,
-      required this.residents,
-      required this.customers});
+  ProjectSite({
+    this.id,
+    this.sequence,
+    required this.siteName,
+    List<SiteResident>? residents,
+    List<Customer>? customers,
+  })  : customers = customers ?? [],
+        residents = residents ?? [];
 
   @override
   String toString() {
@@ -32,9 +33,9 @@ class ProjectSite {
   Map<String, dynamic> toMap() => <String, dynamic>{
         "consecutivo": sequence,
         "nombre_identificador": siteName,
-        "direccion_id": location.id,
+        "direccion_id": location?.id,
         "clientes_asignados": customers.map((e) => e.id).toList(),
-        "residentes_asignados": residents.map((e) => e.id).toList(),
+        "residentes_asignados": residents.map((e) => e?.id).toList(),
       };
 
   static ProjectSite toModel(Map<String, dynamic> json) {
@@ -42,9 +43,6 @@ class ProjectSite {
     int sequence = json['consecutivo'];
     String siteName = json['nombre_identificador'];
     Map<String, Object?> expand = json['expand'];
-    Map<String, dynamic> direccion =
-        expand['direccion_id'] as Map<String, dynamic>;
-    Location location = Location.toModel(direccion);
     List<Map<String, dynamic>> residentes =
         expand['residentes_asignados'] as List<Map<String, dynamic>>;
 
@@ -57,7 +55,6 @@ class ProjectSite {
         id: id,
         sequence: sequence,
         siteName: siteName,
-        location: location,
         residents: siteResidents,
         customers: customers);
   }

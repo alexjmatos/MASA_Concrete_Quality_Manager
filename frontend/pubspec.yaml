@@ -7,9 +7,11 @@ environment:
   sdk: '>=3.2.6 <4.0.0'
 
 dependencies:
+  cool_alert: ^2.0.1
   flutter:
     sdk: flutter
   flutter_dotenv: ^5.1.0
+  fluttertoast: ^8.2.5
   injector: ^3.0.0
   path: ^1.8.3
   pocketbase: ^0.18.1

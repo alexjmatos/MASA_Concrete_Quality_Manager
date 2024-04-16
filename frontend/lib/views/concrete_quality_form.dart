@@ -5,9 +5,7 @@ import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.
 import 'package:masa_epico_concrete_manager/elements/custom_number_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
-import 'package:masa_epico_concrete_manager/models/location.dart';
 import 'package:masa_epico_concrete_manager/models/project_site.dart';
-import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
 
@@ -188,15 +186,15 @@ class _ConcreteQualityFormState extends State<ConcreteQualityForm> {
       _selectedProjectSite = selected;
       setState(
         () {
-          Location location = found.location;
-          List<SiteResident> siteResidents = found.residents;
-          print(siteResidents);
-          _direccionController.text =
-              "${location.street} ${location.number} ${location.district} - ${location.zipCode} ${location.city} ${location.state.toUpperCase()}";
-          availableSiteResidents = siteResidents
-              .map((e) =>
-                  "${e.sequence.toString().padLeft(Constants.LEADING_ZEROS, "0")} - ${e.jobPosition}. ${e.lastName}, ${e.firstName}")
-              .toList();
+          // Location location = found.location;
+          // List<SiteResident> siteResidents = found.residents;
+          // print(siteResidents);
+          // _direccionController.text =
+          //     "${location.street} ${location.number} ${location.district} - ${location.zipCode} ${location.city} ${location.state.toUpperCase()}";
+          // availableSiteResidents = siteResidents
+          //     .map((e) =>
+          //         "${e.sequence.toString().padLeft(Constants.LEADING_ZEROS, "0")} - ${e.jobPosition}. ${e.lastName}, ${e.firstName}")
+          //     .toList();
         },
       );
     }

@@ -19,37 +19,9 @@ class CustomerDao {
 
   Future<RecordModel> addCustomer(Customer customer) async {
     // Generate a next sequence for customer
-    List<int> sequenceManager = await Future.wait([sequentialIdGenerator.getNextSequence(Constants.MANAGERS)]);
-    customer.manager.sequence = sequenceManager[0];
-
-    // Add the manager
-    Future<RecordModel> addManagerFuture =
-        managerDao.addManager(customer.manager);
-
-    addManagerFuture.then((value) {
-      customer.manager.id = value.id;
-    });
-
-    // Generate a next sequence for customer
-    List<int> sequenceLocations = await Future.wait([sequentialIdGenerator.getNextSequence(Constants.LOCATIONS)]);
-    customer.mainLocation.sequence = sequenceLocations[0];
-    
-    // Add the location
-    Future<RecordModel> addLocation =
-        locationDao.addLocation(customer.mainLocation);
-
-    addLocation.then((value) {
-      customer.mainLocation.id = value.id;
-    });
-
-    // Generate a next sequence for customer
     List<int> sequenceCustomer = await Future.wait([sequentialIdGenerator.getNextSequence(Constants.CUSTOMERS)]);
     customer.sequence = sequenceCustomer[0];
-    
-    // Add the customer
-    // Wait for both futures to complete
-    await Future.wait([addManagerFuture, addLocation]);
-
+  
     return await pb
         .collection(Constants.CUSTOMERS)
         .create(body: customer.toMap());
