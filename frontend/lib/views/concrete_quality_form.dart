@@ -62,6 +62,7 @@ class _ConcreteQualityFormState extends State<ConcreteQualityForm> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        automaticallyImplyLeading: false,
         title: const Text(
           'Crear orden de muestreo',
           style: TextStyle(fontWeight: FontWeight.bold),

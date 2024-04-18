@@ -3,20 +3,22 @@ import 'package:masa_epico_concrete_manager/views/concrete_quality_form.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_quality_sample.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_quality_search.dart';
 import 'package:masa_epico_concrete_manager/views/customer_form.dart';
+import 'package:masa_epico_concrete_manager/views/home_view.dart';
 import 'package:masa_epico_concrete_manager/views/project_site_form.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+class MenuPage extends StatefulWidget {
+  const MenuPage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<MenuPage> createState() => _MenuPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _MenuPageState extends State<MenuPage> {
   int _selectedIndex = 0;
   static final List<Widget> _widgetOptions = <Widget>[
+    const HomeView(),
     const CustomerForm(),
     const ProjectSiteAndResidentForm(),
     const ConcreteQualityForm(),
@@ -34,11 +36,12 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.blue.shade400,
-          title: Text(
-            widget.title,
-            style: const TextStyle(color: Colors.white),
-          )),
+        backgroundColor: Colors.blue.shade400,
+        title: Text(
+          widget.title,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
       body: Center(
         child: _widgetOptions[_selectedIndex],
       ),
@@ -59,7 +62,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             ListTile(
-              title: const Text('Agregar cliente'),
+              title: const Text('Inicio'),
               selected: _selectedIndex == 0,
               onTap: () {
                 // Update the state of the app
@@ -69,7 +72,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: const Text('Agregar obra y residente'),
+              title: const Text('Agregar cliente'),
               selected: _selectedIndex == 1,
               onTap: () {
                 // Update the state of the app
@@ -79,7 +82,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: const Text('Crear orden de muestreo'),
+              title: const Text('Agregar obra y residente'),
               selected: _selectedIndex == 2,
               onTap: () {
                 // Update the state of the app
@@ -89,7 +92,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: const Text('Registrar ensayo'),
+              title: const Text('Crear orden de muestreo'),
               selected: _selectedIndex == 3,
               onTap: () {
                 // Update the state of the app
@@ -99,11 +102,21 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: const Text('Buscar y modificar'),
+              title: const Text('Registrar ensayo'),
               selected: _selectedIndex == 4,
               onTap: () {
                 // Update the state of the app
                 _onItemTapped(4);
+                // Then close the drawer
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Buscar y modificar'),
+              selected: _selectedIndex == 5,
+              onTap: () {
+                // Update the state of the app
+                _onItemTapped(5);
                 // Then close the drawer
                 Navigator.pop(context);
               },

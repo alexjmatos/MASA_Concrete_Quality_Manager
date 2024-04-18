@@ -60,6 +60,7 @@ class _ProjectSiteAndResidentFormState
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        automaticallyImplyLeading: false,
         title: const Text(
           'Datos de la obra y residente',
           style: TextStyle(fontWeight: FontWeight.bold),

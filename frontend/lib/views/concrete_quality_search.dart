@@ -14,6 +14,7 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           'Buscar, editar o eliminar',
           style: TextStyle(fontWeight: FontWeight.bold),

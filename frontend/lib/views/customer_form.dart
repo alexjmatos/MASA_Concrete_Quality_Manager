@@ -30,6 +30,7 @@ class _CustomerFormState extends State<CustomerForm> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        automaticallyImplyLeading: false,
         title: const Text(
           'Datos del cliente',
           style: TextStyle(fontWeight: FontWeight.bold),

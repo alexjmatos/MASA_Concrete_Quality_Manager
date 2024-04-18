@@ -15,6 +15,7 @@ class _ConcreteQualitySampleFormState extends State<ConcreteQualitySampleForm> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        automaticallyImplyLeading: false,
         title: const Text(
           'Registro de ensaye',
           style: TextStyle(fontWeight: FontWeight.bold),
