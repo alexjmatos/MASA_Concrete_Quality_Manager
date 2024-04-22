@@ -35,6 +35,7 @@ class Constants {
     'Zacatecas',
   ];
 
+  static const String USERS = "users";
   static const String MANAGERS = "gerentes";
   static const String LOCATIONS = "direcciones";
   static const String CUSTOMERS = "clientes";

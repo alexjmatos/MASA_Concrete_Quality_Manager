@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AutoCompleteElement extends StatefulWidget {
   final String fieldName;
@@ -40,8 +41,22 @@ class _AutoCompleteElementState extends State<AutoCompleteElement> {
             label: Text(widget.fieldName),
             border: const OutlineInputBorder(),
           ),
+          inputFormatters: [
+            UppercaseInputFormatter(),
+          ],
         );
       },
+    );
+  }
+}
+
+class UppercaseInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
     );
   }
 }

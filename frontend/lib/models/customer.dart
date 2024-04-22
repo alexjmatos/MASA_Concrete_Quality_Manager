@@ -46,7 +46,9 @@ class Customer {
         ? expand['obras'] as List<Map<String, dynamic>>
         : [];
     List<ProjectSite> projectSites = [];
+    print(obras);
     if (obras.isNotEmpty) {
+      print(obras);
       projectSites = obras.map((e) => ProjectSite.toModel(e)).toList();
     }
 

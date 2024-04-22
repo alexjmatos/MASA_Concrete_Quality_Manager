@@ -19,9 +19,10 @@ class CustomerDao {
 
   Future<RecordModel> addCustomer(Customer customer) async {
     // Generate a next sequence for customer
-    List<int> sequenceCustomer = await Future.wait([sequentialIdGenerator.getNextSequence(Constants.CUSTOMERS)]);
+    List<int> sequenceCustomer = await Future.wait(
+        [sequentialIdGenerator.getNextSequence(Constants.CUSTOMERS)]);
     customer.sequence = sequenceCustomer[0];
-  
+
     return await pb
         .collection(Constants.CUSTOMERS)
         .create(body: customer.toMap());
@@ -30,10 +31,16 @@ class CustomerDao {
   Future<List<Customer>> getAllCustomers() async {
     List<RecordModel> models = await pb
         .collection(Constants.CUSTOMERS)
-        .getFullList(sort: '-created', expand: "obras,obras.direccion_id,obras.residentes_asignados");
+        .getFullList(
+            sort: '-created',
+            expand: "obras,obras.direccion_id,obras.residentes_asignados");
 
     return models.map((e) {
       return Customer.toModel(e.toJson());
     }).toList();
+  }
+
+  Future<RecordModel> getCustomer(String id) async {
+    return await pb.collection(Constants.CUSTOMERS).getOne(id);
   }
 }

@@ -2,6 +2,7 @@ import 'package:injector/injector.dart';
 import 'package:masa_epico_concrete_manager/constants/constants.dart';
 import 'package:masa_epico_concrete_manager/models/project_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
+import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/location_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
@@ -11,6 +12,7 @@ class ProjectSiteDao {
   late final PocketBase pb;
   final LocationDao locationDao = LocationDao();
   final SiteResidentDao siteResidentDao = SiteResidentDao();
+  final CustomerDao customerDao = CustomerDao();
   late final SequentialIdGenerator sequentialIdGenerator;
 
   ProjectSiteDao() {
@@ -26,12 +28,15 @@ class ProjectSiteDao {
 
     for (SiteResident siteResident in projectSite.residents) {
       // Generate a next sequence for site resident
-      siteResident.sequence = currentSequenceSiteResident;
-      currentSequenceSiteResident++;
+      if (siteResident.id == null) {
+        siteResident.sequence = currentSequenceSiteResident;
+        currentSequenceSiteResident++;
+      }
     }
 
     // Add Site Resident
-    if (projectSite.residents.firstOrNull != null) {
+    if (projectSite.residents.firstOrNull != null &&
+        projectSite.residents.first.id == null) {
       Future<RecordModel> addSiteResidentFuture =
           siteResidentDao.addSiteResident(projectSite.residents.first);
 
@@ -49,8 +54,21 @@ class ProjectSiteDao {
         [sequentialIdGenerator.getNextSequence(Constants.PROJECT_SITES)]);
     projectSite.sequence = sequenceCustomer[0];
 
-    return await pb
+    final newProjectSite = await pb
         .collection(Constants.PROJECT_SITES)
         .create(body: projectSite.toMap());
+
+    // Update the customer to reflect the relation
+    projectSite.customers.forEach((element) {
+      var sites = element.projects.map((e) => e.id).toList();
+      sites.add(newProjectSite.id);
+      pb
+          .collection(Constants.CUSTOMERS)
+          .update(element.id!, body: <String, dynamic>{
+        "obras": sites,
+      });
+    });
+
+    return newProjectSite;
   }
 }

@@ -8,6 +8,7 @@ import 'package:masa_epico_concrete_manager/models/project_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
+import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:pocketbase/pocketbase.dart';
 
 class ProjectSiteAndResidentForm extends StatefulWidget {
@@ -24,6 +25,7 @@ class _ProjectSiteAndResidentFormState
 
   final ProjectSiteDao projectSiteDao = ProjectSiteDao();
   final CustomerDao customerDao = CustomerDao();
+  final SiteResidentDao siteResidentDao = SiteResidentDao();
 
   // Data for General Site Project Info
   final TextEditingController _obraController = TextEditingController();
@@ -38,6 +40,10 @@ class _ProjectSiteAndResidentFormState
 
   static List<Customer> customers = [];
   static List<String> selectionCustomers = [];
+  static List<SiteResident> siteResidents = [];
+  static List<String> selectionSiteResidents = [];
+
+  SiteResident? _selectedSiteResident;
 
   @override
   void initState() {
@@ -47,10 +53,17 @@ class _ProjectSiteAndResidentFormState
 
   void _getDataFromBackend() async {
     customers = await customerDao.getAllCustomers();
+    siteResidents = await siteResidentDao.getAllSiteResidents();
+
     setState(() {
       selectionCustomers = customers
           .map((e) =>
               "${e.sequence.toString().padLeft(Constants.LEADING_ZEROS, '0')} - ${e.identifier}")
+          .toList();
+
+      selectionSiteResidents = siteResidents
+          .map((e) =>
+              "${e.sequence.toString().padLeft(Constants.LEADING_ZEROS, '0')} - ${e.firstName} ${e.lastName}")
           .toList();
     });
   }
@@ -92,6 +105,24 @@ class _ProjectSiteAndResidentFormState
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const Divider(),
+                const SizedBox(height: 20),
+                AutoCompleteElement(
+                  fieldName: "Residentes de obra (Busqueda)",
+                  options: selectionSiteResidents,
+                  onChanged: (p0) {
+                    _selectedSiteResident = siteResidents.firstWhere(
+                        (element) =>
+                            element.sequence
+                                .toString()
+                                .padLeft(Constants.LEADING_ZEROS, "0") ==
+                            p0.split("-")[0].trim());
+
+                    setState(() {
+                      updateSiteResidentInfo();
+                    });
+                  },
+                ),
+                const SizedBox(height: 20),
                 CustomTextFormField.noValidation(
                   controller: _nombresController,
                   labelText: "Nombre",
@@ -111,6 +142,7 @@ class _ProjectSiteAndResidentFormState
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       addProjectSite();
+                      _formKey.currentState!.reset();
                     }
                   },
                   child: const Text('Agregar obra'),
@@ -136,7 +168,15 @@ class _ProjectSiteAndResidentFormState
     String apellidosResidente = _apellidosController.text;
     String puestoResidente = _puestoController.text;
 
-    if (nombreResidente.isNotEmpty || apellidosResidente.isNotEmpty) {
+    if (_selectedSiteResident != null &&
+        _selectedSiteResident!.firstName.toUpperCase() ==
+            nombreResidente.toUpperCase() &&
+        _selectedSiteResident!.lastName.toUpperCase() ==
+            apellidosResidente.toUpperCase() &&
+        _selectedSiteResident!.jobPosition.toUpperCase() ==
+            puestoResidente.toUpperCase()) {
+      residents.add(_selectedSiteResident!);
+    } else if (nombreResidente.isNotEmpty || apellidosResidente.isNotEmpty) {
       SiteResident siteResident = SiteResident(
         firstName: nombreResidente,
         lastName: apellidosResidente,
@@ -146,9 +186,7 @@ class _ProjectSiteAndResidentFormState
     }
 
     ProjectSite projectSite = ProjectSite(
-        siteName: obra,
-        residents: residents,
-        customers: [customerAssigned]);
+        siteName: obra, residents: residents, customers: [customerAssigned]);
 
     Future<RecordModel> future = projectSiteDao.addProjectSite(projectSite);
 
@@ -159,6 +197,7 @@ class _ProjectSiteAndResidentFormState
       name = value.getStringValue("nombre_identificador");
       consecutive = value.getIntValue("consecutivo");
     }).then((value) {
+      _getDataFromBackend();
       CoolAlert.show(
         context: context,
         title: "Registro de obra añadido exitosamente",
@@ -167,7 +206,6 @@ class _ProjectSiteAndResidentFormState
             'Se agrego la obra ${consecutive.toString().padLeft(Constants.LEADING_ZEROS, '0')} - $name',
       );
     }).onError((error, stackTrace) {
-      print(stackTrace);
       CoolAlert.show(
           context: context,
           type: CoolAlertType.error,
@@ -175,5 +213,11 @@ class _ProjectSiteAndResidentFormState
           text:
               "Hubo un error al agregar el cliente. Verifica conexion a internet e intenta de nuevo");
     });
+  }
+
+  void updateSiteResidentInfo() {
+    _nombresController.text = _selectedSiteResident!.firstName;
+    _apellidosController.text = _selectedSiteResident!.lastName;
+    _puestoController.text = _selectedSiteResident!.jobPosition;
   }
 }

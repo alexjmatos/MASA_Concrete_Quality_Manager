@@ -11,14 +11,7 @@ void main() async {
   // Use this static instance
   final injector = Injector.appInstance;
 
-  injector.registerSingleton(() {
-    final pb = PocketBase(dotenv.get("BACKEND_URL"));
-    final result = pb.admins.authWithPassword(
-        dotenv.get("ADMIN_USERNAME"), dotenv.get("ADMIN_PASSWORD"));
-    Future.wait([result]);
-    return pb;
-  });
-
+  injector.registerSingleton(() => PocketBase(dotenv.get("BACKEND_URL")));
   injector.registerSingleton(() => SequentialIdGenerator());
 
   runApp(const MainApp());

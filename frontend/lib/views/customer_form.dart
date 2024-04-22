@@ -70,7 +70,7 @@ class _CustomerFormState extends State<CustomerForm> {
                     if (_formKey.currentState!.validate()) {
                       addCustomer();
                       Navigator.pop(context);
-                      _formKey.currentState!.save();
+                      _formKey.currentState!.reset();
                     } else {
                       Navigator.pop(context, 'Cancel');
                     }

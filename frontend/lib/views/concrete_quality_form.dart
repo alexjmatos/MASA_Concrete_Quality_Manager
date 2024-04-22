@@ -52,7 +52,7 @@ class _ConcreteQualityFormState extends State<ConcreteQualityForm> {
     setState(() {
       availableCustomers = customers
           .map((e) =>
-              "${e.sequence.toString().padLeft(Constants.LEADING_ZEROS, '0')} - ${e.companyName} - ${e.identifier}")
+              "${e.sequence.toString().padLeft(Constants.LEADING_ZEROS, '0')} - ${e.identifier}")
           .toList();
     });
   }
@@ -166,6 +166,7 @@ class _ConcreteQualityFormState extends State<ConcreteQualityForm> {
       setState(
         () {
           projectSites = found.projects;
+          print(projectSites.length);
           availableProjectSites = projectSites
               .map((e) =>
                   "${e.sequence.toString().padLeft(Constants.LEADING_ZEROS, "0")} - ${e.siteName}")

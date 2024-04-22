@@ -20,7 +20,7 @@ class SiteResident {
 
   @override
   String toString() {
-    return 'Manager: { firstName: $firstName, lastName: $lastName, jobPosition: $jobPosition, phoneNumber: $phoneNumber, email: $email }';
+    return 'Site Resident: { id: $id, firstName: $firstName, lastName: $lastName, jobPosition: $jobPosition, phoneNumber: $phoneNumber, email: $email }';
   }
 
   Map<String, dynamic> toMap() => <String, dynamic>{

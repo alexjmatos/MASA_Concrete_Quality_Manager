@@ -9,17 +9,18 @@ class SequentialIdGenerator {
     pb = injector.get<PocketBase>();
   }
 
-  Future<int> getNextSequence(String collection) async {
+  Future<int> getNextSequence(String collection) {
     return pb
         .collection(collection)
         .getList(
           page: 1,
-          perPage: 1,
           sort: '-created',
           fields: "consecutivo",
         )
-        .then((value) => value.items.isEmpty
-            ? 1
-            : (value.items.first.data['consecutivo'] as int) + 1);
+        .then((value) {
+      return value.items.isEmpty
+          ? 1
+          : (value.items.first.data['consecutivo'] as int) + 1;
+    });
   }
 }

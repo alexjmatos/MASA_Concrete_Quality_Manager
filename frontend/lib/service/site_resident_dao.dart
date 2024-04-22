@@ -24,4 +24,14 @@ class SiteResidentDao {
     return result.then((value) =>
         value.items.map((e) => SiteResident.toModel(e.toJson())).toList());
   }
+
+  Future<List<SiteResident>> getAllSiteResidents() async {
+    final models = await pb.collection(Constants.SITE_RESIDENTS).getFullList(
+          sort: '-created',
+        );
+
+    return models.map((e) {
+      return SiteResident.toModel(e.toJson());
+    }).toList();
+  }
 }
