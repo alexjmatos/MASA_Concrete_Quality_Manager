@@ -12,7 +12,8 @@ class SiteResidentDao {
   }
 
   Future<SiteResident> addSiteResident(SiteResident siteResident) async {
-    int id = await db.insert(Constants.SITE_RESIDENTS, siteResident.toMap());
+    int id = await db.insert(Constants.SITE_RESIDENTS, siteResident.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
     return findById(id);
   }
 
@@ -28,6 +29,9 @@ class SiteResidentDao {
   }
 
   Future<List<SiteResident>> getAllSiteResidents() async {
-    return List.empty();
+    var list = await db.query(Constants.SITE_RESIDENTS);
+     var list2 = list.map((e) => SiteResident.toModel(e)).toList();
+     print(list2);
+     return list2;
   }
 }

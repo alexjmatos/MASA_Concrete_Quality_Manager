@@ -1,22 +1,15 @@
-import 'package:masa_epico_concrete_manager/models/manager.dart';
-
-import 'location.dart';
 import 'project_site.dart';
 
 class Customer {
   int? id;
   String identifier;
   String companyName;
-  Manager? manager;
-  Location? mainLocation;
   List<ProjectSite> projects;
 
   Customer({
     this.id,
     required this.identifier,
     required this.companyName,
-    this.manager,
-    this.mainLocation,
     List<ProjectSite>? projects,
   }) : projects = projects ?? [];
 
@@ -32,10 +25,6 @@ class Customer {
   }
 
   static Customer emptyModel() {
-    return Customer(
-        identifier: "",
-        companyName: "",
-        manager: Manager.emptyModel(),
-        mainLocation: Location.emptyModel());
+    return Customer(identifier: "", companyName: "");
   }
 }

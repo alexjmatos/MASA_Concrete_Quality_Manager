@@ -1,6 +1,4 @@
-import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/constants/constants.dart';
 import 'package:masa_epico_concrete_manager/elements/autocomplete.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
@@ -10,7 +8,9 @@ import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
-import 'package:pocketbase/pocketbase.dart';
+import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
+import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
+import 'package:quickalert/quickalert.dart';
 
 class ProjectSiteAndResidentForm extends StatefulWidget {
   const ProjectSiteAndResidentForm({super.key});
@@ -47,19 +47,9 @@ class _ProjectSiteAndResidentFormState
   SiteResident? _selectedSiteResident;
 
   @override
-  void initState()  {
+  void initState() {
     super.initState();
-
-    customerDao.getAllCustomers().then((value) {
-      customers = value;
-    }).whenComplete(() {
-      setState(() {
-        selectionCustomers = customers
-            .map((customer) =>
-        "${customer.id.toString().padLeft(Constants.LEADING_ZEROS, '0')} - ${customer.identifier}")
-            .toList();
-      });
-    });
+    loadCustomerAndSiteResidentData();
   }
 
   @override
@@ -106,11 +96,9 @@ class _ProjectSiteAndResidentFormState
                   onChanged: (p0) {
                     _selectedSiteResident = siteResidents.firstWhere(
                         (element) =>
-                            element.id
-                                .toString()
-                                .padLeft(Constants.LEADING_ZEROS, "0") ==
+                            SequentialIdGenerator.generatePadLeftNumber(
+                                element.id!) ==
                             p0.split("-")[0].trim());
-
                     setState(() {
                       updateSiteResidentInfo();
                     });
@@ -154,10 +142,9 @@ class _ProjectSiteAndResidentFormState
   }
 
   void addProjectSite() {
-    // Process data
-    String obra = _obraController.text;
-    List<SiteResident> residents = [];
+    ProjectSite toBeAdded = ProjectSite();
 
+    String obra = _obraController.text;
     String nombreResidente = _nombresController.text;
     String apellidosResidente = _apellidosController.text;
     String puestoResidente = _puestoController.text;
@@ -169,40 +156,34 @@ class _ProjectSiteAndResidentFormState
             apellidosResidente.toUpperCase() &&
         _selectedSiteResident!.jobPosition.toUpperCase() ==
             puestoResidente.toUpperCase()) {
-      residents.add(_selectedSiteResident!);
+      toBeAdded.resident = _selectedSiteResident;
     } else if (nombreResidente.isNotEmpty || apellidosResidente.isNotEmpty) {
       SiteResident siteResident = SiteResident(
         firstName: nombreResidente,
         lastName: apellidosResidente,
         jobPosition: puestoResidente,
       );
-      residents.add(siteResident);
+
+      print(siteResident);
+
+      siteResidentDao
+          .addSiteResident(siteResident)
+          .then((value) => toBeAdded.resident = value);
     }
 
-    Future<RecordModel> future =
-        projectSiteDao.addProjectSite(ProjectSite(siteName: "siteName"));
+    toBeAdded.siteName = obra;
+    toBeAdded.customer = customers.firstWhere((element) =>
+        element.id ==
+        SequentialIdGenerator.getIdNumberFromConsecutive(_selectedCustomer));
 
-    String name = "";
-    int consecutive = 0;
+    Future<ProjectSite> future = projectSiteDao.addProjectSite(toBeAdded);
 
     future.then((value) {
-      name = value.getStringValue("nombre_identificador");
-      consecutive = value.getIntValue("consecutivo");
-    }).then((value) {
-      CoolAlert.show(
-        context: context,
-        title: "Registro de obra añadido exitosamente",
-        type: CoolAlertType.success,
-        text:
-            'Se agrego la obra ${consecutive.toString().padLeft(Constants.LEADING_ZEROS, '0')} - $name',
-      );
+      ComponentUtils.generateSuccessMessage(context,
+          "Obra ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} - ${value.siteName} agregada con exito");
+      loadCustomerAndSiteResidentData();
     }).onError((error, stackTrace) {
-      CoolAlert.show(
-          context: context,
-          type: CoolAlertType.error,
-          title: "Error al agregar la obra",
-          text:
-              "Hubo un error al agregar el cliente. Verifica conexion a internet e intenta de nuevo");
+      ComponentUtils.generateErrorMessage(context);
     });
   }
 
@@ -210,5 +191,29 @@ class _ProjectSiteAndResidentFormState
     _nombresController.text = _selectedSiteResident!.firstName;
     _apellidosController.text = _selectedSiteResident!.lastName;
     _puestoController.text = _selectedSiteResident!.jobPosition;
+  }
+
+  void loadCustomerAndSiteResidentData(){
+    customerDao.getAllCustomers().then((value) {
+      customers = value;
+    }).whenComplete(() {
+      setState(() {
+        selectionCustomers = customers
+            .map((customer) =>
+        "${SequentialIdGenerator.generatePadLeftNumber(customer.id!)} - ${customer.identifier}")
+            .toList();
+      });
+    });
+
+    siteResidentDao.getAllSiteResidents().then((value) {
+      siteResidents = value;
+    }).whenComplete(() {
+      setState(() {
+        selectionSiteResidents = siteResidents
+            .map((siteResident) =>
+        "${SequentialIdGenerator.generatePadLeftNumber(siteResident.id!)} - ${siteResident.lastName} ${siteResident.firstName}")
+            .toList();
+      });
+    });
   }
 }

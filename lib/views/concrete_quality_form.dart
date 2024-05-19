@@ -56,6 +56,13 @@ class _ConcreteQualityFormState extends State<ConcreteQualityForm> {
     _fechaDeMuestreoController.text = Constants.formatter.format(selectedDate);
   }
 
+
+  void _loadApplicationData() async {
+    // Load clients
+
+
+  }
+
   // void _getDataFromBackend() async {
   //   customers = await customerDao.getAllCustomers();
   //   setState(() {

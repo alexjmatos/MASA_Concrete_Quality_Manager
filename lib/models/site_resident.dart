@@ -27,4 +27,9 @@ class SiteResident {
         lastName: map["last_name"] as String,
         jobPosition: map["job_position"] as String);
   }
+
+  @override
+  String toString() {
+    return 'SiteResident{id: $id, firstName: $firstName, lastName: $lastName, jobPosition: $jobPosition}';
+  }
 }

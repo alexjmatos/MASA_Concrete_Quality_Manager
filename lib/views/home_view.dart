@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:injector/injector.dart';
-import 'package:masa_epico_concrete_manager/constants/constants.dart';
-import 'package:pocketbase/pocketbase.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -11,14 +9,12 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  late final PocketBase pb;
   String name = "";
   Text text = const Text("Bienvenido",
       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16));
 
   _HomeViewState() {
     final injector = Injector.appInstance;
-    pb = injector.get<PocketBase>();
   }
 
   @override

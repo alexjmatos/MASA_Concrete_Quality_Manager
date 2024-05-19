@@ -1,15 +1,11 @@
 import 'package:injector/injector.dart';
 import 'package:masa_epico_concrete_manager/constants/constants.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
-import 'package:masa_epico_concrete_manager/service/location_dao.dart';
-import 'package:masa_epico_concrete_manager/service/manager_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 import 'package:sqflite/sqflite.dart';
 
 class CustomerDao {
   late final Database db;
-  final LocationDao locationDao = LocationDao();
-  final ManagerDao managerDao = ManagerDao();
   final SequentialIdGenerator sequentialIdGenerator = SequentialIdGenerator();
 
   CustomerDao() {

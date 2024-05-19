@@ -1,26 +1,11 @@
-import 'package:injector/injector.dart';
-import 'package:pocketbase/pocketbase.dart';
+import '../constants/constants.dart';
 
 class SequentialIdGenerator {
-  late final PocketBase pb;
-
-  SequentialIdGenerator() {
-    final injector = Injector.appInstance;
-    pb = injector.get<PocketBase>();
+  static String generatePadLeftNumber(int id) {
+    return id.toString().padLeft(Constants.LEADING_ZEROS, '0');
   }
 
-  Future<int> getNextSequence(String collection) {
-    return pb
-        .collection(collection)
-        .getList(
-          page: 1,
-          sort: '-created',
-          fields: "consecutivo",
-        )
-        .then((value) {
-      return value.items.isEmpty
-          ? 1
-          : (value.items.first.data['consecutivo'] as int) + 1;
-    });
+  static int getIdNumberFromConsecutive(String consecutive) {
+    return int.parse(consecutive.split("-")[0].trim());
   }
 }

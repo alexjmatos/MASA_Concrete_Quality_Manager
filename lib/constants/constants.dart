@@ -41,7 +41,7 @@ class Constants {
   static const String MANAGERS = "gerentes";
   static const String LOCATIONS = "direcciones";
   static const String CUSTOMERS = "customers";
-  static const String PROJECT_SITES = "obras";
+  static const String PROJECT_SITES = "project_sites";
   static const String SITE_RESIDENTS = "site_residents";
 
   static const String SEQUENCE_MANAGERS = "consecutivo_gerentes";

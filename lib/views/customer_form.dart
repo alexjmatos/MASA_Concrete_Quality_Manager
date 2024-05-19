@@ -4,8 +4,10 @@ import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
-import 'package:cool_alert/cool_alert.dart';
-
+import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
+import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class CustomerForm extends StatefulWidget {
   const CustomerForm({super.key});
@@ -95,27 +97,11 @@ class _CustomerFormState extends State<CustomerForm> {
 
     Future<Customer> future = customerDao.addCustomer(customer);
 
-    String name = "";
-    int consecutive = 0;
-
     future.then((value) {
-      name = value.identifier;
-      consecutive = value.id!;
-    }).then((value) {
-      CoolAlert.show(
-        context: context,
-        title: "Registro de cliente añadido exitosamente",
-        type: CoolAlertType.success,
-        text:
-            'Se agrego el cliente ${consecutive.toString().padLeft(Constants.LEADING_ZEROS, '0')} - $name',
-      );
+      ComponentUtils.generateSuccessMessage(context,
+          "Cliente ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} - ${value.identifier} agregado con exito");
     }).onError((error, stackTrace) {
-      CoolAlert.show(
-          context: context,
-          type: CoolAlertType.error,
-          title: "Error al agregar cliente",
-          text:
-              "Hubo un error al agregar el cliente. Verifica conexion a internet e intenta de nuevo");
+      ComponentUtils.generateErrorMessage(context);
     });
   }
 }
