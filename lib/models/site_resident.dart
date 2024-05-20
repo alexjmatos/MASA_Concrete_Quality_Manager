@@ -1,8 +1,11 @@
+import 'package:masa_epico_concrete_manager/models/project_site.dart';
+
 class SiteResident {
   int? id;
   String firstName;
   String lastName;
   String jobPosition;
+  List<ProjectSite> projectSites = [];
 
   SiteResident({
     this.id,

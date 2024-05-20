@@ -156,19 +156,16 @@ class _ProjectSiteAndResidentFormState
             apellidosResidente.toUpperCase() &&
         _selectedSiteResident!.jobPosition.toUpperCase() ==
             puestoResidente.toUpperCase()) {
-      toBeAdded.resident = _selectedSiteResident;
+      toBeAdded.residents.add(_selectedSiteResident);
     } else if (nombreResidente.isNotEmpty || apellidosResidente.isNotEmpty) {
       SiteResident siteResident = SiteResident(
         firstName: nombreResidente,
         lastName: apellidosResidente,
         jobPosition: puestoResidente,
       );
-
-      print(siteResident);
-
       siteResidentDao
           .addSiteResident(siteResident)
-          .then((value) => toBeAdded.resident = value);
+          .then((value) => toBeAdded.residents.add(value));
     }
 
     toBeAdded.siteName = obra;
@@ -193,14 +190,14 @@ class _ProjectSiteAndResidentFormState
     _puestoController.text = _selectedSiteResident!.jobPosition;
   }
 
-  void loadCustomerAndSiteResidentData(){
+  void loadCustomerAndSiteResidentData() {
     customerDao.getAllCustomers().then((value) {
       customers = value;
     }).whenComplete(() {
       setState(() {
         selectionCustomers = customers
             .map((customer) =>
-        "${SequentialIdGenerator.generatePadLeftNumber(customer.id!)} - ${customer.identifier}")
+                "${SequentialIdGenerator.generatePadLeftNumber(customer.id!)} - ${customer.identifier}")
             .toList();
       });
     });
@@ -211,7 +208,7 @@ class _ProjectSiteAndResidentFormState
       setState(() {
         selectionSiteResidents = siteResidents
             .map((siteResident) =>
-        "${SequentialIdGenerator.generatePadLeftNumber(siteResident.id!)} - ${siteResident.lastName} ${siteResident.firstName}")
+                "${SequentialIdGenerator.generatePadLeftNumber(siteResident.id!)} - ${siteResident.lastName} ${siteResident.firstName}")
             .toList();
       });
     });

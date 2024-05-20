@@ -38,11 +38,11 @@ class Constants {
   ];
 
   static const String USERS = "users";
-  static const String MANAGERS = "gerentes";
-  static const String LOCATIONS = "direcciones";
   static const String CUSTOMERS = "customers";
   static const String PROJECT_SITES = "project_sites";
   static const String SITE_RESIDENTS = "site_residents";
+  static const String MANY_TO_MANY_PROJECT_SITES_SITE_RESIDENTS = "project_site_resident";
+  static const String CONCRETE_TESTING_ORDERS = "concrete_testing_orders";
 
   static const String SEQUENCE_MANAGERS = "consecutivo_gerentes";
   static const String SEQUENCE_LOCATIONS = "consecutivo_direcciones";

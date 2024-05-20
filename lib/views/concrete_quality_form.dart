@@ -4,13 +4,17 @@ import 'package:masa_epico_concrete_manager/elements/autocomplete.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_number_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
-import 'package:masa_epico_concrete_manager/elements/formatters.dart'
-    as uppercase_input_formatter;
+import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
 import 'package:masa_epico_concrete_manager/models/project_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
+import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
+import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
+import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
+
+import '../utils/sequential_counter_generator.dart';
 
 class ConcreteQualityForm extends StatefulWidget {
   const ConcreteQualityForm({super.key});
@@ -23,55 +27,42 @@ class _ConcreteQualityFormState extends State<ConcreteQualityForm> {
   final _formKey = GlobalKey<FormState>();
   final CustomerDao customerDao = CustomerDao();
   final ProjectSiteDao projectSiteDao = ProjectSiteDao();
+  final SiteResidentDao siteResidentDao = SiteResidentDao();
+  final ConcreteTestingOrderDao concreteTestingOrderDao =
+      ConcreteTestingOrderDao();
 
-  static List<Customer> customers = [];
-  static List<String> availableCustomers = [];
+  static List<Customer> clients = [];
+  static List<String> availableClients = [];
 
   static List<ProjectSite> projectSites = [];
   static List<String> availableProjectSites = [];
 
-  static SiteResident siteResident =
+  static List<SiteResident> siteResidents = [];
+  static List<String> availableSiteResidents = [];
+
+  Customer selectedCustomer = Customer(identifier: "", companyName: "");
+  ProjectSite selectedProjectSite = ProjectSite();
+  SiteResident selectedSiteResident =
       SiteResident(firstName: "", lastName: "", jobPosition: "");
 
-  DateTime selectedDate = DateTime.now();
-  String _selectedCustomer = '';
-  String _selectedProjectSite = '';
-  String _selectedResident = '';
-  final String _selectedFc = '';
-
-  final TextEditingController _residenteController = TextEditingController();
-  final TextEditingController _fechaDeMuestreoController =
+  final TextEditingController _designResistanceController =
       TextEditingController();
   final TextEditingController _slumpingController = TextEditingController();
   final TextEditingController _volumeController = TextEditingController();
   final TextEditingController _tmaController = TextEditingController();
   final TextEditingController _designAgeController = TextEditingController();
+  final TextEditingController _testingDateController = TextEditingController();
+
+  DateTime selectedDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    // _getDataFromBackend();
+    loadCustomerData();
     _tmaController.text = "20";
     _volumeController.text = "7";
-    _fechaDeMuestreoController.text = Constants.formatter.format(selectedDate);
+    _testingDateController.text = Constants.formatter.format(selectedDate);
   }
-
-
-  void _loadApplicationData() async {
-    // Load clients
-
-
-  }
-
-  // void _getDataFromBackend() async {
-  //   customers = await customerDao.getAllCustomers();
-  //   setState(() {
-  //     availableCustomers = customers
-  //         .map((e) =>
-  //             "${e.sequence.toString().padLeft(Constants.LEADING_ZEROS, '0')} - ${e.identifier}")
-  //         .toList();
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -94,28 +85,20 @@ class _ConcreteQualityFormState extends State<ConcreteQualityForm> {
               children: <Widget>[
                 AutoCompleteElement(
                   fieldName: "Cliente",
-                  options: availableCustomers,
-                  onChanged: (p0) =>
-                      (p0),
+                  options: availableClients,
+                  onChanged: (p0) => setSelectedCustomer(p0),
                 ),
                 const SizedBox(height: 20),
                 AutoCompleteElement(
                   fieldName: "Obra",
                   options: availableProjectSites,
-                  onChanged: (p0) =>
-                      setSelectedProjectSiteAndUpdateLocationSiteResident(p0),
+                  onChanged: (p0) => setSelectedProjectSite(p0),
                 ),
                 const SizedBox(height: 20),
-                TextFormField(
-                  controller: _residenteController,
-                  decoration: const InputDecoration(
-                    labelText: "Residente",
-                    border: OutlineInputBorder(),
-                  ),
-                  readOnly: true,
-                  inputFormatters: [
-                    uppercase_input_formatter.UppercaseInputFormatter(),
-                  ],
+                CustomDropdownFormField(
+                  labelText: "Residentes",
+                  items: availableSiteResidents,
+                  onChanged: (p0) => setSelectedSiteResident(p0),
                 ),
                 const SizedBox(height: 20),
                 const Text(
@@ -151,11 +134,13 @@ class _ConcreteQualityFormState extends State<ConcreteQualityForm> {
                 CustomDropdownFormField(
                   labelText: "Edad de diseño",
                   items: Constants.CONCRETE_DESIGN_AGES,
-                  onChanged: (p0) {},
+                  onChanged: (p0) {
+                    _designAgeController.text = p0;
+                  },
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField.noValidation(
-                  controller: _fechaDeMuestreoController,
+                  controller: _testingDateController,
                   labelText: "Fecha de muestreo",
                   readOnly: true,
                 ),
@@ -170,7 +155,7 @@ class _ConcreteQualityFormState extends State<ConcreteQualityForm> {
                     if (dateTime != null) {
                       setState(() {
                         selectedDate = dateTime;
-                        _fechaDeMuestreoController.text =
+                        _testingDateController.text =
                             Constants.formatter.format(selectedDate);
                       });
                     }
@@ -194,49 +179,82 @@ class _ConcreteQualityFormState extends State<ConcreteQualityForm> {
     );
   }
 
-  // setSelectedCustomerAndUpdateProjectSites(String selected) {
-  //   // RETRIEVE CUSTOMER
-  //   Customer? found = customers.firstWhere((element) =>
-  //       element.sequence.toString().padLeft(Constants.LEADING_ZEROS, "0") ==
-  //       selected.split("-")[0].trim());
-  //
-  //   // UPDATE THE LIST OF PROJECT SITES RELATED TO THE GIVEN CUSTOMER
-  //   if (found.id != null) {
-  //     // SET THE SELECTED CUSTOMER IN THE UI
-  //     _selectedCustomer = selected;
-  //     setState(
-  //       () {
-  //         projectSites = found.projects;
-  //         availableProjectSites = projectSites
-  //             .map((e) =>
-  //                 "${e.sequence.toString().padLeft(Constants.LEADING_ZEROS, "0")} - ${e.siteName}")
-  //             .toList();
-  //       },
-  //     );
-  //   }
-  // }
+  void addConcreteQualityOrder() {
+    ConcreteTestingOrder concreteTestingOrder = ConcreteTestingOrder(
+        designResistance: _designResistanceController.text,
+        slumping: int.tryParse(_slumpingController.text),
+        volume: int.tryParse(_volumeController.text),
+        tma: int.tryParse(_tmaController.text),
+        designAge: _designAgeController.text,
+        testingDate: selectedDate,
+        customer: selectedCustomer,
+        projectSite: selectedProjectSite,
+        siteResident: selectedSiteResident);
 
-  setSelectedProjectSiteAndUpdateLocationSiteResident(String selected) {
-    // // RETRIEVE THE PROJECT SITE
-    // ProjectSite? found = projectSites.firstWhere((element) =>
-    //     element.sequence.toString().padLeft(Constants.LEADING_ZEROS, "0") ==
-    //     selected.split("-")[0].trim());
-    //
-    // // UPDATE THE FIELDS LOCATION AND SITE RESIDENTS
-    // if (found.id != null) {
-    //   // SET THE SELECTED CUSTOMER IN THE UI
-    //   _selectedProjectSite = selected;
-    //   setState(
-    //     () {
-    //       siteResident = found.residents.first;
-    //       _residenteController.text =
-    //           "${siteResident.sequence.toString().padLeft(Constants.LEADING_ZEROS, "0")} - ${siteResident.jobPosition}. ${siteResident.firstName} ${siteResident.lastName}";
-    //     },
-    //   );
-    // }
+    concreteTestingOrderDao
+        .addConcreteTestingOrder(concreteTestingOrder)
+        .then((value) {
+      ComponentUtils.generateSuccessMessage(context,
+          "Orden de muestreo - ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} agregada con exito");
+    }).onError((error, stackTrace) {
+      print(stackTrace);
+      ComponentUtils.generateErrorMessage(context);
+    });
   }
 
-  void addConcreteQualityOrder() {
-    
+  void loadCustomerData() {
+    customerDao.getAllCustomers().then((value) {
+      clients = value;
+    }).whenComplete(() {
+      setState(() {
+        availableClients = clients
+            .map((customer) =>
+                "${SequentialIdGenerator.generatePadLeftNumber(customer.id!)} - ${customer.identifier}")
+            .toList();
+      });
+    });
+  }
+
+  void setSelectedCustomer(String selected) async {
+    selectedCustomer = await customerDao.findById(
+        SequentialIdGenerator.getIdNumberFromConsecutive(
+            selected.split("-")[0]));
+
+    projectSiteDao
+        .findProjectSitesByClientId(selectedCustomer.id!)
+        .then((value) {
+      projectSites = value;
+      setState(() {
+        availableProjectSites = projectSites
+            .map((e) =>
+                "${SequentialIdGenerator.generatePadLeftNumber(e.id!)} - ${e.siteName}")
+            .toList();
+      });
+    });
+  }
+
+  void setSelectedProjectSite(String selected) {
+    selectedProjectSite = projectSites.firstWhere((element) =>
+        element.id ==
+        SequentialIdGenerator.getIdNumberFromConsecutive(
+            selected.split("-").first));
+
+    siteResidentDao
+        .getSiteResidentsByProjectSiteId(selectedProjectSite.id!)
+        .then((value) {
+      siteResidents = value;
+      setState(() {
+        availableSiteResidents = value.map((e) {
+          return "${SequentialIdGenerator.generatePadLeftNumber(e.id!)} - ${e.firstName} ${e.lastName}";
+        }).toList();
+      });
+    });
+  }
+
+  void setSelectedSiteResident(String selected) {
+    selectedSiteResident = siteResidents.firstWhere((element) =>
+        element.id ==
+        SequentialIdGenerator.getIdNumberFromConsecutive(
+            selected.split("-").first));
   }
 }

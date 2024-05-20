@@ -4,6 +4,7 @@ class Customer {
   int? id;
   String identifier;
   String companyName;
+  // ONE TO MANY
   List<ProjectSite> projects;
 
   Customer({

@@ -23,15 +23,17 @@ class SiteResidentDao {
     return records.map((e) => SiteResident.toModel(e)).first;
   }
 
-  Future<List<SiteResident>> getSiteResidentsByIds(
-      List<String> residentsId) async {
-    return List.empty();
-  }
-
   Future<List<SiteResident>> getAllSiteResidents() async {
     var list = await db.query(Constants.SITE_RESIDENTS);
-     var list2 = list.map((e) => SiteResident.toModel(e)).toList();
-     print(list2);
-     return list2;
+    return list.map((e) => SiteResident.toModel(e)).toList();
+  }
+
+  Future<List<SiteResident>> getSiteResidentsByProjectSiteId(
+      int projectId) async {
+    var result = await db.rawQuery("""
+    SELECT id, first_name, last_name, job_position FROM site_residents where id in 
+(SELECT site_resident_id from project_site_resident where project_site_id = ?);
+    """, [projectId]);
+    return result.map((e) => SiteResident.toModel(e)).toList();
   }
 }
