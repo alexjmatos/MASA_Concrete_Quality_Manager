@@ -1,36 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class CustomNumberFormField extends StatelessWidget {
+class QuantityFormField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
-  final int maxLength;
   final String validatorText;
   final bool readOnly;
+  final String defaultValue;
+  final void Function(String?)? onChanged;
 
-  const CustomNumberFormField(
+  const QuantityFormField({
+    super.key,
+    required this.controller,
+    required this.labelText,
+    this.readOnly = false,
+    this.onChanged,
+    this.validatorText = "",
+    this.defaultValue = "",
+  });
+
+  const QuantityFormField.withDefault(
       {super.key,
       required this.controller,
       required this.labelText,
-      this.maxLength = 5,
-      this.readOnly = false,
-      required this.validatorText});
-
-  const CustomNumberFormField.withDefault(
-      {super.key,
-      required this.controller,
-      required this.labelText,
-      this.maxLength = 10,
       required this.readOnly,
-      this.validatorText = ""});
+      required this.defaultValue,
+      this.validatorText = "",
+      this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
-      keyboardType: TextInputType.number,
-      maxLength: maxLength,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
       readOnly: readOnly,
+      onChanged: onChanged,
       decoration: InputDecoration(
         labelText: labelText,
         border: const OutlineInputBorder(),
@@ -41,7 +45,9 @@ class CustomNumberFormField extends StatelessWidget {
         }
         return null;
       },
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+      ],
     );
   }
 }

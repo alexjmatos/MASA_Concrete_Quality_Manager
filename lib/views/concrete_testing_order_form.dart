@@ -13,17 +13,19 @@ import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
+import 'package:masa_epico_concrete_manager/views/concrete_volumetric_weight.dart';
 
 import '../utils/sequential_counter_generator.dart';
 
-class ConcreteQualityForm extends StatefulWidget {
-  const ConcreteQualityForm({super.key});
+class ConcreteTestingOrderForm extends StatefulWidget {
+  const ConcreteTestingOrderForm({super.key});
 
   @override
-  State<ConcreteQualityForm> createState() => _ConcreteQualityFormState();
+  State<ConcreteTestingOrderForm> createState() =>
+      _ConcreteTestingOrderFormState();
 }
 
-class _ConcreteQualityFormState extends State<ConcreteQualityForm> {
+class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   final _formKey = GlobalKey<FormState>();
   final CustomerDao customerDao = CustomerDao();
   final ProjectSiteDao projectSiteDao = ProjectSiteDao();
@@ -194,10 +196,14 @@ class _ConcreteQualityFormState extends State<ConcreteQualityForm> {
     concreteTestingOrderDao
         .addConcreteTestingOrder(concreteTestingOrder)
         .then((value) {
-      ComponentUtils.generateSuccessMessage(context,
-          "Orden de muestreo - ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} agregada con exito");
+      ComponentUtils.generateConfirmMessage(
+          context,
+          "Orden de muestreo - ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} agregada con exito",
+          "¿Deseas realizar el registro del peso volumetrico?",
+          ConcreteVolumetricWeightForm.withTestingOrderId(
+            concreteTestingOrderId: value.id!,
+          ));
     }).onError((error, stackTrace) {
-      print(stackTrace);
       ComponentUtils.generateErrorMessage(context);
     });
   }

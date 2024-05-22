@@ -54,20 +54,43 @@ Future<Database> initializeDb() async {
           "CREATE TABLE IF NOT EXISTS project_sites (id INTEGER PRIMARY KEY AUTOINCREMENT, site_name VARCHAR(255), customer_id INTEGER REFERENCES customers(id));");
       await db.execute(
           "CREATE TABLE IF NOT EXISTS project_site_resident (project_site_id INTEGER REFERENCES project_sites(id), site_resident_id INTEGER REFERENCES site_residents(id));");
-      await db.execute(
-        """
-        CREATE TABLE IF NOT EXISTS concrete_testing_orders (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                                                  design_resistance VARCHAR(255), 
-                                                  slumping_cm INTEGER,
-                                                  volume_m3 INTEGER,
-                                                  tma_mm INTEGER,
-                                                  design_age VARCHAR(255),
-                                                  testing_date VARCHAR(255),
-                                                  customer_id INTEGER REFERENCES customers(id),
-                                                  project_site_id INTEGER REFERENCES project_sites(id),
-                                                  site_resident_id INTEGER REFERENCES site_residents(id)); 
-        """
-      );
+      await db.execute("""
+        CREATE TABLE IF NOT EXISTS concrete_volumetric_weight
+        (
+            id             INTEGER PRIMARY KEY AUTOINCREMENT,
+            tare_weight_gr REAL,
+            material_tare_weight_gr REAL,
+            material_weight_gr REAL,
+            tare_volume_cm3 REAL,
+            volumetric_weight_gr_cm3 REAL,
+            volume_load_m3 REAL,
+            cement_quantity_kg REAL,
+            coarse_aggregate_kg REAL,
+            fine_aggregate_kg REAL,
+            water_kg REAL,
+            retardant_additive_lt REAL,
+            other_additive_lt REAL,
+            total_load_kg REAL,
+            total_load_volumetric_weight_relation REAL,
+            percentage REAL
+        );
+        """);
+      await db.execute("""
+        CREATE TABLE IF NOT EXISTS concrete_testing_orders
+        (
+            id                INTEGER PRIMARY KEY AUTOINCREMENT,
+            design_resistance VARCHAR(255),
+            slumping_cm       INTEGER,
+            volume_m3         INTEGER,
+            tma_mm            INTEGER,
+            design_age        VARCHAR(255),
+            testing_date      INTEGER,
+            customer_id       INTEGER REFERENCES customers (id),
+            project_site_id   INTEGER REFERENCES project_sites (id),
+            site_resident_id  INTEGER REFERENCES site_residents (id),
+            concrete_volumetric_weight_id INTEGER REFERENCES concrete_volumetric_weight(id)
+        );
+        """);
       await db.execute(
           "INSERT INTO customers (id, identifier, company_name) VALUES (NULL, 'SEDENA', '');");
       await db.execute(
@@ -84,6 +107,8 @@ Future<Database> initializeDb() async {
           "INSERT INTO project_site_resident (project_site_id, site_resident_id) VALUES (2, 1);");
       await db.execute(
           "INSERT INTO project_site_resident (project_site_id, site_resident_id) VALUES (2, 2);");
+      await db.execute(
+          "INSERT INTO concrete_testing_orders(id, design_resistance, slumping_cm, volume_m3, tma_mm, design_age, testing_date, customer_id, project_site_id, site_resident_id, concrete_volumetric_weight_id) VALUES (1, '250', 14, 7, 20, '28', 1716319147750, 1, 1, 1, NULL);");
     },
     version: 1,
   );

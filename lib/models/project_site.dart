@@ -24,8 +24,8 @@ class ProjectSite {
     };
   }
 
-  static ProjectSite toModel(Map<String, Object?> map) {
+  static ProjectSite toModel(Map<String, Object?>? map) {
     return ProjectSite(
-        id: map["id"] as int, siteName: map["site_name"] as String);
+        id: map?["id"] as int, siteName: map?["site_name"] as String);
   }
 }

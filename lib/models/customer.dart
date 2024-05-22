@@ -18,11 +18,11 @@ class Customer {
     return {"id": id, "identifier": identifier, "company_name": companyName};
   }
 
-  static Customer toModel(Map<String, Object?> map) {
+  static Customer toModel(Map<String, Object?>? map) {
     return Customer(
-        id: map["id"] as int,
-        identifier: map["identifier"] as String,
-        companyName: map["company_name"] as String);
+        id: map?["id"] as int,
+        identifier: map?["identifier"] as String,
+        companyName: map?["company_name"] as String);
   }
 
   static Customer emptyModel() {

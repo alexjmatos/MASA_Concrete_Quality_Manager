@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/views/concrete_quality_form.dart';
+import 'package:masa_epico_concrete_manager/views/concrete_testing_order_form.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_quality_sample.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_quality_search.dart';
+import 'package:masa_epico_concrete_manager/views/concrete_volumetric_weight.dart';
 import 'package:masa_epico_concrete_manager/views/customer_form.dart';
 import 'package:masa_epico_concrete_manager/views/home_view.dart';
 import 'package:masa_epico_concrete_manager/views/project_site_form.dart';
@@ -21,7 +22,8 @@ class _MenuPageState extends State<MenuPage> {
     const HomeView(),
     const CustomerForm(),
     const ProjectSiteAndResidentForm(),
-    const ConcreteQualityForm(),
+    const ConcreteTestingOrderForm(),
+    const ConcreteVolumetricWeightForm(),
     const ConcreteQualitySampleForm(),
     const ConcreteQualitySearch(),
   ];
@@ -102,7 +104,7 @@ class _MenuPageState extends State<MenuPage> {
               },
             ),
             ListTile(
-              title: const Text('Registrar ensayo'),
+              title: const Text('Peso volumetrico'),
               selected: _selectedIndex == 4,
               onTap: () {
                 // Update the state of the app
@@ -112,11 +114,21 @@ class _MenuPageState extends State<MenuPage> {
               },
             ),
             ListTile(
-              title: const Text('Buscar y modificar'),
+              title: const Text('Registrar ensayo'),
               selected: _selectedIndex == 5,
               onTap: () {
                 // Update the state of the app
                 _onItemTapped(5);
+                // Then close the drawer
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Buscar y modificar'),
+              selected: _selectedIndex == 6,
+              onTap: () {
+                // Update the state of the app
+                _onItemTapped(6);
                 // Then close the drawer
                 Navigator.pop(context);
               },

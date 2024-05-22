@@ -1,6 +1,9 @@
+import 'dart:ffi';
+
 import 'package:masa_epico_concrete_manager/models/project_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 
+import 'concrete_volumetric_weight.dart';
 import 'customer.dart';
 
 class ConcreteTestingOrder {
@@ -14,19 +17,20 @@ class ConcreteTestingOrder {
   Customer customer;
   ProjectSite projectSite;
   SiteResident siteResident;
+  ConcreteVolumetricWeight? concreteVolumetricWeight;
 
-  ConcreteTestingOrder({
-    this.id,
-    this.designResistance,
-    this.slumping,
-    this.volume,
-    this.tma,
-    this.designAge,
-    this.testingDate,
-    required this.customer,
-    required this.projectSite,
-    required this.siteResident,
-  });
+  ConcreteTestingOrder(
+      {this.id,
+      this.designResistance,
+      this.slumping,
+      this.volume,
+      this.tma,
+      this.designAge,
+      this.testingDate,
+      required this.customer,
+      required this.projectSite,
+      required this.siteResident,
+      this.concreteVolumetricWeight});
 
   Map<String, Object?> toMap() {
     return {
@@ -36,19 +40,20 @@ class ConcreteTestingOrder {
       "volume_m3": volume,
       "tma_mm": tma,
       "design_age": designAge,
-      "testing_date": testingDate?.toIso8601String(),
+      "testing_date": testingDate?.millisecondsSinceEpoch,
       "customer_id": customer.id!,
       "project_site_id": projectSite.id!,
-      "site_resident_id": siteResident.id!
+      "site_resident_id": siteResident.id!,
+      "concrete_volumetric_weight_id": concreteVolumetricWeight?.id!
     };
   }
 
   static ConcreteTestingOrder toModel(
-    Map<String, Object?> source,
-    Map<String, Object?> customerMap,
-    Map<String, Object?> projectSiteMap,
-    Map<String, Object?> siteResidentMap,
-  ) {
+      Map<String, Object?> source,
+      Map<String, Object?>? customerMap,
+      Map<String, Object?>? projectSiteMap,
+      Map<String, Object?>? siteResidentMap,
+      Map<String, Object?>? volumetricWeightMap) {
     return ConcreteTestingOrder(
         id: source["id"] as int,
         designResistance: source["design_resistance"] as String,
@@ -56,9 +61,12 @@ class ConcreteTestingOrder {
         volume: source["volume_m3"] as int,
         tma: source["tma_mm"] as int,
         designAge: source["design_age"] as String,
-        testingDate: DateTime.parse(source["testing_date"] as String),
+        testingDate:
+            DateTime.fromMillisecondsSinceEpoch(source["testing_date"] as int),
         customer: Customer.toModel(customerMap),
         projectSite: ProjectSite.toModel(projectSiteMap),
-        siteResident: SiteResident.toModel(siteResidentMap));
+        siteResident: SiteResident.toModel(siteResidentMap),
+        concreteVolumetricWeight:
+            ConcreteVolumetricWeight.toModel(volumetricWeightMap));
   }
 }
