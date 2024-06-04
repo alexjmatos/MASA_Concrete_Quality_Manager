@@ -59,22 +59,22 @@ class ConcreteVolumetricWeight {
   static ConcreteVolumetricWeight? toModel(Map<String, Object?>? map) {
     if (map != null) {
       return ConcreteVolumetricWeight(
-          map["id"] as int?,
-          map["tare_weight_gr"] as num?,
-          map["material_tare_weight_gr"] as num?,
-          map["material_weight_gr"] as num?,
-          map["tare_volume_cm3"] as num?,
-          map["volumetric_weight_gr_cm3"] as num?,
-          map["volume_load_m3"] as num?,
-          map["cement_quantity_kg"] as num?,
-          map["coarse_aggregate_kg"] as num?,
-          map["fine_aggregate_kg"] as num?,
-          map["water_kg"] as num?,
-          map["retardant_additive_lt"] as num?,
-          map["other_additive_lt"] as num?,
-          map["total_load_kg"] as num?,
-          map["total_load_volumetric_weight_relation"] as num?,
-          map["percentage"] as num?);
+          (map["id"] ?? 0) as int?,
+          (map["tare_weight_gr"] ?? 0) as num?,
+          (map["material_tare_weight_gr"] ?? 0) as num?,
+          (map["material_weight_gr"] ?? 0) as num?,
+          (map["tare_volume_cm3"] ?? 0) as num?,
+          (map["volumetric_weight_gr_cm3"] ?? 0) as num?,
+          (map["volume_load_m3"] ?? 0) as num?,
+          (map["cement_quantity_kg"] ?? 0) as num?,
+          (map["coarse_aggregate_kg"] ?? 0) as num?,
+          (map["fine_aggregate_kg"] ?? 0) as num?,
+          (map["water_kg"] ?? 0) as num?,
+          (map["retardant_additive_lt"] ?? 0) as num?,
+          (map["other_additive_lt"] ?? 0) as num?,
+          (map["total_load_kg"] ?? 0) as num?,
+          (map["total_load_volumetric_weight_relation"] ?? 0) as num?,
+          (map["percentage"] ?? 0) as num?);
     } else {
       return null;
     }

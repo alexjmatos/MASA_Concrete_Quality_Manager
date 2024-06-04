@@ -24,14 +24,16 @@ class _MenuPageState extends State<MenuPage> {
     const ProjectSiteAndResidentForm(),
     const ConcreteTestingOrderForm(),
     const ConcreteVolumetricWeightForm(),
-    const ConcreteQualitySampleForm(),
+    const ConcreteTestingSampleForm(),
     const ConcreteQualitySearch(),
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    setState(
+      () {
+        _selectedIndex = index;
+      },
+    );
   }
 
   @override
@@ -124,7 +126,7 @@ class _MenuPageState extends State<MenuPage> {
               },
             ),
             ListTile(
-              title: const Text('Buscar y modificar'),
+              title: const Text('Registros'),
               selected: _selectedIndex == 6,
               onTap: () {
                 // Update the state of the app

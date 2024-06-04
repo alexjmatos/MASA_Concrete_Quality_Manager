@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:masa_epico_concrete_manager/models/project_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
@@ -55,14 +54,15 @@ class ConcreteTestingOrder {
       Map<String, Object?>? siteResidentMap,
       Map<String, Object?>? volumetricWeightMap) {
     return ConcreteTestingOrder(
-        id: source["id"] as int,
-        designResistance: source["design_resistance"] as String,
-        slumping: source["slumping_cm"] as int,
-        volume: source["volume_m3"] as int,
-        tma: source["tma_mm"] as int,
-        designAge: source["design_age"] as String,
-        testingDate:
-            DateTime.fromMillisecondsSinceEpoch(source["testing_date"] as int),
+        id: (source["id"] ?? 0) as int,
+        designResistance: (source["design_resistance"] ?? "") as String,
+        slumping: (source["slumping_cm"] ?? 0) as int,
+        volume: (source["volume_m3"] ?? 0) as int,
+        tma: (source["tma_mm"] ?? 0) as int,
+        designAge: (source["design_age"] ?? 0) as String,
+        testingDate: DateTime.fromMillisecondsSinceEpoch(
+            (source["testing_date"] ?? DateTime.now().millisecondsSinceEpoch)
+                as int),
         customer: Customer.toModel(customerMap),
         projectSite: ProjectSite.toModel(projectSiteMap),
         siteResident: SiteResident.toModel(siteResidentMap),

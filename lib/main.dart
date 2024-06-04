@@ -92,7 +92,7 @@ Future<Database> initializeDb() async {
         );
         """);
       await db.execute(
-          "INSERT INTO customers (id, identifier, company_name) VALUES (NULL, 'SEDENA', '');");
+          "INSERT INTO customers (id, identifier, company_name) VALUES (NULL, 'SEDENA', 'MAPA750127PD2');");
       await db.execute(
           "INSERT INTO project_sites (id, site_name, customer_id) VALUES (NULL, 'LA MOLINA', 1);");
       await db.execute(

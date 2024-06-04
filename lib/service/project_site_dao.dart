@@ -40,4 +40,13 @@ class ProjectSiteDao {
         where: "customer_id = ?", whereArgs: [clientId]);
     return records.map((e) => ProjectSite.toModel(e)).toList();
   }
+
+  Future<List<ProjectSite>> findAll() async {
+    List<Map<String, Object?>> records = await db.rawQuery("""
+        SELECT project_sites.id, project_sites.site_name, customers.id as customer_id, customers.identifier, customers.company_name
+        FROM project_sites 
+        INNER JOIN customers ON project_sites.customer_id = customers.id;
+        """);
+    return records.map((e) => ProjectSite.toModel(e)).toList();
+  }
 }

@@ -36,4 +36,9 @@ class SiteResidentDao {
     """, [projectId]);
     return result.map((e) => SiteResident.toModel(e)).toList();
   }
+
+  Future<List<SiteResident>> findAll() async {
+    var result = await db.query(Constants.SITE_RESIDENTS);
+    return result.map((e) => SiteResident.toModel(e)).toList();
+  }
 }

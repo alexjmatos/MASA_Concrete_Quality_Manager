@@ -20,7 +20,7 @@ class CustomerDao {
   }
 
   Future<List<Customer>> getAllCustomers() async {
-    List<Map<String, Object?>> records = await db.query(Constants.CUSTOMERS);
+    List<Map<String, Object?>> records = await db.query(Constants.CUSTOMERS, limit: 100);
     return records.map((e) => Customer.toModel(e)).toList();
   }
 

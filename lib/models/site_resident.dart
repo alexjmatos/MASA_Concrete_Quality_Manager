@@ -25,10 +25,10 @@ class SiteResident {
 
   static SiteResident toModel(Map<String, Object?>? map) {
     return SiteResident(
-        id: map?["id"] as int,
-        firstName: map?["first_name"] as String,
-        lastName: map?["last_name"] as String,
-        jobPosition: map?["job_position"] as String);
+        id: (map?["id"] ?? 0) as int,
+        firstName: (map?["first_name"] ?? "") as String,
+        lastName: (map?["last_name"] ?? "") as String,
+        jobPosition: (map?["job_position"] ?? "") as String);
   }
 
   @override

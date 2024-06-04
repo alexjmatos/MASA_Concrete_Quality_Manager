@@ -64,4 +64,7 @@ class Constants {
   static const List<String> CONCRETE_DESIGN_AGES = ["3", "7", "14", "28"];
 
   static DateFormat formatter = DateFormat('dd-MM-yyyy');
+
+  static const double DATA_TABLE_HORIZONTAL_MARGIN = 24;
+  static const double DATA_TABLE_COLUMN_SPACING = 56;
 }

@@ -4,6 +4,7 @@ class Customer {
   int? id;
   String identifier;
   String companyName;
+
   // ONE TO MANY
   List<ProjectSite> projects;
 
@@ -20,9 +21,9 @@ class Customer {
 
   static Customer toModel(Map<String, Object?>? map) {
     return Customer(
-        id: map?["id"] as int,
-        identifier: map?["identifier"] as String,
-        companyName: map?["company_name"] as String);
+        id: (map?["id"] ?? 0) as int,
+        identifier: (map?["identifier"] ?? "") as String,
+        companyName: (map?["company_name"] ?? "") as String);
   }
 
   static Customer emptyModel() {
