@@ -20,7 +20,8 @@ class CustomerDao {
   }
 
   Future<List<Customer>> getAllCustomers() async {
-    List<Map<String, Object?>> records = await db.query(Constants.CUSTOMERS, limit: 100);
+    List<Map<String, Object?>> records =
+        await db.query(Constants.CUSTOMERS, limit: 100);
     return records.map((e) => Customer.toModel(e)).toList();
   }
 
@@ -28,5 +29,11 @@ class CustomerDao {
     List<Map<String, Object?>> records =
         await db.query(Constants.CUSTOMERS, where: "id = ?", whereArgs: [id]);
     return records.map((e) => Customer.toModel(e)).first;
+  }
+
+  Future<Customer> updateCustomer(Customer customer) async {
+    await db.update(Constants.CUSTOMERS, customer.toMap(),
+        where: "id = ?", whereArgs: [customer.id]);
+    return findById(customer.id!);
   }
 }

@@ -13,6 +13,7 @@ import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 
 import '../data/customer_data_source.dart';
 import '../data/customer_data_table.dart';
+import '../models/customer.dart';
 
 class ConcreteQualitySearch extends StatefulWidget {
   const ConcreteQualitySearch({super.key});
@@ -32,48 +33,16 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
   late SiteResidentData siteResidentData;
   late ConcreteTestingOrderData concreteTestingOrderData;
 
+  final ValueNotifier<List<Customer>> _customerNotifier =
+      ValueNotifier<List<Customer>>([]);
+
   @override
   void initState() {
     super.initState();
-    customerData = CustomerData(customers: []);
+    customerData = CustomerData(
+        context: context, customersNotifier: _customerNotifier);
     projectSiteData = ProjectSiteData(projectSites: []);
-
-    customerDao.getAllCustomers().then(
-      (value) {
-        setState(
-          () {
-            customerData = CustomerData(customers: value);
-          },
-        );
-      },
-    );
-
-    projectSiteDao.findAll().then(
-      (value) {
-        setState(
-          () {
-            projectSiteData = ProjectSiteData(projectSites: value);
-          },
-        );
-      },
-    );
-
-    siteResidentDao.findAll().then(
-      (value) {
-        setState(() {
-          siteResidentData = SiteResidentData(siteResidents: value);
-        });
-      },
-    );
-
-    concreteTestingOrderDao.findAll().then(
-      (value) {
-        setState(() {
-          concreteTestingOrderData =
-              ConcreteTestingOrderData(concreteTestingOrders: value);
-        });
-      },
-    );
+    _loadDataTables();
   }
 
   @override
@@ -132,6 +101,46 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
   ConcreteTestingDataTable generateConcreteTestingDataTable() {
     return ConcreteTestingDataTable(
         concreteTestingOrderData: concreteTestingOrderData);
+  }
+
+  void _loadDataTables() {
+    customerDao.getAllCustomers().then(
+      (value) {
+        setState(
+          () {
+            _customerNotifier.value = value;
+            customerData = CustomerData(context: context, customersNotifier: _customerNotifier);
+          },
+        );
+      },
+    );
+
+    projectSiteDao.findAll().then(
+      (value) {
+        setState(
+          () {
+            projectSiteData = ProjectSiteData(projectSites: value);
+          },
+        );
+      },
+    );
+
+    siteResidentDao.findAll().then(
+      (value) {
+        setState(() {
+          siteResidentData = SiteResidentData(siteResidents: value);
+        });
+      },
+    );
+
+    concreteTestingOrderDao.findAll().then(
+      (value) {
+        setState(() {
+          concreteTestingOrderData = ConcreteTestingOrderData(
+              context: context, concreteTestingOrders: value);
+        });
+      },
+    );
   }
 }
 

@@ -43,8 +43,7 @@ class ComponentUtils {
       onConfirmBtnTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => route),
+          MaterialPageRoute(builder: (context) => route),
         );
       },
     );
@@ -61,5 +60,61 @@ class ComponentUtils {
       titleColor: Colors.white,
       textColor: Colors.white,
     );
+  }
+
+  static void generateInformationMessage(BuildContext context) {
+    QuickAlert.show(
+        context: context,
+        type: QuickAlertType.custom,
+        confirmBtnText: "Cancelar",
+        confirmBtnColor: Colors.black,
+        title: "Operaciones",
+        autoCloseDuration: const Duration(seconds: 30),
+        widget: Column(
+          children: [
+            ElevatedButton.icon(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.details_rounded,
+                color: Colors.white,
+              ),
+              label: const Text(
+                'Detalles',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.lightGreen,
+                textStyle: const TextStyle(fontSize: 16),
+              ),
+            ),
+            ElevatedButton.icon(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.edit,
+                color: Colors.white,
+              ),
+              label: const Text(
+                'Editar',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.lightBlue,
+                textStyle: const TextStyle(fontSize: 16),
+              ),
+            ),
+            ElevatedButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.delete, color: Colors.white),
+              label: const Text(
+                'Eliminar',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                textStyle: const TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            ),
+          ],
+        ));
   }
 }
