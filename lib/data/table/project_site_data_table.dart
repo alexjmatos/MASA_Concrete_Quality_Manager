@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/data/site_resident_data_source.dart';
+import 'package:masa_epico_concrete_manager/data/source/project_site_data_source.dart';
+import 'package:masa_epico_concrete_manager/models/project_site.dart';
 
-import '../constants/constants.dart';
+class ProjectSiteDataTable extends StatelessWidget {
+  final ValueNotifier<List<ProjectSite>> projectSitesNotifier;
 
-class SiteResidentDataTable extends StatelessWidget {
-  final SiteResidentData siteResidentData;
-
-  const SiteResidentDataTable({super.key, required this.siteResidentData});
+  const ProjectSiteDataTable({super.key, required this.projectSitesNotifier});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +23,7 @@ class SiteResidentDataTable extends StatelessWidget {
         DataColumn(
           label: Expanded(
             child: Text(
-              "Nombre Completo",
+              "Obra",
               textAlign: TextAlign.center,
               style: TextStyle(fontStyle: FontStyle.normal),
             ),
@@ -33,14 +32,16 @@ class SiteResidentDataTable extends StatelessWidget {
         DataColumn(
           label: Expanded(
             child: Text(
-              "Puesto",
+              "Cliente",
               textAlign: TextAlign.center,
               style: TextStyle(fontStyle: FontStyle.normal),
             ),
           ),
-        )
+        ),
       ],
-      source: siteResidentData,
+      source: ProjectSiteData(
+          context: context, projectSiteNotifier: projectSitesNotifier),
+      rowsPerPage: 10,
     );
   }
 }

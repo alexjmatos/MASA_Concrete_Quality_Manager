@@ -30,8 +30,12 @@ class ProjectSiteDao {
   }
 
   Future<ProjectSite> findById(int id) async {
-    List<Map<String, Object?>> records = await db
-        .query(Constants.PROJECT_SITES, where: "id = ?", whereArgs: [id]);
+    List<Map<String, Object?>> records = await db.rawQuery("""
+        SELECT project_sites.id, project_sites.site_name, customers.id as customer_id, customers.identifier, customers.company_name
+        FROM project_sites 
+        INNER JOIN customers ON project_sites.customer_id = customers.id
+        WHERE project_sites.id = ?;
+        """, [id]);
     return records.map((e) => ProjectSite.toModel(e)).first;
   }
 

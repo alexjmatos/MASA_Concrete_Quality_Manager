@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/models/project_site.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 
-class ProjectSiteData extends DataTableSource {
-  List<ProjectSite> projectSites;
+import '../../models/site_resident.dart';
 
-  ProjectSiteData({required this.projectSites});
+class SiteResidentData extends DataTableSource {
+  final BuildContext context;
+  final ValueNotifier<List<SiteResident>> siteResidentNotifier;
+
+  SiteResidentData({required this.context, required this.siteResidentNotifier});
 
   @override
   DataRow? getRow(int index) {
@@ -14,21 +16,22 @@ class ProjectSiteData extends DataTableSource {
         DataCell(
           Text(
             SequentialIdGenerator.generatePadLeftNumber(
-                projectSites[index].id!),
-          ),
-        ),
-        DataCell(
-          Text(
-            projectSites[index].siteName!,
+                siteResidentNotifier.value[index].id!),
             textAlign: TextAlign.center,
           ),
         ),
         DataCell(
           Text(
-            projectSites[index].customer!.identifier,
+            "${siteResidentNotifier.value[index].lastName} ${siteResidentNotifier.value[index].firstName}",
             textAlign: TextAlign.center,
           ),
         ),
+        DataCell(
+          Text(
+            siteResidentNotifier.value[index].jobPosition,
+            textAlign: TextAlign.center,
+          ),
+        )
       ],
     );
   }
@@ -37,7 +40,7 @@ class ProjectSiteData extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => projectSites.length;
+  int get rowCount => siteResidentNotifier.value.length;
 
   @override
   int get selectedRowCount => 0;

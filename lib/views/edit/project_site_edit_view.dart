@@ -11,16 +11,22 @@ import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 
-class ProjectSiteAndResidentForm extends StatefulWidget {
-  const ProjectSiteAndResidentForm({super.key});
+class ProjectSiteDetails extends StatefulWidget {
+  final int id;
+  final bool readOnly;
+  final ValueNotifier<List<ProjectSite>> projectSitesNotifier;
+
+  const ProjectSiteDetails(
+      {super.key,
+      required this.id,
+      required this.readOnly,
+      required this.projectSitesNotifier});
 
   @override
-  State<ProjectSiteAndResidentForm> createState() =>
-      _ProjectSiteAndResidentFormState();
+  State<ProjectSiteDetails> createState() => _ProjectSiteDetailsState();
 }
 
-class _ProjectSiteAndResidentFormState
-    extends State<ProjectSiteAndResidentForm> {
+class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
   final _formKey = GlobalKey<FormState>();
 
   final ProjectSiteDao projectSiteDao = ProjectSiteDao();
@@ -32,24 +38,26 @@ class _ProjectSiteAndResidentFormState
 
   // Data for Customer
   final TextEditingController _customerController = TextEditingController();
-  final TextEditingController _siteResidentController = TextEditingController();
 
   // Data for Site Resident
   final TextEditingController _nombresController = TextEditingController();
   final TextEditingController _apellidosController = TextEditingController();
   final TextEditingController _puestoController = TextEditingController();
+  final TextEditingController _siteResidentController = TextEditingController();
 
   static List<Customer> customers = [];
   static List<String> selectionCustomers = [];
   static List<SiteResident> siteResidents = [];
   static List<String> selectionSiteResidents = [];
 
+  late ProjectSite selectedProjectSite;
   SiteResident? _selectedSiteResident;
 
   @override
   void initState() {
     super.initState();
     loadCustomerAndSiteResidentData();
+    fillValues();
   }
 
   @override
@@ -122,19 +130,38 @@ class _ProjectSiteAndResidentFormState
                   labelText: "Puesto",
                 ),
                 const SizedBox(height: 20),
-                ElevatedButtonDialog(
-                  title: "Agregar obra",
-                  description: "Presiona OK para realizar la operacion",
-                  onOkPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      addProjectSite();
-                      Navigator.pop(context);
-                      _formKey.currentState!.reset();
-                    } else {
-                      Navigator.pop(context, 'Cancel');
-                    }
-                  },
-                ),
+                if (!widget.readOnly)
+                  ElevatedButtonDialog(
+                    title: "Modificar obra",
+                    description: "Presiona OK para realizar la operacion",
+                    onOkPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        updateProjectSite();
+                        projectSiteDao.findAll().then(
+                              (value) =>
+                                  widget.projectSitesNotifier.value = value,
+                            );
+                        Navigator.popUntil(context,
+                            ModalRoute.withName(Navigator.defaultRouteName));
+                      }
+                    },
+                  ),
+                ElevatedButton.icon(
+                  onPressed: () => Navigator.popUntil(
+                      context, ModalRoute.withName(Navigator.defaultRouteName)),
+                  icon: const Icon(
+                    Icons.keyboard_return_rounded,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    'Regresar',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.lightGreen,
+                    textStyle: const TextStyle(fontSize: 16),
+                  ),
+                )
               ],
             ),
           ),
@@ -143,7 +170,7 @@ class _ProjectSiteAndResidentFormState
     );
   }
 
-  Future<void> addProjectSite() async {
+  void updateProjectSite() {
     ProjectSite toBeAdded = ProjectSite();
 
     String obra = _obraController.text;
@@ -165,10 +192,9 @@ class _ProjectSiteAndResidentFormState
         lastName: apellidosResidente,
         jobPosition: puestoResidente,
       );
-      var siteResidentResult =
-          await siteResidentDao.addSiteResident(siteResident);
-
-      toBeAdded.residents.add(siteResidentResult);
+      siteResidentDao
+          .addSiteResident(siteResident)
+          .then((value) => toBeAdded.residents.add(value));
     }
 
     toBeAdded.siteName = obra;
@@ -216,5 +242,20 @@ class _ProjectSiteAndResidentFormState
             .toList();
       });
     });
+  }
+
+  Future<void> fillValues() async {
+    projectSiteDao.findById(widget.id).then(
+      (value) {
+        selectedProjectSite = value;
+        setState(() {
+          _obraController.text = selectedProjectSite.siteName!;
+          print(selectedProjectSite.customer!.identifier);
+          print(selectedProjectSite.customer!.companyName);
+          _customerController.text =
+              "${SequentialIdGenerator.generatePadLeftNumber(selectedProjectSite.customer!.id!)} - ${selectedProjectSite.customer!.identifier}";
+        });
+      },
+    );
   }
 }

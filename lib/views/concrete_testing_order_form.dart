@@ -47,6 +47,8 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   SiteResident selectedSiteResident =
       SiteResident(firstName: "", lastName: "", jobPosition: "");
 
+  final TextEditingController _customerController = TextEditingController();
+  final TextEditingController _projectSiteController = TextEditingController();
   final TextEditingController _designResistanceController =
       TextEditingController();
   final TextEditingController _slumpingController = TextEditingController();
@@ -89,12 +91,14 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                   fieldName: "Cliente",
                   options: availableClients,
                   onChanged: (p0) => setSelectedCustomer(p0),
+                  controller: _customerController,
                 ),
                 const SizedBox(height: 20),
                 AutoCompleteElement(
                   fieldName: "Obra",
                   options: availableProjectSites,
                   onChanged: (p0) => setSelectedProjectSite(p0),
+                  controller: _projectSiteController,
                 ),
                 const SizedBox(height: 20),
                 CustomDropdownFormField(
@@ -197,12 +201,13 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
         .addConcreteTestingOrder(concreteTestingOrder)
         .then((value) {
       ComponentUtils.generateConfirmMessage(
-          context,
-          "Orden de muestreo - ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} agregada con exito",
-          "¿Deseas realizar el registro del peso volumetrico?",
-          ConcreteVolumetricWeightForm.withTestingOrderId(
-            concreteTestingOrderId: value.id!,
-          ));
+        context,
+        "Orden de muestreo - ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} agregada con exito",
+        "¿Deseas realizar el registro del peso volumetrico?",
+        ConcreteVolumetricWeightForm.withTestingOrderId(
+          concreteTestingOrderId: value.id!,
+        ),
+      );
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
     });

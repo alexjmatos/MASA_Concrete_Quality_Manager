@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/data/project_site_data_source.dart';
-import 'package:masa_epico_concrete_manager/data/project_site_data_table.dart';
-import 'package:masa_epico_concrete_manager/data/site_resident_data_source.dart';
-import 'package:masa_epico_concrete_manager/data/site_resident_data_table.dart';
-import 'package:masa_epico_concrete_manager/data/testing_order_data_source.dart';
-import 'package:masa_epico_concrete_manager/data/testing_order_data_table.dart';
+import 'package:masa_epico_concrete_manager/data/source/project_site_data_source.dart';
+import 'package:masa_epico_concrete_manager/data/table/project_site_data_table.dart';
+import 'package:masa_epico_concrete_manager/data/source/site_resident_data_source.dart';
+import 'package:masa_epico_concrete_manager/data/table/site_resident_data_table.dart';
+import 'package:masa_epico_concrete_manager/data/source/testing_order_data_source.dart';
+import 'package:masa_epico_concrete_manager/data/table/testing_order_data_table.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
+import 'package:masa_epico_concrete_manager/models/project_site.dart';
+import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 
-import '../data/customer_data_source.dart';
-import '../data/customer_data_table.dart';
+import '../data/source/customer_data_source.dart';
+import '../data/table/customer_data_table.dart';
 import '../models/customer.dart';
 
 class ConcreteQualitySearch extends StatefulWidget {
@@ -28,20 +31,20 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
   ProjectSiteDao projectSiteDao = ProjectSiteDao();
   SiteResidentDao siteResidentDao = SiteResidentDao();
   ConcreteTestingOrderDao concreteTestingOrderDao = ConcreteTestingOrderDao();
-  late CustomerData customerData;
-  late ProjectSiteData projectSiteData;
-  late SiteResidentData siteResidentData;
-  late ConcreteTestingOrderData concreteTestingOrderData;
 
-  final ValueNotifier<List<Customer>> _customerNotifier =
+  final ValueNotifier<List<Customer>> _customersNotifier =
       ValueNotifier<List<Customer>>([]);
+  final ValueNotifier<List<ProjectSite>> _projectSitesNotifier =
+      ValueNotifier<List<ProjectSite>>([]);
+  final ValueNotifier<List<SiteResident>> _siteResidentsNotifier =
+      ValueNotifier<List<SiteResident>>([]);
+  final ValueNotifier<List<ConcreteTestingOrder>>
+      _concreteTestingOrderNotifier =
+      ValueNotifier<List<ConcreteTestingOrder>>([]);
 
   @override
   void initState() {
     super.initState();
-    customerData = CustomerData(
-        context: context, customersNotifier: _customerNotifier);
-    projectSiteData = ProjectSiteData(projectSites: []);
     _loadDataTables();
   }
 
@@ -82,25 +85,26 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
 
   CustomerDataTable generateCustomerDataTable() {
     return CustomerDataTable(
-      customerData: customerData,
+      customersNotifier: _customersNotifier,
     );
   }
 
   ProjectSiteDataTable generateProjectSiteDataTable() {
     return ProjectSiteDataTable(
-      projectSiteData: projectSiteData,
+      projectSitesNotifier: _projectSitesNotifier,
     );
   }
 
   SiteResidentDataTable generateSiteResidentDataTable() {
     return SiteResidentDataTable(
-      siteResidentData: siteResidentData,
+      siteResidentNotifier: _siteResidentsNotifier,
     );
   }
 
   ConcreteTestingDataTable generateConcreteTestingDataTable() {
     return ConcreteTestingDataTable(
-        concreteTestingOrderData: concreteTestingOrderData);
+      concreteTestingOrdersNotifier: _concreteTestingOrderNotifier,
+    );
   }
 
   void _loadDataTables() {
@@ -108,8 +112,7 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
       (value) {
         setState(
           () {
-            _customerNotifier.value = value;
-            customerData = CustomerData(context: context, customersNotifier: _customerNotifier);
+            _customersNotifier.value = value;
           },
         );
       },
@@ -119,7 +122,7 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
       (value) {
         setState(
           () {
-            projectSiteData = ProjectSiteData(projectSites: value);
+            _projectSitesNotifier.value = value;
           },
         );
       },
@@ -128,7 +131,7 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
     siteResidentDao.findAll().then(
       (value) {
         setState(() {
-          siteResidentData = SiteResidentData(siteResidents: value);
+          _siteResidentsNotifier.value = value;
         });
       },
     );
@@ -136,8 +139,7 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
     concreteTestingOrderDao.findAll().then(
       (value) {
         setState(() {
-          concreteTestingOrderData = ConcreteTestingOrderData(
-              context: context, concreteTestingOrders: value);
+          _concreteTestingOrderNotifier.value = value;
         });
       },
     );

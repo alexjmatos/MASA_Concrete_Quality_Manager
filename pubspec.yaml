@@ -16,6 +16,7 @@ dependencies:
   path: ^1.8.3
   quickalert: ^1.1.0
   sqflite: ^2.3.2
+  sqflite_common_ffi: ^2.3.3
   uuid: ^4.3.3
 
 dev_dependencies:

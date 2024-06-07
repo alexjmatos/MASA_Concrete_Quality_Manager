@@ -4,7 +4,7 @@ import 'package:masa_epico_concrete_manager/views/edit/customer_edit_view.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
-import '../models/customer.dart';
+import '../../models/customer.dart';
 
 class CustomerData extends DataTableSource {
   BuildContext context;

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/data/testing_order_data_source.dart';
+import 'package:masa_epico_concrete_manager/data/source/testing_order_data_source.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 
-import '../constants/constants.dart';
+import '../../constants/constants.dart';
 
 class ConcreteTestingDataTable extends StatelessWidget {
-  final ConcreteTestingOrderData concreteTestingOrderData;
+  final ValueNotifier<List<ConcreteTestingOrder>> concreteTestingOrdersNotifier;
 
-  const ConcreteTestingDataTable({super.key, required this.concreteTestingOrderData});
+  const ConcreteTestingDataTable(
+      {super.key, required this.concreteTestingOrdersNotifier});
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +69,9 @@ class ConcreteTestingDataTable extends StatelessWidget {
           ),
         ),
       ],
-      source: concreteTestingOrderData,
+      source: ConcreteTestingOrderData(
+          context: context,
+          concreteTestingOrdersNotifier: concreteTestingOrdersNotifier),
     );
   }
 }

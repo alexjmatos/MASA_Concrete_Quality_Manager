@@ -102,6 +102,7 @@ class _ConcreteVolumetricWeightState
                     fieldName: "Orden de muestreo",
                     options: selectableConcreteTestingOrders,
                     onChanged: (p0) => setSelectedConcreteTestingOrder(p0),
+                    controller: _concreteTestingOrderController,
                   ),
                 if (concreteTestingOrderId != 0)
                   CustomTextFormField(

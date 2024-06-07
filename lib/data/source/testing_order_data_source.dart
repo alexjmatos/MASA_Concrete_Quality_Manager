@@ -3,17 +3,17 @@ import 'package:intl/intl.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
-import '../models/concrete_testing_order.dart';
-import '../utils/component_utils.dart';
-import '../utils/sequential_counter_generator.dart';
-import '../views/edit/concrete_testing_order_details.dart';
+import '../../models/concrete_testing_order.dart';
+import '../../utils/component_utils.dart';
+import '../../utils/sequential_counter_generator.dart';
+import '../../views/edit/concrete_testing_order_details.dart';
 
 class ConcreteTestingOrderData extends DataTableSource {
-  List<ConcreteTestingOrder> concreteTestingOrders = [];
+  final ValueNotifier<List<ConcreteTestingOrder>> concreteTestingOrdersNotifier;
   BuildContext context;
 
   ConcreteTestingOrderData(
-      {required this.context, required this.concreteTestingOrders});
+      {required this.context, required this.concreteTestingOrdersNotifier});
 
   @override
   DataRow? getRow(int index) {
@@ -21,52 +21,52 @@ class ConcreteTestingOrderData extends DataTableSource {
       cells: [
         DataCell(
           Text(
-            "M - ${SequentialIdGenerator.generatePadLeftNumber(concreteTestingOrders[index].id!)}",
+            "M - ${SequentialIdGenerator.generatePadLeftNumber(concreteTestingOrdersNotifier.value[index].id!)}",
             textAlign: TextAlign.center,
           ),
           onLongPress: () =>
-              executeEditOrDelete(context, concreteTestingOrders[index].id!),
+              executeEditOrDelete(context, concreteTestingOrdersNotifier.value[index].id!),
         ),
         DataCell(
           Text(
             DateFormat("dd-MM-yyy")
-                .format(concreteTestingOrders[index].testingDate!),
+                .format(concreteTestingOrdersNotifier.value[index].testingDate!),
             textAlign: TextAlign.center,
           ),
           onLongPress: () =>
-              executeEditOrDelete(context, concreteTestingOrders[index].id!),
+              executeEditOrDelete(context, concreteTestingOrdersNotifier.value[index].id!),
         ),
         DataCell(
           Text(
-            concreteTestingOrders[index].projectSite.siteName!,
+            concreteTestingOrdersNotifier.value[index].projectSite.siteName!,
             textAlign: TextAlign.center,
           ),
           onLongPress: () =>
-              executeEditOrDelete(context, concreteTestingOrders[index].id!),
+              executeEditOrDelete(context, concreteTestingOrdersNotifier.value[index].id!),
         ),
         DataCell(
           Text(
-            "F'C - ${concreteTestingOrders[index].designResistance!}",
+            "F'C - ${concreteTestingOrdersNotifier.value[index].designResistance!}",
             textAlign: TextAlign.center,
           ),
           onLongPress: () =>
-              executeEditOrDelete(context, concreteTestingOrders[index].id!),
+              executeEditOrDelete(context, concreteTestingOrdersNotifier.value[index].id!),
         ),
         DataCell(
           Text(
-            "${concreteTestingOrders[index].designAge!} días",
+            "${concreteTestingOrdersNotifier.value[index].designAge!} días",
             textAlign: TextAlign.center,
           ),
           onLongPress: () =>
-              executeEditOrDelete(context, concreteTestingOrders[index].id!),
+              executeEditOrDelete(context, concreteTestingOrdersNotifier.value[index].id!),
         ),
         DataCell(
           Text(
-            "${concreteTestingOrders[index].slumping!} cm",
+            "${concreteTestingOrdersNotifier.value[index].slumping!} cm",
             textAlign: TextAlign.center,
           ),
           onLongPress: () =>
-              executeEditOrDelete(context, concreteTestingOrders[index].id!),
+              executeEditOrDelete(context, concreteTestingOrdersNotifier.value[index].id!),
         ),
       ],
     );
@@ -76,7 +76,7 @@ class ConcreteTestingOrderData extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => concreteTestingOrders.length;
+  int get rowCount => concreteTestingOrdersNotifier.value.length;
 
   @override
   int get selectedRowCount => 0;

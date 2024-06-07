@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 
-import 'customer_data_source.dart';
+import '../../models/customer.dart';
+import '../source/customer_data_source.dart';
 
 class CustomerDataTable extends StatelessWidget {
-  final CustomerData customerData;
+  final ValueNotifier<List<Customer>> customersNotifier;
 
-  const CustomerDataTable({super.key, required this.customerData});
+  const CustomerDataTable({super.key, required this.customersNotifier});
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: customerData.customersNotifier,
+      valueListenable: customersNotifier,
       builder: (context, value, child) {
         return PaginatedDataTable(
           columns: const [
@@ -44,9 +45,8 @@ class CustomerDataTable extends StatelessWidget {
           ],
           source: CustomerData(
               context: context,
-              customersNotifier: customerData.customersNotifier),
+              customersNotifier: customersNotifier),
           rowsPerPage: 10,
-          showCheckboxColumn: true,
         );
       },
     );
