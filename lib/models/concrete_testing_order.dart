@@ -14,7 +14,7 @@ class ConcreteTestingOrder {
   String? designAge;
   DateTime? testingDate;
   Customer customer;
-  ProjectSite projectSite;
+  BuildingSite projectSite;
   SiteResident siteResident;
   ConcreteVolumetricWeight? concreteVolumetricWeight;
 
@@ -64,7 +64,7 @@ class ConcreteTestingOrder {
             (source["testing_date"] ?? DateTime.now().millisecondsSinceEpoch)
                 as int),
         customer: Customer.toModel(customerMap),
-        projectSite: ProjectSite.toModel(projectSiteMap),
+        projectSite: BuildingSite.toModel(projectSiteMap),
         siteResident: SiteResident.toModel(siteResidentMap),
         concreteVolumetricWeight:
             ConcreteVolumetricWeight.toModel(volumetricWeightMap));

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/constants/constants.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
@@ -84,8 +83,8 @@ class _CustomerFormState extends State<CustomerForm> {
 
   void addCustomer() {
     // Process data
-    String razonSocial = _clienteController.text;
-    String rfc = _razonSocialController.text;
+    String razonSocial = _clienteController.text.trim();
+    String rfc = _razonSocialController.text.trim();
 
     // Minimal implementation - manager and location empty
     Customer customer = Customer(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/elements/autocomplete.dart';
+import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
@@ -14,7 +14,7 @@ import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.d
 class ProjectSiteDetails extends StatefulWidget {
   final int id;
   final bool readOnly;
-  final ValueNotifier<List<ProjectSite>> projectSitesNotifier;
+  final ValueNotifier<List<BuildingSite>> projectSitesNotifier;
 
   const ProjectSiteDetails(
       {super.key,
@@ -35,29 +35,30 @@ class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
 
   // Data for General Site Project Info
   final TextEditingController _obraController = TextEditingController();
-
-  // Data for Customer
   final TextEditingController _customerController = TextEditingController();
+  final TextEditingController _siteResidentController = TextEditingController();
 
   // Data for Site Resident
   final TextEditingController _nombresController = TextEditingController();
   final TextEditingController _apellidosController = TextEditingController();
   final TextEditingController _puestoController = TextEditingController();
-  final TextEditingController _siteResidentController = TextEditingController();
 
   static List<Customer> customers = [];
   static List<String> selectionCustomers = [];
   static List<SiteResident> siteResidents = [];
   static List<String> selectionSiteResidents = [];
 
-  late ProjectSite selectedProjectSite;
-  SiteResident? _selectedSiteResident;
+  late BuildingSite selectedProjectSite;
+  SiteResident? selectedSiteResident;
+  Customer? selectedCustomer;
+
+  int selectedCustomerIndex = 0;
+  int selectedSiteResidentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    loadCustomerAndSiteResidentData();
-    fillValues();
+    loadProjectSiteData();
   }
 
   @override
@@ -82,53 +83,58 @@ class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
                 CustomTextFormField(
                   controller: _obraController,
                   labelText: "Identificador",
+                  readOnly: widget.readOnly,
                   validatorText:
                       "El identificador de la obra no puede quedar vacio",
                 ),
                 const SizedBox(height: 20),
-                AutoCompleteElement(
-                  fieldName: "Cliente asignado",
-                  options: selectionCustomers,
-                  onChanged: (p0) => _customerController.text = p0,
-                  controller: _customerController,
-                ),
+                if (widget.readOnly)
+                  CustomTextFormField.noValidation(
+                    controller: _customerController,
+                    labelText: "Cliente",
+                    readOnly: widget.readOnly,
+                  ),
+                if (!widget.readOnly)
+                  CustomDropdownFormField(
+                    labelText: "Cliente",
+                    items: selectionCustomers,
+                    onChanged: (p0) {
+                      selectedCustomer = customers.firstWhere(
+                        (element) =>
+                            element.id ==
+                            SequentialIdGenerator.getIdNumberFromConsecutive(
+                                p0.split("-")[0]),
+                      );
+                    },
+                    defaultValueIndex: selectedCustomerIndex,
+                  ),
                 const SizedBox(height: 20),
                 const Text(
-                  'Residente de obra (Opcional)',
+                  'Residente de obra',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const Divider(),
                 const SizedBox(height: 20),
-                AutoCompleteElement(
-                  fieldName: "Residentes de obra (Busqueda)",
-                  options: selectionSiteResidents,
-                  onChanged: (p0) {
-                    _selectedSiteResident = siteResidents.firstWhere(
+                if (widget.readOnly)
+                  CustomTextFormField.noValidation(
+                    controller: _siteResidentController,
+                    labelText: "Residente",
+                    readOnly: widget.readOnly,
+                  ),
+                if (!widget.readOnly)
+                  CustomDropdownFormField(
+                    labelText: "Residentes",
+                    items: selectionSiteResidents,
+                    onChanged: (p0) {
+                      selectedSiteResident = siteResidents.firstWhere(
                         (element) =>
-                            SequentialIdGenerator.generatePadLeftNumber(
-                                element.id!) ==
-                            p0.split("-")[0].trim());
-                    setState(() {
-                      updateSiteResidentInfo();
-                    });
-                  },
-                  controller: _siteResidentController,
-                ),
-                const SizedBox(height: 20),
-                CustomTextFormField.noValidation(
-                  controller: _nombresController,
-                  labelText: "Nombre",
-                ),
-                const SizedBox(height: 20),
-                CustomTextFormField.noValidation(
-                  controller: _apellidosController,
-                  labelText: "Apellidos",
-                ),
-                const SizedBox(height: 20),
-                CustomTextFormField.noValidation(
-                  controller: _puestoController,
-                  labelText: "Puesto",
-                ),
+                            element.id ==
+                            SequentialIdGenerator.getIdNumberFromConsecutive(
+                                p0.split("-")[0]),
+                      );
+                    },
+                    defaultValueIndex: selectedSiteResidentIndex,
+                  ),
                 const SizedBox(height: 20),
                 if (!widget.readOnly)
                   ElevatedButtonDialog(
@@ -171,59 +177,44 @@ class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
   }
 
   void updateProjectSite() {
-    ProjectSite toBeAdded = ProjectSite();
+    selectedProjectSite.id = widget.id;
+    selectedProjectSite.siteName = _obraController.text;
+    selectedProjectSite.customer = selectedCustomer;
+    selectedProjectSite.siteResident = selectedSiteResident;
 
-    String obra = _obraController.text;
-    String nombreResidente = _nombresController.text;
-    String apellidosResidente = _apellidosController.text;
-    String puestoResidente = _puestoController.text;
-
-    if (_selectedSiteResident != null &&
-        _selectedSiteResident!.firstName.toUpperCase() ==
-            nombreResidente.toUpperCase() &&
-        _selectedSiteResident!.lastName.toUpperCase() ==
-            apellidosResidente.toUpperCase() &&
-        _selectedSiteResident!.jobPosition.toUpperCase() ==
-            puestoResidente.toUpperCase()) {
-      toBeAdded.residents.add(_selectedSiteResident);
-    } else if (nombreResidente.isNotEmpty || apellidosResidente.isNotEmpty) {
-      SiteResident siteResident = SiteResident(
-        firstName: nombreResidente,
-        lastName: apellidosResidente,
-        jobPosition: puestoResidente,
-      );
-      siteResidentDao
-          .addSiteResident(siteResident)
-          .then((value) => toBeAdded.residents.add(value));
-    }
-
-    toBeAdded.siteName = obra;
-    toBeAdded.customer = customers.firstWhere((element) =>
-        element.id ==
-        SequentialIdGenerator.getIdNumberFromConsecutive(
-            _customerController.text));
-
-    Future<ProjectSite> future = projectSiteDao.addProjectSite(toBeAdded);
+    Future<BuildingSite> future = projectSiteDao.update(selectedProjectSite);
 
     future.then((value) {
       ComponentUtils.generateSuccessMessage(context,
-          "Obra ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} - ${value.siteName} agregada con exito");
-      loadCustomerAndSiteResidentData();
+          "Obra ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} - ${value.siteName} actualizada con exito");
+      loadProjectSiteData();
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
     });
   }
 
   void updateSiteResidentInfo() {
-    _nombresController.text = _selectedSiteResident!.firstName;
-    _apellidosController.text = _selectedSiteResident!.lastName;
-    _puestoController.text = _selectedSiteResident!.jobPosition;
+    _nombresController.text = selectedSiteResident!.firstName;
+    _apellidosController.text = selectedSiteResident!.lastName;
+    _puestoController.text = selectedSiteResident!.jobPosition;
   }
 
-  void loadCustomerAndSiteResidentData() {
-    customerDao.getAllCustomers().then((value) {
+  Future<void> loadProjectSiteData() async {
+    await projectSiteDao.findById(widget.id).then(
+      (value) {
+        selectedProjectSite = value;
+        selectedCustomer = value.customer!;
+        selectedSiteResident = value.siteResident!;
+
+        selectedSiteResident = selectedProjectSite.siteResident;
+        selectedCustomer = selectedProjectSite.customer;
+        _obraController.text = selectedProjectSite.siteName!;
+      },
+    );
+
+    await customerDao.getAllCustomers().then((value) {
       customers = value;
-    }).whenComplete(() {
+    }).then((value) {
       setState(() {
         selectionCustomers = customers
             .map((customer) =>
@@ -232,28 +223,34 @@ class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
       });
     });
 
-    siteResidentDao.getAllSiteResidents().then((value) {
+    await siteResidentDao.getAllSiteResidents().then((value) {
       siteResidents = value;
-    }).whenComplete(() {
-      setState(() {
-        selectionSiteResidents = siteResidents
-            .map((siteResident) =>
-                "${SequentialIdGenerator.generatePadLeftNumber(siteResident.id!)} - ${siteResident.lastName} ${siteResident.firstName}")
-            .toList();
-      });
-    });
-  }
-
-  Future<void> fillValues() async {
-    projectSiteDao.findById(widget.id).then(
+    }).then(
       (value) {
-        selectedProjectSite = value;
+        setState(
+          () {
+            selectionSiteResidents = siteResidents
+                .map((siteResident) =>
+                    "${SequentialIdGenerator.generatePadLeftNumber(siteResident.id!)} - ${siteResident.lastName} ${siteResident.firstName}")
+                .toList();
+          },
+        );
+      },
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
         setState(() {
-          _obraController.text = selectedProjectSite.siteName!;
-          print(selectedProjectSite.customer!.identifier);
-          print(selectedProjectSite.customer!.companyName);
-          _customerController.text =
-              "${SequentialIdGenerator.generatePadLeftNumber(selectedProjectSite.customer!.id!)} - ${selectedProjectSite.customer!.identifier}";
+          selectedCustomerIndex = customers.indexOf(customers.firstWhere(
+            (element) => element.id == selectedCustomer?.id!,
+          ));
+          selectedSiteResidentIndex =
+              siteResidents.indexOf(siteResidents.firstWhere(
+            (element) => element.id == selectedSiteResident?.id!,
+          ));
+
+          _customerController.text = selectionCustomers[selectedCustomerIndex];
+          _siteResidentController.text = selectionSiteResidents[selectedSiteResidentIndex];
         });
       },
     );

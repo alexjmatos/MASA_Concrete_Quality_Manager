@@ -17,13 +17,8 @@ CREATE TABLE IF NOT EXISTS project_sites
 (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     site_name   VARCHAR(255),
-    customer_id INTEGER REFERENCES customers (id)
-);
-
-CREATE TABLE IF NOT EXISTS project_site_resident
-(
-    project_site_id  INTEGER REFERENCES project_sites (id),
-    site_resident_id INTEGER REFERENCES site_residents (id)
+    customer_id INTEGER REFERENCES customers (id),
+    site_resident_id INTEGER REFERENCES site_residents(id)
 );
 
 CREATE TABLE IF NOT EXISTS concrete_volumetric_weight
@@ -64,26 +59,17 @@ CREATE TABLE IF NOT EXISTS concrete_testing_orders
 INSERT INTO customers (id, identifier, company_name)
 VALUES (NULL, 'SEDENA', '');
 
-INSERT INTO project_sites (id, site_name, customer_id)
-VALUES (NULL, 'LA MOLINA', 1);
-
-INSERT INTO project_sites (id, site_name, customer_id)
-VALUES (NULL, 'BECAN', 1);
-
 INSERT INTO site_residents (id, first_name, last_name, job_position)
 VALUES (NULL, 'EDUARDO', 'PAZ', 'INGENIERO');
 
 INSERT INTO site_residents (id, first_name, last_name, job_position)
 VALUES (NULL, 'ALEJANDRO', 'MATOS', 'INGENIERO');
 
-INSERT INTO project_site_resident (project_site_id, site_resident_id)
-VALUES (1, 1);
+INSERT INTO project_sites (id, site_name, customer_id, site_resident_id)
+VALUES (NULL, 'LA MOLINA', 1, 1);
 
-INSERT INTO project_site_resident (project_site_id, site_resident_id)
-VALUES (2, 1);
-
-INSERT INTO project_site_resident (project_site_id, site_resident_id)
-VALUES (2, 2);
+INSERT INTO project_sites (id, site_name, customer_id, site_resident_id)
+VALUES (NULL, 'BECAN', 1, 2);
 
 INSERT INTO concrete_testing_orders(id, design_resistance, slumping_cm, volume_m3, tma_mm, design_age, testing_date, customer_id, project_site_id, site_resident_id, concrete_volumetric_weight_id)
 VALUES (1, '250', 14, 7, 20, '28', 1716319147750, 1, 1, 1, NULL);

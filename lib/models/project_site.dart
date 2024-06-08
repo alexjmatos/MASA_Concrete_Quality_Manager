@@ -2,33 +2,40 @@
 import 'package:masa_epico_concrete_manager/models/customer.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 
-class ProjectSite {
+class BuildingSite {
   int? id;
   String? siteName;
 
-  // MANY TO MANY
-  List<SiteResident?> residents = [];
+  // ONE TO MANY
+  SiteResident? siteResident;
 
   // ONE TO MANY
   Customer? customer;
 
-  ProjectSite({
-    this.id,
-    this.siteName,
-    this.customer,
-  });
+  BuildingSite({this.id, this.siteName, this.customer, this.siteResident});
 
   Map<String, Object?> toMap() {
-    return {"id": id, "site_name": siteName, "customer_id": customer?.id};
+    return {
+      "id": id,
+      "site_name": siteName,
+      "customer_id": customer?.id,
+      "site_resident_id": siteResident?.id
+    };
   }
 
-  static ProjectSite toModel(Map<String, Object?>? map) {
-    return ProjectSite(
+  static BuildingSite toModel(Map<String, Object?>? map) {
+    return BuildingSite(
         id: map?["id"] as int,
         siteName: map?["site_name"] as String,
         customer: Customer(
             id: (map?["customer_id"] ?? 0) as int,
             identifier: (map?["identifier"] ?? "") as String,
-            companyName: (map?["company_name"] ?? "") as String));
+            companyName: (map?["company_name"] ?? "") as String),
+    siteResident: SiteResident(
+      id: (map?["site_resident_id"] ?? 0) as int,
+      firstName: (map?["first_name"] ?? "") as String,
+      lastName: (map?["last_name"] ?? "") as String,
+      jobPosition: (map?["job_position"] ?? "") as String
+    ));
   }
 }

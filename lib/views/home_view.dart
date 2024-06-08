@@ -20,21 +20,6 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    // // Get the user information
-    // final recordFuture = pb.collection(Constants.USERS).getOne(
-    //       pb.authStore.model.id,
-    //       expand: 'name',
-    //     );
-    //
-    // recordFuture.then((value) {
-    //   name = value.getStringValue("name");
-    //   setState(() {
-    //     text = Text(
-    //       "Bienvenido $name",
-    //       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-    //     );
-    //   });
-    // });
   }
 
   @override

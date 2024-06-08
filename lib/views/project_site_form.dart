@@ -100,9 +100,12 @@ class _ProjectSiteAndResidentFormState
                             SequentialIdGenerator.generatePadLeftNumber(
                                 element.id!) ==
                             p0.split("-")[0].trim());
-                    setState(() {
-                      updateSiteResidentInfo();
-                    });
+                    _siteResidentController.text = p0;
+                    setState(
+                      () {
+                        updateSiteResidentInfo();
+                      },
+                    );
                   },
                   controller: _siteResidentController,
                 ),
@@ -110,16 +113,19 @@ class _ProjectSiteAndResidentFormState
                 CustomTextFormField.noValidation(
                   controller: _nombresController,
                   labelText: "Nombre",
+                  readOnly: true,
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField.noValidation(
                   controller: _apellidosController,
                   labelText: "Apellidos",
+                  readOnly: true,
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField.noValidation(
                   controller: _puestoController,
                   labelText: "Puesto",
+                  readOnly: true,
                 ),
                 const SizedBox(height: 20),
                 ElevatedButtonDialog(
@@ -144,12 +150,12 @@ class _ProjectSiteAndResidentFormState
   }
 
   Future<void> addProjectSite() async {
-    ProjectSite toBeAdded = ProjectSite();
+    BuildingSite toBeAdded = BuildingSite();
 
-    String obra = _obraController.text;
-    String nombreResidente = _nombresController.text;
-    String apellidosResidente = _apellidosController.text;
-    String puestoResidente = _puestoController.text;
+    String obra = _obraController.text.trim();
+    String nombreResidente = _nombresController.text.trim();
+    String apellidosResidente = _apellidosController.text.trim();
+    String puestoResidente = _puestoController.text.trim();
 
     if (_selectedSiteResident != null &&
         _selectedSiteResident!.firstName.toUpperCase() ==
@@ -158,7 +164,7 @@ class _ProjectSiteAndResidentFormState
             apellidosResidente.toUpperCase() &&
         _selectedSiteResident!.jobPosition.toUpperCase() ==
             puestoResidente.toUpperCase()) {
-      toBeAdded.residents.add(_selectedSiteResident);
+      toBeAdded.siteResident = _selectedSiteResident;
     } else if (nombreResidente.isNotEmpty || apellidosResidente.isNotEmpty) {
       SiteResident siteResident = SiteResident(
         firstName: nombreResidente,
@@ -168,7 +174,7 @@ class _ProjectSiteAndResidentFormState
       var siteResidentResult =
           await siteResidentDao.addSiteResident(siteResident);
 
-      toBeAdded.residents.add(siteResidentResult);
+      toBeAdded.siteResident = siteResidentResult;
     }
 
     toBeAdded.siteName = obra;
@@ -177,7 +183,7 @@ class _ProjectSiteAndResidentFormState
         SequentialIdGenerator.getIdNumberFromConsecutive(
             _customerController.text));
 
-    Future<ProjectSite> future = projectSiteDao.addProjectSite(toBeAdded);
+    Future<BuildingSite> future = projectSiteDao.addProjectSite(toBeAdded);
 
     future.then((value) {
       ComponentUtils.generateSuccessMessage(context,

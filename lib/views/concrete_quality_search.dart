@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/data/source/project_site_data_source.dart';
 import 'package:masa_epico_concrete_manager/data/table/project_site_data_table.dart';
-import 'package:masa_epico_concrete_manager/data/source/site_resident_data_source.dart';
 import 'package:masa_epico_concrete_manager/data/table/site_resident_data_table.dart';
-import 'package:masa_epico_concrete_manager/data/source/testing_order_data_source.dart';
 import 'package:masa_epico_concrete_manager/data/table/testing_order_data_table.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
@@ -14,7 +11,6 @@ import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 
-import '../data/source/customer_data_source.dart';
 import '../data/table/customer_data_table.dart';
 import '../models/customer.dart';
 
@@ -34,8 +30,8 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
 
   final ValueNotifier<List<Customer>> _customersNotifier =
       ValueNotifier<List<Customer>>([]);
-  final ValueNotifier<List<ProjectSite>> _projectSitesNotifier =
-      ValueNotifier<List<ProjectSite>>([]);
+  final ValueNotifier<List<BuildingSite>> _projectSitesNotifier =
+      ValueNotifier<List<BuildingSite>>([]);
   final ValueNotifier<List<SiteResident>> _siteResidentsNotifier =
       ValueNotifier<List<SiteResident>>([]);
   final ValueNotifier<List<ConcreteTestingOrder>>

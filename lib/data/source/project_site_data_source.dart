@@ -7,7 +7,7 @@ import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class ProjectSiteData extends DataTableSource {
   final BuildContext context;
-  final ValueNotifier<List<ProjectSite>> projectSiteNotifier;
+  final ValueNotifier<List<BuildingSite>> projectSiteNotifier;
 
   ProjectSiteData({required this.context, required this.projectSiteNotifier});
 
@@ -33,6 +33,12 @@ class ProjectSiteData extends DataTableSource {
         DataCell(
           Text(
             projectSiteNotifier.value[index].customer!.identifier,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        DataCell(
+          Text(
+            "${projectSiteNotifier.value[index].siteResident!.lastName} ${projectSiteNotifier.value[index].siteResident!.firstName}",
             textAlign: TextAlign.center,
           ),
         ),

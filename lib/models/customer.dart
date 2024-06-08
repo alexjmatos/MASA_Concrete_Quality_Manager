@@ -6,13 +6,13 @@ class Customer {
   String companyName;
 
   // ONE TO MANY
-  List<ProjectSite> projects;
+  List<BuildingSite> projects;
 
   Customer({
     this.id,
     required this.identifier,
     required this.companyName,
-    List<ProjectSite>? projects,
+    List<BuildingSite>? projects,
   }) : projects = projects ?? [];
 
   Map<String, Object?> toMap() {

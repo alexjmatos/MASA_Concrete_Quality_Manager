@@ -16,41 +16,51 @@ class ProjectSiteDao {
     db = injector.get<Database>();
   }
 
-  Future<ProjectSite> addProjectSite(ProjectSite projectSite) async {
+  Future<BuildingSite> addProjectSite(BuildingSite projectSite) async {
     // ADD PROJECT SITE TO THE project_sites table
     int id = await db.insert(Constants.PROJECT_SITES, projectSite.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
-
-    // ADD THE PROJECT SITE AND SITE RESIDENT TO THE MANY-MANY TABLE
-    await db.insert(Constants.MANY_TO_MANY_PROJECT_SITES_SITE_RESIDENTS, {
-      "project_site_id": id,
-      "site_resident_id": projectSite.residents.first?.id
-    });
     return findById(id);
   }
 
-  Future<ProjectSite> findById(int id) async {
+  Future<BuildingSite> findById(int id) async {
     List<Map<String, Object?>> records = await db.rawQuery("""
-        SELECT project_sites.id, project_sites.site_name, customers.id as customer_id, customers.identifier, customers.company_name
+        SELECT project_sites.id, project_sites.site_name, 
+		    customers.id as customer_id, customers.identifier, customers.company_name, 
+		    site_residents.id AS site_resident_id, site_residents.first_name, site_residents.last_name, site_residents.job_position
         FROM project_sites 
         INNER JOIN customers ON project_sites.customer_id = customers.id
+        INNER JOIN site_residents ON project_sites.site_resident_id = site_residents.id
         WHERE project_sites.id = ?;
         """, [id]);
-    return records.map((e) => ProjectSite.toModel(e)).first;
+    return records.map((e) => BuildingSite.toModel(e)).first;
   }
 
-  Future<List<ProjectSite>> findProjectSitesByClientId(int clientId) async {
+  Future<List<BuildingSite>> findProjectSitesByClientId(int clientId) async {
     List<Map<String, Object?>> records = await db.query(Constants.PROJECT_SITES,
         where: "customer_id = ?", whereArgs: [clientId]);
-    return records.map((e) => ProjectSite.toModel(e)).toList();
+    return records.map((e) => BuildingSite.toModel(e)).toList();
   }
 
-  Future<List<ProjectSite>> findAll() async {
+  Future<List<BuildingSite>> findAll() async {
     List<Map<String, Object?>> records = await db.rawQuery("""
-        SELECT project_sites.id, project_sites.site_name, customers.id as customer_id, customers.identifier, customers.company_name
+        SELECT project_sites.id, project_sites.site_name, 
+		    customers.id as customer_id, customers.identifier, customers.company_name, 
+		    site_residents.id AS site_resident_id, site_residents.first_name, site_residents.last_name, site_residents.job_position
         FROM project_sites 
-        INNER JOIN customers ON project_sites.customer_id = customers.id;
+        INNER JOIN customers ON project_sites.customer_id = customers.id
+        INNER JOIN site_residents ON project_sites.site_resident_id = site_residents.id;
         """);
-    return records.map((e) => ProjectSite.toModel(e)).toList();
+    return records.map((e) => BuildingSite.toModel(e)).toList();
+  }
+
+  Future<BuildingSite> update(BuildingSite toBeUpdated) async {
+    // Update the Building Site
+    await db.update(Constants.PROJECT_SITES, toBeUpdated.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+        where: "id = ?",
+        whereArgs: [toBeUpdated.id]);
+
+    return findById(toBeUpdated.id!);
   }
 }

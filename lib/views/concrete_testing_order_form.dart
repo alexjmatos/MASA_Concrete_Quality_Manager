@@ -36,14 +36,14 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   static List<Customer> clients = [];
   static List<String> availableClients = [];
 
-  static List<ProjectSite> projectSites = [];
+  static List<BuildingSite> projectSites = [];
   static List<String> availableProjectSites = [];
 
   static List<SiteResident> siteResidents = [];
   static List<String> availableSiteResidents = [];
 
   Customer selectedCustomer = Customer(identifier: "", companyName: "");
-  ProjectSite selectedProjectSite = ProjectSite();
+  BuildingSite selectedProjectSite = BuildingSite();
   SiteResident selectedSiteResident =
       SiteResident(firstName: "", lastName: "", jobPosition: "");
 

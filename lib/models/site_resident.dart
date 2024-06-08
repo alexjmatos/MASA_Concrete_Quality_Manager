@@ -5,7 +5,7 @@ class SiteResident {
   String firstName;
   String lastName;
   String jobPosition;
-  List<ProjectSite> projectSites = [];
+  List<BuildingSite> projectSites = [];
 
   SiteResident({
     this.id,

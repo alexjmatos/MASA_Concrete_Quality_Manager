@@ -14,7 +14,6 @@ class SiteResidentDao {
   Future<SiteResident> addSiteResident(SiteResident siteResident) async {
     int id = await db.insert(Constants.SITE_RESIDENTS, siteResident.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
-    print(id);
     return findById(id);
   }
 

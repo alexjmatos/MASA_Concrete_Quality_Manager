@@ -33,8 +33,17 @@ class _AutoCompleteElementState extends State<AutoCompleteElement> {
       widget.onChanged(selection); // Pass the selected value to the callback
     }, fieldViewBuilder:
             (context, textEditingController, focusNode, onFieldSubmitted) {
+      textEditingController.value = widget.controller.value;
       return TextFormField(
-        controller: widget.controller,
+        validator: (value) {
+          if (value!.isEmpty) {
+            return "El campo no puede quedar vacio";
+          } else if (!widget.options.contains(value.toUpperCase())) {
+            return "Entrada no valida";
+          }
+          return null;
+        },
+        controller: textEditingController,
         focusNode: focusNode,
         decoration: InputDecoration(
           label: Text(widget.fieldName),
