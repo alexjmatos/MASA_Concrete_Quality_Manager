@@ -134,7 +134,10 @@ class _ProjectSiteAndResidentFormState
                   onOkPressed: () {
                     if (_formKey.currentState!.validate()) {
                       addProjectSite();
-                      Navigator.pop(context);
+                      Navigator.popUntil(
+                        context,
+                        ModalRoute.withName(Navigator.defaultRouteName),
+                      );
                       _formKey.currentState!.reset();
                     } else {
                       Navigator.pop(context, 'Cancel');
@@ -171,8 +174,7 @@ class _ProjectSiteAndResidentFormState
         lastName: apellidosResidente,
         jobPosition: puestoResidente,
       );
-      var siteResidentResult =
-          await siteResidentDao.addSiteResident(siteResident);
+      var siteResidentResult = await siteResidentDao.add(siteResident);
 
       toBeAdded.siteResident = siteResidentResult;
     }
@@ -183,7 +185,7 @@ class _ProjectSiteAndResidentFormState
         SequentialIdGenerator.getIdNumberFromConsecutive(
             _customerController.text));
 
-    Future<BuildingSite> future = projectSiteDao.addProjectSite(toBeAdded);
+    Future<BuildingSite> future = projectSiteDao.add(toBeAdded);
 
     future.then((value) {
       ComponentUtils.generateSuccessMessage(context,
@@ -201,7 +203,7 @@ class _ProjectSiteAndResidentFormState
   }
 
   void loadCustomerAndSiteResidentData() {
-    customerDao.getAllCustomers().then((value) {
+    customerDao.findAll().then((value) {
       customers = value;
     }).whenComplete(() {
       setState(() {
@@ -212,7 +214,7 @@ class _ProjectSiteAndResidentFormState
       });
     });
 
-    siteResidentDao.getAllSiteResidents().then((value) {
+    siteResidentDao.findAll().then((value) {
       siteResidents = value;
     }).whenComplete(() {
       setState(() {

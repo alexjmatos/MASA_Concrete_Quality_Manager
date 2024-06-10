@@ -16,7 +16,7 @@ class ProjectSiteDao {
     db = injector.get<Database>();
   }
 
-  Future<BuildingSite> addProjectSite(BuildingSite projectSite) async {
+  Future<BuildingSite> add(BuildingSite projectSite) async {
     // ADD PROJECT SITE TO THE project_sites table
     int id = await db.insert(Constants.PROJECT_SITES, projectSite.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
@@ -36,7 +36,7 @@ class ProjectSiteDao {
     return records.map((e) => BuildingSite.toModel(e)).first;
   }
 
-  Future<List<BuildingSite>> findProjectSitesByClientId(int clientId) async {
+  Future<List<BuildingSite>> findByClientId(int clientId) async {
     List<Map<String, Object?>> records = await db.query(Constants.PROJECT_SITES,
         where: "customer_id = ?", whereArgs: [clientId]);
     return records.map((e) => BuildingSite.toModel(e)).toList();

@@ -99,8 +99,27 @@ Future<Database> initializeDb() async {
           "INSERT INTO project_sites (id, site_name, customer_id, site_resident_id) VALUES (NULL, 'LA MOLINA', 1, 1);");
       await db.execute(
           "INSERT INTO project_sites (id, site_name, customer_id, site_resident_id) VALUES (NULL, 'BECAN', 1, 2);");
+      await db.execute("""
+      INSERT INTO concrete_volumetric_weight(id, 
+                                          tare_weight_gr, 
+                                          material_tare_weight_gr, 
+                                          material_weight_gr, 
+                                          tare_volume_cm3, 
+                                          volumetric_weight_gr_cm3,
+                                          volume_load_m3, 
+                                          cement_quantity_kg,
+                                          coarse_aggregate_kg,
+                                          fine_aggregate_kg, 
+                                          water_kg, 
+                                          retardant_additive_lt,
+                                          other_additive_lt, 
+                                          total_load_kg, 
+                                          total_load_volumetric_weight_relation,
+                                          percentage) 
+      VALUES (1, 3480, 15180,11700,5.181,2258,7,2924,5518,5398,1500,4.36,14.53,15358,6.8,97.17);
+      """);
       await db.execute(
-          "INSERT INTO concrete_testing_orders(id, design_resistance, slumping_cm, volume_m3, tma_mm, design_age, testing_date, customer_id, project_site_id, site_resident_id, concrete_volumetric_weight_id) VALUES (1, '250', 14, 7, 20, '28', 1716319147750, 1, 1, 1, NULL);");
+          "INSERT INTO concrete_testing_orders(id, design_resistance, slumping_cm, volume_m3, tma_mm, design_age, testing_date, customer_id, project_site_id, site_resident_id, concrete_volumetric_weight_id) VALUES (1, '250', 14, 7, 20, '28', 1716319147750, 1, 1, 1, 1);");
     },
     version: 1,
   );

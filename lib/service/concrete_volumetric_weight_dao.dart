@@ -14,7 +14,7 @@ class ConcreteVolumetricWeightDao {
     db = injector.get<Database>();
   }
 
-  Future<ConcreteVolumetricWeight?> addConcreteVolumetricWeight(
+  Future<ConcreteVolumetricWeight?> add(
       ConcreteVolumetricWeight concreteVolumetricWeight) async {
     int id = await db.insert(
         Constants.CONCRETE_VOLUMETRIC_WEIGHT, concreteVolumetricWeight.toMap());

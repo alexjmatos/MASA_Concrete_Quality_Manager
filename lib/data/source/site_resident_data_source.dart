@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
+import 'package:masa_epico_concrete_manager/views/edit/site_resident_edit_view.dart';
 
 import '../../models/site_resident.dart';
 
@@ -19,6 +21,20 @@ class SiteResidentData extends DataTableSource {
                 siteResidentNotifier.value[index].id!),
             textAlign: TextAlign.center,
           ),
+          onLongPress: () {
+            int id = siteResidentNotifier.value[index].id!;
+            ComponentUtils.executeEditOrDelete(
+              context,
+              SiteResidentDetails(
+                  id: id,
+                  readOnly: true,
+                  siteResidentNotifier: siteResidentNotifier),
+              SiteResidentDetails(
+                  id: id,
+                  readOnly: false,
+                  siteResidentNotifier: siteResidentNotifier),
+            );
+          },
         ),
         DataCell(
           Text(

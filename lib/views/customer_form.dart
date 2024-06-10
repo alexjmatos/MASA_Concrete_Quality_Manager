@@ -92,7 +92,7 @@ class _CustomerFormState extends State<CustomerForm> {
       companyName: rfc,
     );
 
-    Future<Customer> future = customerDao.addCustomer(customer);
+    Future<Customer> future = customerDao.add(customer);
 
     future.then((value) {
       ComponentUtils.generateSuccessMessage(context,

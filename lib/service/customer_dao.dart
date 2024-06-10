@@ -13,13 +13,13 @@ class CustomerDao {
     db = injector.get<Database>();
   }
 
-  Future<Customer> addCustomer(Customer customer) async {
+  Future<Customer> add(Customer customer) async {
     int id = await db.insert(Constants.CUSTOMERS, customer.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
     return findById(id);
   }
 
-  Future<List<Customer>> getAllCustomers() async {
+  Future<List<Customer>> findAll() async {
     List<Map<String, Object?>> records =
         await db.query(Constants.CUSTOMERS, limit: 100);
     return records.map((e) => Customer.toModel(e)).toList();
@@ -31,7 +31,7 @@ class CustomerDao {
     return records.map((e) => Customer.toModel(e)).first;
   }
 
-  Future<Customer> updateCustomer(Customer customer) async {
+  Future<Customer> update(Customer customer) async {
     await db.update(Constants.CUSTOMERS, customer.toMap(),
         where: "id = ?", whereArgs: [customer.id]);
     return findById(customer.id!);

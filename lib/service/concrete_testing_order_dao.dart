@@ -14,7 +14,7 @@ class ConcreteTestingOrderDao {
     db = injector.get<Database>();
   }
 
-  Future<ConcreteTestingOrder> addConcreteTestingOrder(
+  Future<ConcreteTestingOrder> add(
       ConcreteTestingOrder concreteTestingOrder) async {
     int id = await db.insert(
         Constants.CONCRETE_TESTING_ORDERS, concreteTestingOrder.toMap());
@@ -66,7 +66,7 @@ class ConcreteTestingOrderDao {
         volumetricWeightMap.firstOrNull);
   }
 
-  Future<int> updateConcreteTestingDao(
+  Future<int> update(
       ConcreteTestingOrder selectedConcreteTestingOrder) async {
     int update = await db.update(
         Constants.CONCRETE_TESTING_ORDERS, selectedConcreteTestingOrder.toMap(),

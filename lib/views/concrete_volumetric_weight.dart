@@ -207,6 +207,11 @@ class _ConcreteVolumetricWeightState
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       addConcreteVolumetricWeight();
+                      _formKey.currentState!.reset();
+                      Navigator.popUntil(
+                        context,
+                        ModalRoute.withName(Navigator.defaultRouteName),
+                      );
                     }
                   },
                   child: const Text("Registrar peso volumetrico"),
@@ -244,7 +249,9 @@ class _ConcreteVolumetricWeightState
   }
 
   void setSelectedConcreteTestingOrder(String selected) {
-    selectedConcreteTestingOrder = concreteTestingOrders.firstWhere((element) => element.id == SequentialIdGenerator.getIdNumberFromConsecutive(selected));
+    selectedConcreteTestingOrder = concreteTestingOrders.firstWhere((element) =>
+        element.id ==
+        SequentialIdGenerator.getIdNumberFromConsecutive(selected));
   }
 
   void updateMaterialWeight(String value) {
@@ -323,14 +330,12 @@ class _ConcreteVolumetricWeightState
             percentage);
 
     // ADD THE CONCRETE VOLUMETRIC WEIGHT
-    concreteVolumetricWeightDao
-        .addConcreteVolumetricWeight(concreteVolumetricWeight)
-        .then((value) {
+    concreteVolumetricWeightDao.add(concreteVolumetricWeight).then((value) {
       selectedConcreteTestingOrder?.concreteVolumetricWeight = value;
       // UPDATE THE CONCRETE TESTING ORDER
 
       concreteTestingOrderDao
-          .updateConcreteTestingDao(selectedConcreteTestingOrder!)
+          .update(selectedConcreteTestingOrder!)
           .then((value) {
         ComponentUtils.generateSuccessMessage(
             context, "Peso volumetrico registrado con exito");

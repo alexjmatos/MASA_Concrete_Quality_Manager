@@ -93,7 +93,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                     onOkPressed: () {
                       if (_formKey.currentState!.validate()) {
                         updateCustomer();
-                        customerDao.getAllCustomers().then(
+                        customerDao.findAll().then(
                               (value) => widget.customersNotifier.value = value,
                             );
                         Navigator.popUntil(context,
@@ -137,7 +137,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
       companyName: rfc,
     );
 
-    Future<Customer> future = customerDao.updateCustomer(customer);
+    Future<Customer> future = customerDao.update(customer);
 
     future.then((value) {
       ComponentUtils.generateSuccessMessage(context,

@@ -15,6 +15,7 @@ import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_volumetric_weight.dart';
 
+import '../elements/elevated_button_dialog.dart';
 import '../utils/sequential_counter_generator.dart';
 
 class ConcreteTestingOrderForm extends StatefulWidget {
@@ -49,6 +50,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
 
   final TextEditingController _customerController = TextEditingController();
   final TextEditingController _projectSiteController = TextEditingController();
+  final TextEditingController _siteResidentController = TextEditingController();
   final TextEditingController _designResistanceController =
       TextEditingController();
   final TextEditingController _slumpingController = TextEditingController();
@@ -63,9 +65,6 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   void initState() {
     super.initState();
     loadCustomerData();
-    _tmaController.text = "20";
-    _volumeController.text = "7";
-    _testingDateController.text = Constants.formatter.format(selectedDate);
   }
 
   @override
@@ -101,10 +100,10 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                   controller: _projectSiteController,
                 ),
                 const SizedBox(height: 20),
-                CustomDropdownFormField(
-                  labelText: "Residentes",
-                  items: availableSiteResidents,
-                  onChanged: (p0) => setSelectedSiteResident(p0),
+                CustomTextFormField.noValidation(
+                  controller: _siteResidentController,
+                  labelText: "Residente",
+                  readOnly: true,
                 ),
                 const SizedBox(height: 20),
                 const Text(
@@ -116,7 +115,8 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                 CustomDropdownFormField(
                   labelText: "F'C (kg/cm2)",
                   items: Constants.CONCRETE_COMPRESSION_RESISTANCES,
-                  onChanged: (p0) {},
+                  onChanged: (p0) => _designResistanceController.text = p0,
+                  defaultValueIndex: 2,
                 ),
                 const SizedBox(height: 20),
                 CustomNumberFormField(
@@ -143,6 +143,8 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                   onChanged: (p0) {
                     _designAgeController.text = p0;
                   },
+                  defaultValueIndex: Constants.CONCRETE_DESIGN_AGES
+                      .indexOf(Constants.CONCRETE_DESIGN_AGES.last),
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField.noValidation(
@@ -169,14 +171,19 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                   child: const Text("Seleccionar fecha de muestreo \u23F0"),
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
+                ElevatedButtonDialog(
+                  title: "Agregar orden de muestreo",
+                  description: "Presiona OK para realizar la operacion",
+                  onOkPressed: () {
                     if (_formKey.currentState!.validate()) {
                       addConcreteQualityOrder();
+                      Navigator.pop(context);
+                      reset();
+                    } else {
+                      Navigator.pop(context, 'Cancel');
                     }
                   },
-                  child: const Text("Agregar muestra"),
-                )
+                ),
               ],
             ),
           ),
@@ -197,9 +204,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
         projectSite: selectedProjectSite,
         siteResident: selectedSiteResident);
 
-    concreteTestingOrderDao
-        .addConcreteTestingOrder(concreteTestingOrder)
-        .then((value) {
+    concreteTestingOrderDao.add(concreteTestingOrder).then((value) {
       ComponentUtils.generateConfirmMessage(
         context,
         "Orden de muestreo - ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} agregada con exito",
@@ -214,7 +219,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   }
 
   void loadCustomerData() {
-    customerDao.getAllCustomers().then((value) {
+    customerDao.findAll().then((value) {
       clients = value;
     }).whenComplete(() {
       setState(() {
@@ -223,17 +228,25 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                 "${SequentialIdGenerator.generatePadLeftNumber(customer.id!)} - ${customer.identifier}")
             .toList();
       });
-    });
+    }).then(
+      (value) {
+        _tmaController.text = "20";
+        _volumeController.text = "7";
+        _testingDateController.text = Constants.formatter.format(selectedDate);
+        _designResistanceController.text =
+            Constants.CONCRETE_COMPRESSION_RESISTANCES[2];
+        _designAgeController.text = Constants.CONCRETE_DESIGN_AGES.last;
+      },
+    );
   }
 
   void setSelectedCustomer(String selected) async {
+    _customerController.text = selected;
     selectedCustomer = await customerDao.findById(
         SequentialIdGenerator.getIdNumberFromConsecutive(
             selected.split("-")[0]));
 
-    projectSiteDao
-        .findProjectSitesByClientId(selectedCustomer.id!)
-        .then((value) {
+    projectSiteDao.findByClientId(selectedCustomer.id!).then((value) {
       projectSites = value;
       setState(() {
         availableProjectSites = projectSites
@@ -245,27 +258,26 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   }
 
   void setSelectedProjectSite(String selected) {
+    _projectSiteController.text = selected;
     selectedProjectSite = projectSites.firstWhere((element) =>
         element.id ==
         SequentialIdGenerator.getIdNumberFromConsecutive(
             selected.split("-").first));
 
-    siteResidentDao
-        .getSiteResidentsByProjectSiteId(selectedProjectSite.id!)
-        .then((value) {
+    siteResidentDao.findByBuildingSiteId(selectedProjectSite.id!).then((value) {
       siteResidents = value;
       setState(() {
-        availableSiteResidents = value.map((e) {
-          return "${SequentialIdGenerator.generatePadLeftNumber(e.id!)} - ${e.firstName} ${e.lastName}";
-        }).toList();
+        selectedSiteResident = value.first;
+
+        _siteResidentController.text =
+            "${SequentialIdGenerator.generatePadLeftNumber(selectedSiteResident.id!)} - ${selectedSiteResident.firstName} ${selectedSiteResident.lastName}";
       });
     });
   }
 
-  void setSelectedSiteResident(String selected) {
-    selectedSiteResident = siteResidents.firstWhere((element) =>
-        element.id ==
-        SequentialIdGenerator.getIdNumberFromConsecutive(
-            selected.split("-").first));
+  void reset() {
+    _customerController.text = "";
+    _projectSiteController.text = "";
+    _siteResidentController.text = "";
   }
 }

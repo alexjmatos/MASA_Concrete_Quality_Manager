@@ -97,7 +97,7 @@ class _SiteResidentFormState extends State<SiteResidentForm> {
       lastName: apellidosResidente,
       jobPosition: puestoResidente,
     );
-    var future = siteResidentDao.addSiteResident(siteResident);
+    var future = siteResidentDao.add(siteResident);
     future.then((value) {
       ComponentUtils.generateSuccessMessage(context,
           "Residente ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} - ${value.firstName} - ${value.lastName} agregada con exito");

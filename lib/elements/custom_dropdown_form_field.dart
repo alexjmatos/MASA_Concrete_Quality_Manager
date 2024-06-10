@@ -29,7 +29,9 @@ class _CustomDropdownFormFieldState extends State<CustomDropdownFormField> {
       () {
         setState(
           () {
-            _selectedItem = widget.items[widget.defaultValueIndex];
+            if (widget.items.isNotEmpty) {
+              _selectedItem = widget.items[widget.defaultValueIndex];
+            }
           },
         );
       },

@@ -104,7 +104,7 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
   }
 
   void _loadDataTables() {
-    customerDao.getAllCustomers().then(
+    customerDao.findAll().then(
       (value) {
         setState(
           () {

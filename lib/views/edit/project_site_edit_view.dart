@@ -149,6 +149,7 @@ class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
                             );
                         Navigator.popUntil(context,
                             ModalRoute.withName(Navigator.defaultRouteName));
+                        _formKey.currentState!.reset();
                       }
                     },
                   ),
@@ -212,7 +213,7 @@ class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
       },
     );
 
-    await customerDao.getAllCustomers().then((value) {
+    await customerDao.findAll().then((value) {
       customers = value;
     }).then((value) {
       setState(() {
@@ -223,7 +224,7 @@ class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
       });
     });
 
-    await siteResidentDao.getAllSiteResidents().then((value) {
+    await siteResidentDao.findAll().then((value) {
       siteResidents = value;
     }).then(
       (value) {
