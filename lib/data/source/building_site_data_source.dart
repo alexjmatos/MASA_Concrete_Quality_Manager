@@ -4,11 +4,11 @@ import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 import 'package:masa_epico_concrete_manager/views/edit/project_site_edit_view.dart';
 
-class ProjectSiteData extends DataTableSource {
+class BuildingSiteData extends DataTableSource {
   final BuildContext context;
-  final ValueNotifier<List<BuildingSite>> projectSiteNotifier;
+  final ValueNotifier<List<BuildingSite>> buildingSiteNotifier;
 
-  ProjectSiteData({required this.context, required this.projectSiteNotifier});
+  BuildingSiteData({required this.context, required this.buildingSiteNotifier});
 
   @override
   DataRow? getRow(int index) {
@@ -16,36 +16,36 @@ class ProjectSiteData extends DataTableSource {
       cells: [
         DataCell(
           Text(
-            SequentialIdGenerator.generatePadLeftNumber(
-                projectSiteNotifier.value[index].id!),
+            SequentialFormatter.generatePadLeftNumber(
+                buildingSiteNotifier.value[index].id!),
           ),
           onLongPress: () {
-            int id = projectSiteNotifier.value[index].id!;
-            ComponentUtils.executeEditOrDelete(context, ProjectSiteDetails(
+            int id = buildingSiteNotifier.value[index].id!;
+            ComponentUtils.executeEditOrDelete(context, BuildingSiteDetails(
                 id: id,
                 readOnly: true,
-                projectSitesNotifier: projectSiteNotifier), ProjectSiteDetails(
+                projectSitesNotifier: buildingSiteNotifier), BuildingSiteDetails(
                 id: id,
                 readOnly: false,
-                projectSitesNotifier: projectSiteNotifier));
+                projectSitesNotifier: buildingSiteNotifier));
           },
         ),
         DataCell(
           Text(
-            projectSiteNotifier.value[index].siteName!,
+            buildingSiteNotifier.value[index].siteName!,
             textAlign: TextAlign.center,
           ),
         ),
         DataCell(
           Text(
-            projectSiteNotifier.value[index].customer!.identifier,
+            buildingSiteNotifier.value[index].customer!.identifier,
             textAlign: TextAlign.center,
           ),
         ),
         DataCell(
           Text(
-            "${projectSiteNotifier.value[index].siteResident!
-                .lastName} ${projectSiteNotifier.value[index].siteResident!
+            "${buildingSiteNotifier.value[index].siteResident!
+                .lastName} ${buildingSiteNotifier.value[index].siteResident!
                 .firstName}",
             textAlign: TextAlign.center,
           ),
@@ -58,7 +58,7 @@ class ProjectSiteData extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => projectSiteNotifier.value.length;
+  int get rowCount => buildingSiteNotifier.value.length;
 
   @override
   int get selectedRowCount => 0;

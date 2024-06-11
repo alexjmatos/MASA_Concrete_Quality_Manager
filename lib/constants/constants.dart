@@ -39,7 +39,7 @@ class Constants {
 
   static const String USERS = "users";
   static const String CUSTOMERS = "customers";
-  static const String PROJECT_SITES = "project_sites";
+  static const String PROJECT_SITES = "building_sites";
   static const String SITE_RESIDENTS = "site_residents";
   static const String MANY_TO_MANY_PROJECT_SITES_SITE_RESIDENTS =
       "project_site_resident";

@@ -26,7 +26,7 @@ class SiteResidentDao {
   Future<List<SiteResident>> findByBuildingSiteId(int projectId) async {
     var result = await db.rawQuery("""
     SELECT id, first_name, last_name, job_position FROM site_residents where id in 
-    (SELECT site_resident_id from project_sites where id = ?);
+    (SELECT site_resident_id from building_sites where id = ?);
     """, [projectId]);
     return result.map((e) => SiteResident.toModel(e)).toList();
   }

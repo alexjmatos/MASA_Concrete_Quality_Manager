@@ -17,7 +17,7 @@ class SiteResidentData extends DataTableSource {
       cells: [
         DataCell(
           Text(
-            SequentialIdGenerator.generatePadLeftNumber(
+            SequentialFormatter.generatePadLeftNumber(
                 siteResidentNotifier.value[index].id!),
             textAlign: TextAlign.center,
           ),

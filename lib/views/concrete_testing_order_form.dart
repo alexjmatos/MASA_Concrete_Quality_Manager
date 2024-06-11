@@ -201,13 +201,13 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
         designAge: _designAgeController.text,
         testingDate: selectedDate,
         customer: selectedCustomer,
-        projectSite: selectedProjectSite,
+        buildingSite: selectedProjectSite,
         siteResident: selectedSiteResident);
 
     concreteTestingOrderDao.add(concreteTestingOrder).then((value) {
       ComponentUtils.generateConfirmMessage(
         context,
-        "Orden de muestreo - ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} agregada con exito",
+        "Orden de muestreo - ${SequentialFormatter.generatePadLeftNumber(value.id!)} agregada con exito",
         "¿Deseas realizar el registro del peso volumetrico?",
         ConcreteVolumetricWeightForm.withTestingOrderId(
           concreteTestingOrderId: value.id!,
@@ -215,6 +215,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
       );
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
+      print(stackTrace);
     });
   }
 
@@ -225,7 +226,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
       setState(() {
         availableClients = clients
             .map((customer) =>
-                "${SequentialIdGenerator.generatePadLeftNumber(customer.id!)} - ${customer.identifier}")
+                "${SequentialFormatter.generatePadLeftNumber(customer.id!)} - ${customer.identifier}")
             .toList();
       });
     }).then(
@@ -243,7 +244,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   void setSelectedCustomer(String selected) async {
     _customerController.text = selected;
     selectedCustomer = await customerDao.findById(
-        SequentialIdGenerator.getIdNumberFromConsecutive(
+        SequentialFormatter.getIdNumberFromConsecutive(
             selected.split("-")[0]));
 
     projectSiteDao.findByClientId(selectedCustomer.id!).then((value) {
@@ -251,7 +252,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
       setState(() {
         availableProjectSites = projectSites
             .map((e) =>
-                "${SequentialIdGenerator.generatePadLeftNumber(e.id!)} - ${e.siteName}")
+                "${SequentialFormatter.generatePadLeftNumber(e.id!)} - ${e.siteName}")
             .toList();
       });
     });
@@ -261,7 +262,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
     _projectSiteController.text = selected;
     selectedProjectSite = projectSites.firstWhere((element) =>
         element.id ==
-        SequentialIdGenerator.getIdNumberFromConsecutive(
+        SequentialFormatter.getIdNumberFromConsecutive(
             selected.split("-").first));
 
     siteResidentDao.findByBuildingSiteId(selectedProjectSite.id!).then((value) {
@@ -270,7 +271,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
         selectedSiteResident = value.first;
 
         _siteResidentController.text =
-            "${SequentialIdGenerator.generatePadLeftNumber(selectedSiteResident.id!)} - ${selectedSiteResident.firstName} ${selectedSiteResident.lastName}";
+            "${SequentialFormatter.generatePadLeftNumber(selectedSiteResident.id!)} - ${selectedSiteResident.firstName} ${selectedSiteResident.lastName}";
       });
     });
   }

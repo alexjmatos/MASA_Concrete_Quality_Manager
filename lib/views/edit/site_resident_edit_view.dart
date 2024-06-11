@@ -141,7 +141,7 @@ class _SiteResidentDetailsState extends State<SiteResidentDetails> {
     var future = siteResidentDao.update(selectedSiteResident);
     future.then((value) {
       ComponentUtils.generateSuccessMessage(context,
-          "Residente ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} - ${value.firstName} - ${value.lastName} actualizado con exito");
+          "Residente ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.firstName} - ${value.lastName} actualizado con exito");
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
     });

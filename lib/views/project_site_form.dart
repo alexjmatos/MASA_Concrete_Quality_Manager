@@ -97,7 +97,7 @@ class _ProjectSiteAndResidentFormState
                   onChanged: (p0) {
                     _selectedSiteResident = siteResidents.firstWhere(
                         (element) =>
-                            SequentialIdGenerator.generatePadLeftNumber(
+                            SequentialFormatter.generatePadLeftNumber(
                                 element.id!) ==
                             p0.split("-")[0].trim());
                     _siteResidentController.text = p0;
@@ -182,14 +182,14 @@ class _ProjectSiteAndResidentFormState
     toBeAdded.siteName = obra;
     toBeAdded.customer = customers.firstWhere((element) =>
         element.id ==
-        SequentialIdGenerator.getIdNumberFromConsecutive(
+        SequentialFormatter.getIdNumberFromConsecutive(
             _customerController.text));
 
     Future<BuildingSite> future = projectSiteDao.add(toBeAdded);
 
     future.then((value) {
       ComponentUtils.generateSuccessMessage(context,
-          "Obra ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} - ${value.siteName} agregada con exito");
+          "Obra ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.siteName} agregada con exito");
       loadCustomerAndSiteResidentData();
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
@@ -209,7 +209,7 @@ class _ProjectSiteAndResidentFormState
       setState(() {
         selectionCustomers = customers
             .map((customer) =>
-                "${SequentialIdGenerator.generatePadLeftNumber(customer.id!)} - ${customer.identifier}")
+                "${SequentialFormatter.generatePadLeftNumber(customer.id!)} - ${customer.identifier}")
             .toList();
       });
     });
@@ -220,7 +220,7 @@ class _ProjectSiteAndResidentFormState
       setState(() {
         selectionSiteResidents = siteResidents
             .map((siteResident) =>
-                "${SequentialIdGenerator.generatePadLeftNumber(siteResident.id!)} - ${siteResident.lastName} ${siteResident.firstName}")
+                "${SequentialFormatter.generatePadLeftNumber(siteResident.id!)} - ${siteResident.lastName} ${siteResident.firstName}")
             .toList();
       });
     });

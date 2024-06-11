@@ -245,13 +245,13 @@ class _ConcreteVolumetricWeightState
   }
 
   String formatConcreteTestingOrder(ConcreteTestingOrder e) {
-    return "${SequentialIdGenerator.generatePadLeftNumber(e.id!)} - ${e.customer.identifier} : ${e.projectSite.siteName} - (${e.testingDate?.day}/${e.testingDate?.month}/${e.testingDate?.year})";
+    return "${SequentialFormatter.generatePadLeftNumber(e.id!)} - ${e.customer.identifier} : ${e.buildingSite.siteName} - (${e.testingDate?.day}/${e.testingDate?.month}/${e.testingDate?.year})";
   }
 
   void setSelectedConcreteTestingOrder(String selected) {
     selectedConcreteTestingOrder = concreteTestingOrders.firstWhere((element) =>
         element.id ==
-        SequentialIdGenerator.getIdNumberFromConsecutive(selected));
+        SequentialFormatter.getIdNumberFromConsecutive(selected));
   }
 
   void updateMaterialWeight(String value) {

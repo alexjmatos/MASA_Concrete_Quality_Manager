@@ -19,7 +19,7 @@ class ConcreteTestingOrderData extends DataTableSource {
       cells: [
         DataCell(
             Text(
-              "M - ${SequentialIdGenerator.generatePadLeftNumber(concreteTestingOrdersNotifier.value[index].id!)}",
+              "M - ${SequentialFormatter.generatePadLeftNumber(concreteTestingOrdersNotifier.value[index].id!)}",
               textAlign: TextAlign.center,
             ), onLongPress: () {
           int id = concreteTestingOrdersNotifier.value[index].id!;
@@ -46,7 +46,7 @@ class ConcreteTestingOrderData extends DataTableSource {
         ),
         DataCell(
           Text(
-            concreteTestingOrdersNotifier.value[index].projectSite.siteName!,
+            concreteTestingOrdersNotifier.value[index].buildingSite.siteName!,
             textAlign: TextAlign.center,
           ),
         ),

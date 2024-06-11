@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/data/source/project_site_data_source.dart';
+import 'package:masa_epico_concrete_manager/data/source/building_site_data_source.dart';
 import 'package:masa_epico_concrete_manager/models/project_site.dart';
 
 class ProjectSiteDataTable extends StatelessWidget {
@@ -51,8 +51,8 @@ class ProjectSiteDataTable extends StatelessWidget {
               ),
             ),
           ],
-          source: ProjectSiteData(
-              context: context, projectSiteNotifier: projectSitesNotifier),
+          source: BuildingSiteData(
+              context: context, buildingSiteNotifier: projectSitesNotifier),
           rowsPerPage: 10,
         );
       },

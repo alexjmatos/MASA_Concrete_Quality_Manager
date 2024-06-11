@@ -7,7 +7,7 @@ import '../utils/sequential_counter_generator.dart';
 
 class ConcreteVolumetricWeightDao {
   late final Database db;
-  final SequentialIdGenerator sequentialIdGenerator = SequentialIdGenerator();
+  final SequentialFormatter sequentialIdGenerator = SequentialFormatter();
 
   ConcreteVolumetricWeightDao() {
     final injector = Injector.appInstance;

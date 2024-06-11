@@ -18,7 +18,7 @@ class CustomerData extends DataTableSource {
     return DataRow(cells: [
       DataCell(
         Text(
-          SequentialIdGenerator.generatePadLeftNumber(
+          SequentialFormatter.generatePadLeftNumber(
               customersNotifier.value[index].id!),
           textAlign: TextAlign.center,
         ),

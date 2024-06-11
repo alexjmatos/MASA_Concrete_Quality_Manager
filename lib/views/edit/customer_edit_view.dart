@@ -141,7 +141,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
 
     future.then((value) {
       ComponentUtils.generateSuccessMessage(context,
-          "Cliente ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} - ${value.identifier} actualizado con exito!");
+          "Cliente ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.identifier} actualizado con exito!");
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
     });

@@ -96,7 +96,7 @@ class _CustomerFormState extends State<CustomerForm> {
 
     future.then((value) {
       ComponentUtils.generateSuccessMessage(context,
-          "Cliente ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} - ${value.identifier} agregado con exito");
+          "Cliente ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.identifier} agregado con exito");
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
     });

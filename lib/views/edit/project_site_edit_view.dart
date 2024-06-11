@@ -11,22 +11,22 @@ import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 
-class ProjectSiteDetails extends StatefulWidget {
+class BuildingSiteDetails extends StatefulWidget {
   final int id;
   final bool readOnly;
   final ValueNotifier<List<BuildingSite>> projectSitesNotifier;
 
-  const ProjectSiteDetails(
+  const BuildingSiteDetails(
       {super.key,
       required this.id,
       required this.readOnly,
       required this.projectSitesNotifier});
 
   @override
-  State<ProjectSiteDetails> createState() => _ProjectSiteDetailsState();
+  State<BuildingSiteDetails> createState() => _BuildingSiteDetailsState();
 }
 
-class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
+class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
   final _formKey = GlobalKey<FormState>();
 
   final ProjectSiteDao projectSiteDao = ProjectSiteDao();
@@ -102,7 +102,7 @@ class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
                       selectedCustomer = customers.firstWhere(
                         (element) =>
                             element.id ==
-                            SequentialIdGenerator.getIdNumberFromConsecutive(
+                            SequentialFormatter.getIdNumberFromConsecutive(
                                 p0.split("-")[0]),
                       );
                     },
@@ -129,7 +129,7 @@ class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
                       selectedSiteResident = siteResidents.firstWhere(
                         (element) =>
                             element.id ==
-                            SequentialIdGenerator.getIdNumberFromConsecutive(
+                            SequentialFormatter.getIdNumberFromConsecutive(
                                 p0.split("-")[0]),
                       );
                     },
@@ -187,7 +187,7 @@ class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
 
     future.then((value) {
       ComponentUtils.generateSuccessMessage(context,
-          "Obra ${SequentialIdGenerator.generatePadLeftNumber(value.id!)} - ${value.siteName} actualizada con exito");
+          "Obra ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.siteName} actualizada con exito");
       loadProjectSiteData();
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
@@ -218,8 +218,7 @@ class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
     }).then((value) {
       setState(() {
         selectionCustomers = customers
-            .map((customer) =>
-                "${SequentialIdGenerator.generatePadLeftNumber(customer.id!)} - ${customer.identifier}")
+            .map((customer) => SequentialFormatter.generateSequentialFormat(customer))
             .toList();
       });
     });
@@ -232,7 +231,7 @@ class _ProjectSiteDetailsState extends State<ProjectSiteDetails> {
           () {
             selectionSiteResidents = siteResidents
                 .map((siteResident) =>
-                    "${SequentialIdGenerator.generatePadLeftNumber(siteResident.id!)} - ${siteResident.lastName} ${siteResident.firstName}")
+                    "${SequentialFormatter.generatePadLeftNumber(siteResident.id!)} - ${siteResident.lastName} ${siteResident.firstName}")
                 .toList();
           },
         );

@@ -6,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 
 class CustomerDao {
   late final Database db;
-  final SequentialIdGenerator sequentialIdGenerator = SequentialIdGenerator();
+  final SequentialFormatter sequentialIdGenerator = SequentialFormatter();
 
   CustomerDao() {
     final injector = Injector.appInstance;
