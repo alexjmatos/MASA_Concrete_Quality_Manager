@@ -29,7 +29,7 @@ class ConcreteTestingOrderForm extends StatefulWidget {
 class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   final _formKey = GlobalKey<FormState>();
   final CustomerDao customerDao = CustomerDao();
-  final ProjectSiteDao projectSiteDao = ProjectSiteDao();
+  final BuildingSiteDao projectSiteDao = BuildingSiteDao();
   final SiteResidentDao siteResidentDao = SiteResidentDao();
   final ConcreteTestingOrderDao concreteTestingOrderDao =
       ConcreteTestingOrderDao();

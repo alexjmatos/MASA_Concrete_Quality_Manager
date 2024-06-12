@@ -46,29 +46,6 @@ class ConcreteTestingOrder {
     };
   }
 
-  // static ConcreteTestingOrder toModel(
-  //     Map<String, Object?> source,
-  //     Map<String, Object?>? customerMap,
-  //     Map<String, Object?>? projectSiteMap,
-  //     Map<String, Object?>? siteResidentMap,
-  //     Map<String, Object?>? volumetricWeightMap) {
-  //   return ConcreteTestingOrder(
-  //       id: (source["id"] ?? 0) as int,
-  //       designResistance: (source["design_resistance"] ?? "") as String,
-  //       slumping: (source["slumping_cm"] ?? 0) as int,
-  //       volume: (source["volume_m3"] ?? 0) as int,
-  //       tma: (source["tma_mm"] ?? 0) as int,
-  //       designAge: (source["design_age"] ?? 0) as String,
-  //       testingDate: DateTime.fromMillisecondsSinceEpoch(
-  //           (source["testing_date"] ?? DateTime.now().millisecondsSinceEpoch)
-  //               as int),
-  //       customer: Customer.toModel(customerMap),
-  //       buildingSite: BuildingSite.toModel(projectSiteMap),
-  //       siteResident: SiteResident.toModel(siteResidentMap),
-  //       concreteVolumetricWeight:
-  //           ConcreteVolumetricWeight.toModel(volumetricWeightMap));
-  // }
-
   static ConcreteTestingOrder toModel(Map<String, Object?> source) {
     Customer customer = Customer(
         id: (source["customer_id"] ?? 0) as int,

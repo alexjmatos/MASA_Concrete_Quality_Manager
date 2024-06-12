@@ -24,7 +24,7 @@ class ConcreteQualitySearch extends StatefulWidget {
 class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
   Entity _selected = Entity.Clientes;
   CustomerDao customerDao = CustomerDao();
-  ProjectSiteDao projectSiteDao = ProjectSiteDao();
+  BuildingSiteDao projectSiteDao = BuildingSiteDao();
   SiteResidentDao siteResidentDao = SiteResidentDao();
   ConcreteTestingOrderDao concreteTestingOrderDao = ConcreteTestingOrderDao();
 

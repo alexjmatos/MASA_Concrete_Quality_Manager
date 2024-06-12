@@ -29,7 +29,7 @@ class BuildingSiteDetails extends StatefulWidget {
 class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
   final _formKey = GlobalKey<FormState>();
 
-  final ProjectSiteDao projectSiteDao = ProjectSiteDao();
+  final BuildingSiteDao projectSiteDao = BuildingSiteDao();
   final CustomerDao customerDao = CustomerDao();
   final SiteResidentDao siteResidentDao = SiteResidentDao();
 
@@ -218,7 +218,7 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
     }).then((value) {
       setState(() {
         selectionCustomers = customers
-            .map((customer) => SequentialFormatter.generateSequentialFormat(customer))
+            .map((customer) => SequentialFormatter.generateSequentialFormatFromCustomer(customer))
             .toList();
       });
     });

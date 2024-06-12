@@ -6,12 +6,12 @@ import 'package:sqflite/sqflite.dart';
 
 import '../constants/constants.dart';
 
-class ProjectSiteDao {
+class BuildingSiteDao {
   late final Database db;
   final SiteResidentDao siteResidentDao = SiteResidentDao();
   final CustomerDao customerDao = CustomerDao();
 
-  ProjectSiteDao() {
+  BuildingSiteDao() {
     final injector = Injector.appInstance;
     db = injector.get<Database>();
   }

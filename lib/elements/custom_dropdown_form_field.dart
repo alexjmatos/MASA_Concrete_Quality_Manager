@@ -25,7 +25,7 @@ class _CustomDropdownFormFieldState extends State<CustomDropdownFormField> {
   void initState() {
     super.initState();
     Future.delayed(
-      const Duration(seconds: 1),
+      const Duration(milliseconds: 500),
       () {
         setState(
           () {

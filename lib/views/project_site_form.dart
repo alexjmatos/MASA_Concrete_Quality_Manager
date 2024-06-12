@@ -23,7 +23,7 @@ class _ProjectSiteAndResidentFormState
     extends State<ProjectSiteAndResidentForm> {
   final _formKey = GlobalKey<FormState>();
 
-  final ProjectSiteDao projectSiteDao = ProjectSiteDao();
+  final BuildingSiteDao projectSiteDao = BuildingSiteDao();
   final CustomerDao customerDao = CustomerDao();
   final SiteResidentDao siteResidentDao = SiteResidentDao();
 

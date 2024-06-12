@@ -6,13 +6,15 @@ class AutoCompleteElement extends StatefulWidget {
   final List<String> options;
   final Function(String) onChanged;
   final TextEditingController controller;
+  final bool readOnly;
 
   const AutoCompleteElement(
       {super.key,
       required this.fieldName,
       required this.options,
       required this.onChanged,
-      required this.controller});
+      required this.controller,
+      this.readOnly = false});
 
   @override
   State<AutoCompleteElement> createState() => _AutoCompleteElementState();
@@ -35,6 +37,7 @@ class _AutoCompleteElementState extends State<AutoCompleteElement> {
             (context, textEditingController, focusNode, onFieldSubmitted) {
       textEditingController.value = widget.controller.value;
       return TextFormField(
+        readOnly: widget.readOnly,
         validator: (value) {
           if (value!.isEmpty) {
             return "El campo no puede quedar vacio";
