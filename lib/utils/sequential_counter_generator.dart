@@ -2,6 +2,7 @@ import 'package:masa_epico_concrete_manager/models/project_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 
 import '../constants/constants.dart';
+import '../models/concrete_testing_order.dart';
 import '../models/customer.dart';
 
 class SequentialFormatter {
@@ -25,5 +26,9 @@ class SequentialFormatter {
   static String generateSequentialFormatFromSiteResident(
       SiteResident siteResident) {
     return "${SequentialFormatter.generatePadLeftNumber(siteResident.id!)} - ${siteResident.firstName} ${siteResident.lastName}";
+  }
+
+  static String generateSequentialFormatFromConcreteTestingOrder(ConcreteTestingOrder e) {
+    return "${SequentialFormatter.generatePadLeftNumber(e.id!)} - ${e.customer.identifier} : ${e.buildingSite.siteName} - (${e.testingDate?.day}/${e.testingDate?.month}/${e.testingDate?.year})";
   }
 }

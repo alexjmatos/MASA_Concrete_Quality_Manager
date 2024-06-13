@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'formatters.dart';
+
 class AutoCompleteElement extends StatefulWidget {
   final String fieldName;
   final List<String> options;
@@ -48,6 +50,7 @@ class _AutoCompleteElementState extends State<AutoCompleteElement> {
         },
         controller: textEditingController,
         focusNode: focusNode,
+        autovalidateMode: AutovalidateMode.disabled,
         decoration: InputDecoration(
           label: Text(widget.fieldName),
           border: const OutlineInputBorder(),
@@ -57,16 +60,5 @@ class _AutoCompleteElementState extends State<AutoCompleteElement> {
         ],
       );
     });
-  }
-}
-
-class UppercaseInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    return TextEditingValue(
-      text: newValue.text.toUpperCase(),
-      selection: newValue.selection,
-    );
   }
 }

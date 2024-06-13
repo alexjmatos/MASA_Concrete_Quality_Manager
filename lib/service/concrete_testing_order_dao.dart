@@ -51,8 +51,7 @@ class ConcreteTestingOrderDao {
     cvw.coarse_aggregate_kg,
     cvw.fine_aggregate_kg,
     cvw.water_kg,
-    cvw.retardant_additive_lt,
-    cvw.other_additive_lt,
+    cvw.additives,
     cvw.total_load_kg,
     cvw.total_load_volumetric_weight_relation,
     cvw.percentage
@@ -102,8 +101,7 @@ class ConcreteTestingOrderDao {
     cvw.coarse_aggregate_kg,
     cvw.fine_aggregate_kg,
     cvw.water_kg,
-    cvw.retardant_additive_lt,
-    cvw.other_additive_lt,
+    cvw.additives,
     cvw.total_load_kg,
     cvw.total_load_volumetric_weight_relation,
     cvw.percentage

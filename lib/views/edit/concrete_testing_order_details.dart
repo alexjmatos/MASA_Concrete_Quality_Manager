@@ -73,6 +73,7 @@ class _ConcreteTestingOrderDetailsState
 
   @override
   void initState() {
+    super.initState();
     _setOrderFields();
     _loadData();
   }

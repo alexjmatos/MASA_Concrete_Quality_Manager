@@ -13,7 +13,7 @@ import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
-import 'package:masa_epico_concrete_manager/views/concrete_volumetric_weight.dart';
+import 'package:masa_epico_concrete_manager/views/concrete_volumetric_weight_form.dart';
 
 import '../elements/elevated_button_dialog.dart';
 import '../utils/sequential_counter_generator.dart';
@@ -39,9 +39,6 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
 
   static List<BuildingSite> projectSites = [];
   static List<String> availableProjectSites = [];
-
-  static List<SiteResident> siteResidents = [];
-  static List<String> availableSiteResidents = [];
 
   Customer selectedCustomer = Customer(identifier: "", companyName: "");
   BuildingSite selectedProjectSite = BuildingSite();
@@ -178,7 +175,6 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                     if (_formKey.currentState!.validate()) {
                       addConcreteQualityOrder();
                       Navigator.pop(context);
-                      reset();
                     } else {
                       Navigator.pop(context, 'Cancel');
                     }
@@ -266,19 +262,11 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
             selected.split("-").first));
 
     siteResidentDao.findByBuildingSiteId(selectedProjectSite.id!).then((value) {
-      siteResidents = value;
       setState(() {
         selectedSiteResident = value.first;
-
         _siteResidentController.text =
             "${SequentialFormatter.generatePadLeftNumber(selectedSiteResident.id!)} - ${selectedSiteResident.firstName} ${selectedSiteResident.lastName}";
       });
     });
-  }
-
-  void reset() {
-    _customerController.text = "";
-    _projectSiteController.text = "";
-    _siteResidentController.text = "";
   }
 }

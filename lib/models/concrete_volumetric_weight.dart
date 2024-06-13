@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class ConcreteVolumetricWeight {
   int? id;
   num? tareWeight;
@@ -10,8 +12,7 @@ class ConcreteVolumetricWeight {
   num? coarseAggregateQuantity;
   num? fineAggregateQuantity;
   num? waterQuantity;
-  num? retardantAdditiveQuantity;
-  num? otherAdditiveQuantity;
+  Map<String, num> additives;
   num? totalLoad;
   num? totalLoadVolumetricWeightRelation;
   num? percentage;
@@ -28,8 +29,7 @@ class ConcreteVolumetricWeight {
       this.coarseAggregateQuantity,
       this.fineAggregateQuantity,
       this.waterQuantity,
-      this.retardantAdditiveQuantity,
-      this.otherAdditiveQuantity,
+      this.additives,
       this.totalLoad,
       this.totalLoadVolumetricWeightRelation,
       this.percentage);
@@ -47,8 +47,7 @@ class ConcreteVolumetricWeight {
       "coarse_aggregate_kg": coarseAggregateQuantity,
       "fine_aggregate_kg": fineAggregateQuantity,
       "water_kg": waterQuantity,
-      "retardant_additive_lt": retardantAdditiveQuantity,
-      "other_additive_lt": otherAdditiveQuantity,
+      "additives": json.encode(additives),
       "total_load_kg": totalLoad,
       "total_load_volumetric_weight_relation":
           totalLoadVolumetricWeightRelation,
@@ -58,6 +57,11 @@ class ConcreteVolumetricWeight {
 
   static ConcreteVolumetricWeight? toModel(Map<String, Object?>? map) {
     if (map != null) {
+      var sourceMap =
+          json.decode(map["additives"] as String) as Map<String, dynamic>;
+      var additives = Map.fromEntries(sourceMap.entries
+          .where((entry) => entry.value is num)
+          .map((entry) => MapEntry(entry.key, entry.value as num)));
       return ConcreteVolumetricWeight(
           (map["id"] ?? 0) as int?,
           (map["tare_weight_gr"] ?? 0) as num?,
@@ -70,8 +74,7 @@ class ConcreteVolumetricWeight {
           (map["coarse_aggregate_kg"] ?? 0) as num?,
           (map["fine_aggregate_kg"] ?? 0) as num?,
           (map["water_kg"] ?? 0) as num?,
-          (map["retardant_additive_lt"] ?? 0) as num?,
-          (map["other_additive_lt"] ?? 0) as num?,
+          additives,
           (map["total_load_kg"] ?? 0) as num?,
           (map["total_load_volumetric_weight_relation"] ?? 0) as num?,
           (map["percentage"] ?? 0) as num?);

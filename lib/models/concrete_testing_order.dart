@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:masa_epico_concrete_manager/models/project_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 
@@ -64,6 +66,9 @@ class ConcreteTestingOrder {
         customer: customer,
         siteResident: siteResident);
 
+    Map<String, dynamic> additives = json.decode((source["additives"] ?? "{}") as String);
+    Map<String, num> parsedMap = additives.map((key, value) => MapEntry(key, value as num));
+
     ConcreteVolumetricWeight concreteVolumetricWeight =
         ConcreteVolumetricWeight(
             (source["concrete_volumetric_weight_id"] ?? 0) as int?,
@@ -77,8 +82,7 @@ class ConcreteTestingOrder {
             (source["coarse_aggregate_kg"] ?? 0) as num?,
             (source["fine_aggregate_kg"] ?? 0) as num?,
             (source["water_kg"] ?? 0) as num?,
-            (source["retardant_additive_lt"] ?? 0) as num?,
-            (source["other_additive_lt"] ?? 0) as num?,
+            parsedMap,
             (source["total_load_kg"] ?? 0) as num?,
             (source["total_load_volumetric_weight_relation"] ?? 0) as num?,
             (source["percentage"] ?? 0) as num?);

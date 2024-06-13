@@ -40,8 +40,7 @@ CREATE TABLE IF NOT EXISTS concrete_volumetric_weight
     coarse_aggregate_kg REAL,
     fine_aggregate_kg REAL,
     water_kg REAL,
-    retardant_additive_lt REAL,
-    other_additive_lt REAL,
+    additives TEXT,
     total_load_kg REAL,
     total_load_volumetric_weight_relation REAL,
     percentage REAL
@@ -88,12 +87,11 @@ INSERT INTO concrete_volumetric_weight(id,
                                        coarse_aggregate_kg,
                                        fine_aggregate_kg,
                                        water_kg,
-                                       retardant_additive_lt,
-                                       other_additive_lt,
+                                       additives,
                                        total_load_kg,
                                        total_load_volumetric_weight_relation,
                                        percentage)
-VALUES (1, 3480, 15180,11700,5.181,2258,7,2924,5518,5398,1500,4.36,14.53,15358,6.8,97.17);
+VALUES (1, 3480, 15180,11700,5.181,2258,7,2924,5518,5398,1500,'{"RETARDANTE": 4.46, "383", 14.88}',15358,6.8,97.17);
 
 INSERT INTO concrete_testing_orders(id, design_resistance, slumping_cm, volume_m3, tma_mm, design_age, testing_date, customer_id, building_site_id, site_resident_id, concrete_volumetric_weight_id)
 VALUES (1, '250', 14, 7, 20, '28', 1716319147750, 1, 1, 1, 1);

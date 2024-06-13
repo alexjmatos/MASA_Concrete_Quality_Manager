@@ -148,8 +148,8 @@ class _SiteResidentDetailsState extends State<SiteResidentDetails> {
   }
 
   void updateSiteResidentInfo() {
-    _nombresController.text = selectedSiteResident!.firstName.trim();
-    _apellidosController.text = selectedSiteResident!.lastName.trim();
-    _puestoController.text = selectedSiteResident!.jobPosition.trim();
+    _nombresController.text = selectedSiteResident.firstName.trim();
+    _apellidosController.text = selectedSiteResident.lastName.trim();
+    _puestoController.text = selectedSiteResident.jobPosition.trim();
   }
 }

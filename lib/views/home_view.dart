@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:injector/injector.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -12,10 +11,6 @@ class _HomeViewState extends State<HomeView> {
   String name = "";
   Text text = const Text("Bienvenido",
       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16));
-
-  _HomeViewState() {
-    final injector = Injector.appInstance;
-  }
 
   @override
   void initState() {

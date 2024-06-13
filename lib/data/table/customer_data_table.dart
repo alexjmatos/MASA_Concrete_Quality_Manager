@@ -14,13 +14,14 @@ class CustomerDataTable extends StatelessWidget {
       valueListenable: customersNotifier,
       builder: (context, value, child) {
         return PaginatedDataTable(
+          showCheckboxColumn: false,
           columns: const [
             DataColumn(
               label: Expanded(
                 child: Text(
                   "ID",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontStyle: FontStyle.normal),
+                  style: TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -29,7 +30,7 @@ class CustomerDataTable extends StatelessWidget {
                 child: Text(
                   "Cliente",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontStyle: FontStyle.normal),
+                  style: TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -38,14 +39,13 @@ class CustomerDataTable extends StatelessWidget {
                 child: Text(
                   "RFC",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontStyle: FontStyle.normal),
+                  style: TextStyle(fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
           ],
           source: CustomerData(
-              context: context,
-              customersNotifier: customersNotifier),
+              context: context, customersNotifier: customersNotifier),
           rowsPerPage: 10,
         );
       },
