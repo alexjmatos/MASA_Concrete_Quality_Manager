@@ -94,8 +94,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                       if (_formKey.currentState!.validate()) {
                         updateCustomer();
                         customerDao.findAll().then(
-                              (value) => widget.customersNotifier.value = value,
-                            );
+                            (value) => widget.customersNotifier.value = value);
                         Navigator.popUntil(context,
                             ModalRoute.withName(Navigator.defaultRouteName));
                       }

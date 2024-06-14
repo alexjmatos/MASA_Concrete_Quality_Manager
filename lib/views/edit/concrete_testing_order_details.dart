@@ -13,6 +13,7 @@ import '../../elements/custom_text_form_field.dart';
 import '../../elements/elevated_button_dialog.dart';
 import '../../elements/formatters.dart';
 import '../../elements/quantity_form_field.dart';
+import '../../elements/value_notifier_list.dart';
 import '../../models/concrete_testing_order.dart';
 import '../../models/customer.dart';
 import '../../models/project_site.dart';
@@ -28,7 +29,7 @@ import '../../utils/utils.dart';
 class ConcreteTestingOrderDetails extends StatefulWidget {
   final int id;
   final bool readOnly;
-  final ValueNotifier<List<ConcreteTestingOrder>> concreteTestingOrdersNotifier;
+  final ValueNotifierList<ConcreteTestingOrder> concreteTestingOrdersNotifier;
 
   const ConcreteTestingOrderDetails(
       {super.key,
@@ -315,11 +316,9 @@ class _ConcreteTestingOrderDetailsState
                   ElevatedButtonDialog(
                     title: "Confirmar cambios",
                     description: "Presiona OK para realizar la operacion",
-                    onOkPressed: () {
+                    onOkPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         updateConcreteQualityOrder();
-                        concreteTestingOrderDao.findAll().then((value) =>
-                            widget.concreteTestingOrdersNotifier.value = value);
                         Navigator.popUntil(context,
                             ModalRoute.withName(Navigator.defaultRouteName));
                         _formKey.currentState!.reset();
@@ -783,11 +782,16 @@ class _ConcreteTestingOrderDetailsState
     if (result != null) {
       selectedConcreteTestingOrder.concreteVolumetricWeight = result;
     }
-    await concreteTestingOrderDao
+
+    return concreteTestingOrderDao
         .update(selectedConcreteTestingOrder)
         .then((value) {
       ComponentUtils.generateSuccessMessage(
           context, "Orden de muestreo actualizado con exito");
+      int index = widget.concreteTestingOrdersNotifier.value.indexWhere(
+        (element) => element.id == value.id,
+      );
+      widget.concreteTestingOrdersNotifier.updateAtIndex(index, value);
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
     });

@@ -3,6 +3,7 @@ import 'package:masa_epico_concrete_manager/data/table/building_site_data_table.
 import 'package:masa_epico_concrete_manager/data/table/site_resident_data_table.dart';
 import 'package:masa_epico_concrete_manager/data/table/testing_order_data_table.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
+import 'package:masa_epico_concrete_manager/elements/value_notifier_list.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 import 'package:masa_epico_concrete_manager/models/project_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
@@ -22,26 +23,21 @@ class ConcreteQualitySearch extends StatefulWidget {
 }
 
 class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
-  Entity _selected = Entity.Clientes;
-  CustomerDao customerDao = CustomerDao();
-  BuildingSiteDao projectSiteDao = BuildingSiteDao();
-  SiteResidentDao siteResidentDao = SiteResidentDao();
-  ConcreteTestingOrderDao concreteTestingOrderDao = ConcreteTestingOrderDao();
+  Entity _selected = Entity.Clientes; // Default selected entity
+  CustomerDao customerDao = CustomerDao(); // DAO for customers
+  BuildingSiteDao projectSiteDao = BuildingSiteDao(); // DAO for project sites
+  SiteResidentDao siteResidentDao = SiteResidentDao(); // DAO for site residents
+  ConcreteTestingOrderDao concreteTestingOrderDao = ConcreteTestingOrderDao(); // DAO for concrete testing orders
 
-  final ValueNotifier<List<Customer>> _customersNotifier =
-      ValueNotifier<List<Customer>>([]);
-  final ValueNotifier<List<BuildingSite>> _projectSitesNotifier =
-      ValueNotifier<List<BuildingSite>>([]);
-  final ValueNotifier<List<SiteResident>> _siteResidentsNotifier =
-      ValueNotifier<List<SiteResident>>([]);
-  final ValueNotifier<List<ConcreteTestingOrder>>
-      _concreteTestingOrderNotifier =
-      ValueNotifier<List<ConcreteTestingOrder>>([]);
+  final ValueNotifierList<Customer> _customersNotifier = ValueNotifierList([]); // Notifier for customers
+  final ValueNotifierList<BuildingSite> _buildingSitesNotifier = ValueNotifierList([]);  // Notifier for project sites
+  final ValueNotifierList<SiteResident> _siteResidentsNotifier = ValueNotifierList([]);  // Notifier for site residents
+  final ValueNotifierList<ConcreteTestingOrder> _concreteTestingOrderNotifier = ValueNotifierList([]);  // Notifier for concrete testing orders
 
   @override
   void initState() {
     super.initState();
-    _loadDataTables();
+    _loadDataTables(); // Load data when the widget is initialized
   }
 
   @override
@@ -58,7 +54,7 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
                 items: Entity.values.asNameMap().keys.toList(),
                 onChanged: (p0) {
                   setState(() {
-                    _selected = Entity.values.byName(p0);
+                    _selected = Entity.values.byName(p0); // Update the selected entity
                   });
                 },
               ),
@@ -70,9 +66,9 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
               else if (_selected == Entity.Obras)
                 generateProjectSiteDataTable()
               else if (_selected == Entity.Residentes)
-                generateSiteResidentDataTable()
-              else if (_selected == Entity.Muestras)
-                generateConcreteTestingDataTable()
+                  generateSiteResidentDataTable()
+                else if (_selected == Entity.Muestras)
+                    generateConcreteTestingDataTable()
             ],
           ),
         ),
@@ -80,69 +76,75 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
     );
   }
 
+  // Helper method to generate Customer Data Table
   CustomerDataTable generateCustomerDataTable() {
     return CustomerDataTable(
       customersNotifier: _customersNotifier,
     );
   }
 
+  // Helper method to generate Project Site Data Table
   ProjectSiteDataTable generateProjectSiteDataTable() {
     return ProjectSiteDataTable(
-      projectSitesNotifier: _projectSitesNotifier,
+      projectSitesNotifier: _buildingSitesNotifier,
     );
   }
 
+  // Helper method to generate Site Resident Data Table
   SiteResidentDataTable generateSiteResidentDataTable() {
     return SiteResidentDataTable(
       siteResidentNotifier: _siteResidentsNotifier,
     );
   }
 
+  // Helper method to generate Concrete Testing Data Table
   ConcreteTestingDataTable generateConcreteTestingDataTable() {
     return ConcreteTestingDataTable(
       concreteTestingOrdersNotifier: _concreteTestingOrderNotifier,
     );
   }
 
+  // Method to load data for all tables
   void _loadDataTables() {
     customerDao.findAll().then(
-      (value) {
+          (value) {
         setState(
-          () {
-            _customersNotifier.value = value;
+              () {
+            _customersNotifier.value = value; // Update customers notifier
           },
         );
       },
     );
 
     projectSiteDao.findAll().then(
-      (value) {
+          (value) {
         setState(
-          () {
-            _projectSitesNotifier.value = value;
+              () {
+            _buildingSitesNotifier.value = value; // Update project sites notifier
           },
         );
       },
     );
 
     siteResidentDao.findAll().then(
-      (value) {
+          (value) {
         setState(() {
-          _siteResidentsNotifier.value = value;
+          _siteResidentsNotifier.value = value; // Update site residents notifier
         });
       },
     );
 
     concreteTestingOrderDao.findAll().then(
-      (value) {
+          (value) {
         setState(() {
-          _concreteTestingOrderNotifier.value = value;
+          _concreteTestingOrderNotifier.value = value; // Update concrete testing orders notifier
         });
       },
     );
   }
 }
 
+// Enum to define different entities
 enum Entity {
   Clientes,
   Obras,

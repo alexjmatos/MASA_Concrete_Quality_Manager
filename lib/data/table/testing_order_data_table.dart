@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/data/source/testing_order_data_source.dart';
+import 'package:masa_epico_concrete_manager/elements/value_notifier_list.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 
 class ConcreteTestingDataTable extends StatelessWidget {
-  final ValueNotifier<List<ConcreteTestingOrder>> concreteTestingOrdersNotifier;
+  final ValueNotifierList<ConcreteTestingOrder> concreteTestingOrdersNotifier;
 
   const ConcreteTestingDataTable(
       {super.key, required this.concreteTestingOrdersNotifier});
@@ -12,8 +13,7 @@ class ConcreteTestingDataTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: concreteTestingOrdersNotifier,
-      builder: (BuildContext context, List<ConcreteTestingOrder> value,
-          Widget? child) {
+      builder: (context, value, child) {
         return PaginatedDataTable(
           columns: const [
             DataColumn(
