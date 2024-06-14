@@ -26,4 +26,12 @@ class ConcreteVolumetricWeightDao {
         where: "id = ?", whereArgs: [id], limit: 1);
     return ConcreteVolumetricWeight.toModel(list.first);
   }
+
+  Future<ConcreteVolumetricWeight?> update(
+      ConcreteVolumetricWeight concreteVolumetricWeight) async {
+    await db.update(
+        Constants.CONCRETE_VOLUMETRIC_WEIGHT, concreteVolumetricWeight.toMap(),
+        where: "id = ?", whereArgs: [concreteVolumetricWeight.id]);
+    return findById(concreteVolumetricWeight.id!);
+  }
 }

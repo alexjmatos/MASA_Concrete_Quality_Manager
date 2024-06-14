@@ -4,12 +4,14 @@ class CustomExpansionTile extends StatefulWidget {
   final String title;
   final List<Widget> children;
   final bool initiallyExpanded;
+  final Function() onExpand;
 
   const CustomExpansionTile({
     super.key,
     required this.title,
     required this.children,
     this.initiallyExpanded = false,
+    required this.onExpand
   });
 
   @override
@@ -53,6 +55,7 @@ class _CustomExpansionTileState extends State<CustomExpansionTile> {
             onExpansionChanged: (bool expanded) {
               setState(() {
                 _customTileExpanded = expanded;
+                widget.onExpand();
               });
             },
             initiallyExpanded: widget.initiallyExpanded,
