@@ -4,13 +4,14 @@ class CustomDropdownFormField extends StatefulWidget {
   final String labelText;
   final List<String> items;
   final Function(String) onChanged;
+  final int defaultValueIndex;
 
-  const CustomDropdownFormField({
-    super.key,
-    required this.labelText,
-    required this.items,
-    required this.onChanged,
-  });
+  const CustomDropdownFormField(
+      {super.key,
+      required this.labelText,
+      required this.items,
+      required this.onChanged,
+      this.defaultValueIndex = 0});
 
   @override
   State<CustomDropdownFormField> createState() =>
@@ -19,6 +20,23 @@ class CustomDropdownFormField extends StatefulWidget {
 
 class _CustomDropdownFormFieldState extends State<CustomDropdownFormField> {
   String? _selectedItem;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(
+      const Duration(milliseconds: 500),
+      () {
+        setState(
+          () {
+            if (widget.items.isNotEmpty) {
+              _selectedItem = widget.items[widget.defaultValueIndex];
+            }
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

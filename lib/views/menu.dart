@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/views/concrete_quality_form.dart';
+import 'package:masa_epico_concrete_manager/views/concrete_testing_order_form.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_quality_sample.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_quality_search.dart';
+import 'package:masa_epico_concrete_manager/views/concrete_volumetric_weight_form.dart';
 import 'package:masa_epico_concrete_manager/views/customer_form.dart';
 import 'package:masa_epico_concrete_manager/views/home_view.dart';
 import 'package:masa_epico_concrete_manager/views/project_site_form.dart';
+import 'package:masa_epico_concrete_manager/views/site_resident_form.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key, required this.title});
@@ -20,16 +22,20 @@ class _MenuPageState extends State<MenuPage> {
   static final List<Widget> _widgetOptions = <Widget>[
     const HomeView(),
     const CustomerForm(),
+    const SiteResidentForm(),
     const ProjectSiteAndResidentForm(),
-    const ConcreteQualityForm(),
-    const ConcreteQualitySampleForm(),
+    const ConcreteTestingOrderForm(),
+    const ConcreteVolumetricWeightForm(),
+    const ConcreteTestingSampleForm(),
     const ConcreteQualitySearch(),
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    setState(
+      () {
+        _selectedIndex = index;
+      },
+    );
   }
 
   @override
@@ -82,7 +88,7 @@ class _MenuPageState extends State<MenuPage> {
               },
             ),
             ListTile(
-              title: const Text('Agregar obra y residente'),
+              title: const Text('Agregar residente de obra'),
               selected: _selectedIndex == 2,
               onTap: () {
                 // Update the state of the app
@@ -92,7 +98,7 @@ class _MenuPageState extends State<MenuPage> {
               },
             ),
             ListTile(
-              title: const Text('Crear orden de muestreo'),
+              title: const Text('Agregar obra'),
               selected: _selectedIndex == 3,
               onTap: () {
                 // Update the state of the app
@@ -102,7 +108,7 @@ class _MenuPageState extends State<MenuPage> {
               },
             ),
             ListTile(
-              title: const Text('Registrar ensayo'),
+              title: const Text('Crear orden de muestreo'),
               selected: _selectedIndex == 4,
               onTap: () {
                 // Update the state of the app
@@ -112,11 +118,31 @@ class _MenuPageState extends State<MenuPage> {
               },
             ),
             ListTile(
-              title: const Text('Buscar y modificar'),
+              title: const Text('Peso volumetrico'),
               selected: _selectedIndex == 5,
               onTap: () {
                 // Update the state of the app
                 _onItemTapped(5);
+                // Then close the drawer
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Registrar ensayo'),
+              selected: _selectedIndex == 6,
+              onTap: () {
+                // Update the state of the app
+                _onItemTapped(6);
+                // Then close the drawer
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Registros'),
+              selected: _selectedIndex == 7,
+              onTap: () {
+                // Update the state of the app
+                _onItemTapped(7);
                 // Then close the drawer
                 Navigator.pop(context);
               },

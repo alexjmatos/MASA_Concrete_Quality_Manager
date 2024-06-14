@@ -1,74 +1,66 @@
 import 'package:injector/injector.dart';
-import 'package:masa_epico_concrete_manager/constants/constants.dart';
 import 'package:masa_epico_concrete_manager/models/project_site.dart';
-import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
-import 'package:masa_epico_concrete_manager/service/location_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
-import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
-import 'package:pocketbase/pocketbase.dart';
+import 'package:sqflite/sqflite.dart';
 
-class ProjectSiteDao {
-  late final PocketBase pb;
-  final LocationDao locationDao = LocationDao();
+import '../constants/constants.dart';
+
+class BuildingSiteDao {
+  late final Database db;
   final SiteResidentDao siteResidentDao = SiteResidentDao();
   final CustomerDao customerDao = CustomerDao();
-  late final SequentialIdGenerator sequentialIdGenerator;
 
-  ProjectSiteDao() {
+  BuildingSiteDao() {
     final injector = Injector.appInstance;
-    pb = injector.get<PocketBase>();
-    sequentialIdGenerator = injector.get<SequentialIdGenerator>();
+    db = injector.get<Database>();
   }
 
-  Future<RecordModel> addProjectSite(ProjectSite projectSite) async {
-    List<int> sequenceSiteResident = await Future.wait(
-        [sequentialIdGenerator.getNextSequence(Constants.SITE_RESIDENTS)]);
-    int currentSequenceSiteResident = sequenceSiteResident[0];
+  Future<BuildingSite> add(BuildingSite projectSite) async {
+    // ADD PROJECT SITE TO THE project_sites table
+    int id = await db.insert(Constants.PROJECT_SITES, projectSite.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+    return findById(id);
+  }
 
-    for (SiteResident siteResident in projectSite.residents) {
-      // Generate a next sequence for site resident
-      if (siteResident.id == null) {
-        siteResident.id = currentSequenceSiteResident;
-        currentSequenceSiteResident++;
-      }
-    }
+  Future<BuildingSite> findById(int id) async {
+    List<Map<String, Object?>> records = await db.rawQuery("""
+        SELECT building_sites.id, building_sites.site_name, 
+		    customers.id as customer_id, customers.identifier, customers.company_name, 
+		    site_residents.id AS site_resident_id, site_residents.first_name, site_residents.last_name, site_residents.job_position
+        FROM building_sites 
+        INNER JOIN customers ON building_sites.customer_id = customers.id
+        INNER JOIN site_residents ON building_sites.site_resident_id = site_residents.id
+        WHERE building_sites.id = ?;
+        """, [id]);
+    return records.map((e) => BuildingSite.toModel(e)).first;
+  }
 
-    // Add Site Resident
-    if (projectSite.residents.firstOrNull != null &&
-        projectSite.residents.first.id == null) {
-      Future<RecordModel> addSiteResidentFuture =
-          siteResidentDao.addSiteResident(projectSite.residents.first) as Future<RecordModel>;
+  Future<List<BuildingSite>> findByClientId(int clientId) async {
+    List<Map<String, Object?>> records = await db.query(Constants.PROJECT_SITES,
+        where: "customer_id = ?", whereArgs: [clientId]);
+    return records.map((e) => BuildingSite.toModel(e)).toList();
+  }
 
-      addSiteResidentFuture.then((value) {
-        projectSite.residents.first.id = value.id as int?;
-      });
+  Future<List<BuildingSite>> findAll() async {
+    List<Map<String, Object?>> records = await db.rawQuery("""
+        SELECT building_sites.id, building_sites.site_name, 
+		    customers.id as customer_id, customers.identifier, customers.company_name, 
+		    site_residents.id AS site_resident_id, site_residents.first_name, site_residents.last_name, site_residents.job_position
+        FROM building_sites 
+        INNER JOIN customers ON building_sites.customer_id = customers.id
+        INNER JOIN site_residents ON building_sites.site_resident_id = site_residents.id;
+        """);
+    return records.map((e) => BuildingSite.toModel(e)).toList();
+  }
 
-      await Future.wait([addSiteResidentFuture]);
-    }
+  Future<BuildingSite> update(BuildingSite toBeUpdated) async {
+    // Update the Building Site
+    await db.update(Constants.PROJECT_SITES, toBeUpdated.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+        where: "id = ?",
+        whereArgs: [toBeUpdated.id]);
 
-    // Add the project site
-    // Wait for both futures to complete
-    // Generate a next sequence for project site
-    List<int> sequenceCustomer = await Future.wait(
-        [sequentialIdGenerator.getNextSequence(Constants.PROJECT_SITES)]);
-    projectSite.sequence = sequenceCustomer[0];
-
-    final newProjectSite = await pb
-        .collection(Constants.PROJECT_SITES)
-        .create(body: projectSite.toMap());
-
-    // Update the customer to reflect the relation
-    // for (var element in projectSite.customers) {
-    //   var sites = element.projects.map((e) => e.id).toList();
-    //   sites.add(newProjectSite.id);
-    //   pb
-    //       .collection(Constants.CUSTOMERS)
-    //       .update(element.id!, body: <String, dynamic>{
-    //     "obras": sites,
-    //   });
-    // }
-
-    return newProjectSite;
+    return findById(toBeUpdated.id!);
   }
 }

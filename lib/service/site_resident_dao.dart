@@ -11,8 +11,9 @@ class SiteResidentDao {
     db = injector.get<Database>();
   }
 
-  Future<SiteResident> addSiteResident(SiteResident siteResident) async {
-    int id = await db.insert(Constants.SITE_RESIDENTS, siteResident.toMap());
+  Future<SiteResident> add(SiteResident siteResident) async {
+    int id = await db.insert(Constants.SITE_RESIDENTS, siteResident.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
     return findById(id);
   }
 
@@ -22,12 +23,24 @@ class SiteResidentDao {
     return records.map((e) => SiteResident.toModel(e)).first;
   }
 
-  Future<List<SiteResident>> getSiteResidentsByIds(
-      List<String> residentsId) async {
-    return List.empty();
+  Future<List<SiteResident>> findByBuildingSiteId(int projectId) async {
+    var result = await db.rawQuery("""
+    SELECT id, first_name, last_name, job_position FROM site_residents where id in 
+    (SELECT site_resident_id from building_sites where id = ?);
+    """, [projectId]);
+    return result.map((e) => SiteResident.toModel(e)).toList();
   }
 
-  Future<List<SiteResident>> getAllSiteResidents() async {
-    return List.empty();
+  Future<List<SiteResident>> findAll() async {
+    var result = await db.query(Constants.SITE_RESIDENTS);
+    return result.map((e) => SiteResident.toModel(e)).toList();
+  }
+
+  Future<SiteResident> update(SiteResident siteResident) async {
+    await db.update(Constants.SITE_RESIDENTS, siteResident.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+        where: "id = ?",
+        whereArgs: [siteResident.id]);
+    return findById(siteResident.id!);
   }
 }

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class ConcreteQualitySampleForm extends StatefulWidget {
-  const ConcreteQualitySampleForm({super.key});
+class ConcreteTestingSampleForm extends StatefulWidget {
+  const ConcreteTestingSampleForm({super.key});
 
   @override
-  State<ConcreteQualitySampleForm> createState() => _ConcreteQualitySampleFormState();
+  State<ConcreteTestingSampleForm> createState() => _ConcreteTestingSampleFormState();
 }
 
-class _ConcreteQualitySampleFormState extends State<ConcreteQualitySampleForm> {
+class _ConcreteTestingSampleFormState extends State<ConcreteTestingSampleForm> {
   final _formKey = GlobalKey<FormState>();
 
   @override

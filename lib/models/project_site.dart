@@ -1,61 +1,41 @@
 // Entidad - Obra en backend
 import 'package:masa_epico_concrete_manager/models/customer.dart';
-import 'package:masa_epico_concrete_manager/models/location.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
-import 'package:masa_epico_concrete_manager/service/location_dao.dart';
-import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 
-class ProjectSite {
-  static final LocationDao locationDao = LocationDao();
-  static final SiteResidentDao siteResidentDao = SiteResidentDao();
+class BuildingSite {
+  int? id;
+  String? siteName;
 
-  String? id;
-  int? sequence;
-  String siteName;
-  Location? location;
-  List<SiteResident> residents;
-  List<Customer> customers;
+  // ONE TO MANY
+  SiteResident? siteResident;
 
-  ProjectSite({
-    this.id,
-    this.sequence,
-    required this.siteName,
-    List<SiteResident>? residents,
-    List<Customer>? customers,
-  })  : customers = customers ?? [],
-        residents = residents ?? [];
+  // ONE TO MANY
+  Customer? customer;
 
-  @override
-  String toString() {
-    return 'ProjectSite: { siteName: $siteName, location: $location, customer: $customers }';
+  BuildingSite({this.id, this.siteName, this.customer, this.siteResident});
+
+  Map<String, Object?> toMap() {
+    return {
+      "id": id,
+      "site_name": siteName,
+      "customer_id": customer?.id,
+      "site_resident_id": siteResident?.id
+    };
   }
 
-  Map<String, dynamic> toMap() => <String, dynamic>{
-        "consecutivo": sequence,
-        "nombre_identificador": siteName,
-        "direccion_id": location?.id,
-        "clientes_asignados": customers.map((e) => e.id).toList(),
-        "residentes_asignados": residents.map((e) => e.id).toList(),
-      };
-
-  static ProjectSite toModel(Map<String, dynamic> json) {
-    String id = json['id'];
-    int sequence = json['consecutivo'];
-    String siteName = json['nombre_identificador'];
-    Map<String, Object?> expand = json['expand'];
-    List<Map<String, dynamic>> residentes =
-        expand['residentes_asignados'] as List<Map<String, dynamic>>;
-
-    List<SiteResident> siteResidents =
-        residentes.map((e) => SiteResident.toModel(e)).toList();
-
-    List<Customer> customers = [];
-
-    return ProjectSite(
-        id: id,
-        sequence: sequence,
-        siteName: siteName,
-        residents: siteResidents,
-        customers: customers);
+  static BuildingSite toModel(Map<String, Object?>? map) {
+    return BuildingSite(
+        id: map?["id"] as int,
+        siteName: map?["site_name"] as String,
+        customer: Customer(
+            id: (map?["customer_id"] ?? 0) as int,
+            identifier: (map?["identifier"] ?? "") as String,
+            companyName: (map?["company_name"] ?? "") as String),
+    siteResident: SiteResident(
+      id: (map?["site_resident_id"] ?? 0) as int,
+      firstName: (map?["first_name"] ?? "") as String,
+      lastName: (map?["last_name"] ?? "") as String,
+      jobPosition: (map?["job_position"] ?? "") as String
+    ));
   }
 }

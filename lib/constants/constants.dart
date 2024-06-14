@@ -38,21 +38,17 @@ class Constants {
   ];
 
   static const String USERS = "users";
-  static const String MANAGERS = "gerentes";
-  static const String LOCATIONS = "direcciones";
   static const String CUSTOMERS = "customers";
-  static const String PROJECT_SITES = "obras";
+  static const String PROJECT_SITES = "building_sites";
   static const String SITE_RESIDENTS = "site_residents";
-
-  static const String SEQUENCE_MANAGERS = "consecutivo_gerentes";
-  static const String SEQUENCE_LOCATIONS = "consecutivo_direcciones";
-  static const String SEQUENCE_CUSTOMERS = "consecutivo_clientes";
-  static const String SEQUENCE_PROJECT_SITES = "consecutivo_obras";
-  static const String SEQUENCE_SITE_RESIDENTS =
-      "consecutivo_residentes_de_obra";
+  static const String MANY_TO_MANY_PROJECT_SITES_SITE_RESIDENTS =
+      "project_site_resident";
+  static const String CONCRETE_TESTING_ORDERS = "concrete_testing_orders";
+  static const String CONCRETE_VOLUMETRIC_WEIGHT = "concrete_volumetric_weight";
 
   static const int LEADING_ZEROS = 4;
-
+  static const int TARE_WEIGHT = 3480;
+  static const num TARE_VOLUME = 5.181;
   static const List<String> CONCRETE_COMPRESSION_RESISTANCES = [
     "100",
     "150",
@@ -65,12 +61,10 @@ class Constants {
     "500"
   ];
 
-  static const List<String> CONCRETE_DESIGN_AGES = [
-    "3",
-    "7",
-    "14",
-    "28"
-  ];
+  static const List<String> CONCRETE_DESIGN_AGES = ["3", "7", "14", "28"];
 
   static DateFormat formatter = DateFormat('dd-MM-yyyy');
+
+  static const double DATA_TABLE_HORIZONTAL_MARGIN = 24;
+  static const double DATA_TABLE_COLUMN_SPACING = 56;
 }
