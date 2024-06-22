@@ -34,3 +34,4 @@ flutter:
   assets: 
     - images/masa-control.png
     - dev.env
+    - init.sql

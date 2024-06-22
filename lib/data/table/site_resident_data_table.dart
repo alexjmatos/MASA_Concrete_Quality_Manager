@@ -27,7 +27,16 @@ class SiteResidentDataTable extends StatelessWidget {
             DataColumn(
               label: Expanded(
                 child: Text(
-                  "Nombre Completo",
+                  "Nombre",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontStyle: FontStyle.normal),
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Expanded(
+                child: Text(
+                  "Apellidos",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontStyle: FontStyle.normal),
                 ),

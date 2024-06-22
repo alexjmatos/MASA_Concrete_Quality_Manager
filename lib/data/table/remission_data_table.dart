@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/data/source/testing_order_data_source.dart';
+import 'package:masa_epico_concrete_manager/data/source/remission_data_source.dart';
 import 'package:masa_epico_concrete_manager/elements/value_notifier_list.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_testing_remission.dart';
 
-class ConcreteTestingDataTable extends StatelessWidget {
-  final ValueNotifierList<ConcreteTestingOrder> concreteTestingOrdersNotifier;
+class ConcreteRemissionDataTable extends StatelessWidget {
+  final ValueNotifierList<ConcreteTestingRemission>
+      concreteTestingRemissionNotifier;
 
-  const ConcreteTestingDataTable(
-      {super.key, required this.concreteTestingOrdersNotifier});
+  const ConcreteRemissionDataTable(
+      {super.key, required this.concreteTestingRemissionNotifier});
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: concreteTestingOrdersNotifier,
+      valueListenable: concreteTestingRemissionNotifier,
       builder: (context, value, child) {
         return PaginatedDataTable(
           columns: const [
@@ -20,15 +21,6 @@ class ConcreteTestingDataTable extends StatelessWidget {
               label: Expanded(
                 child: Text(
                   "Identificador",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontStyle: FontStyle.normal),
-                ),
-              ),
-            ),
-            DataColumn(
-              label: Expanded(
-                child: Text(
-                  "Fecha",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontStyle: FontStyle.normal),
                 ),
@@ -46,7 +38,7 @@ class ConcreteTestingDataTable extends StatelessWidget {
             DataColumn(
               label: Expanded(
                 child: Text(
-                  "Resistencia",
+                  "Edad de\ndiseño",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontStyle: FontStyle.normal),
                 ),
@@ -55,7 +47,7 @@ class ConcreteTestingDataTable extends StatelessWidget {
             DataColumn(
               label: Expanded(
                 child: Text(
-                  "Edad de \ndiseño",
+                  "Resistencia \nde diseño F'C",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontStyle: FontStyle.normal),
                 ),
@@ -64,16 +56,45 @@ class ConcreteTestingDataTable extends StatelessWidget {
             DataColumn(
               label: Expanded(
                 child: Text(
-                  "Revenimiento",
+                  "Hora en\nplanta",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontStyle: FontStyle.normal),
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Expanded(
+                child: Text(
+                  "Revenimiento \nreal (cm)",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontStyle: FontStyle.normal),
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Expanded(
+                child: Text(
+                  "Temperatura (°C)",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontStyle: FontStyle.normal),
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Expanded(
+                child: Text(
+                  "Ubicación",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontStyle: FontStyle.normal),
                 ),
               ),
             ),
           ],
-          source: ConcreteTestingOrderData(
+          rowsPerPage: 8,
+          source: ConcreteRemissionData(
               context: context,
-              concreteTestingOrdersNotifier: concreteTestingOrdersNotifier),
+              concreteTestingRemissionNotifier:
+                  concreteTestingRemissionNotifier),
         );
       },
     );

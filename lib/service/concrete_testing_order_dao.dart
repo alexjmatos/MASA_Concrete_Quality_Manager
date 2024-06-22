@@ -131,10 +131,10 @@ class ConcreteTestingOrderDao {
     return ConcreteTestingOrder.toModel(source);
   }
 
-  Future<int> update(ConcreteTestingOrder selectedConcreteTestingOrder) async {
-    int update = await db.update(
+  Future<ConcreteTestingOrder> update(ConcreteTestingOrder selectedConcreteTestingOrder) async {
+    await db.update(
         Constants.CONCRETE_TESTING_ORDERS, selectedConcreteTestingOrder.toMap(),
         where: "id = ?", whereArgs: [selectedConcreteTestingOrder.id!]);
-    return update;
+    return findById(selectedConcreteTestingOrder.id!);
   }
 }

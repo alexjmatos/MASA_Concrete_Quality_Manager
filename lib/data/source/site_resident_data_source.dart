@@ -16,10 +16,12 @@ class SiteResidentData extends DataTableSource {
     return DataRow(
       cells: [
         DataCell(
-          Text(
-            SequentialFormatter.generatePadLeftNumber(
-                siteResidentNotifier.value[index].id!),
-            textAlign: TextAlign.center,
+          Center(
+            child: Text(
+              SequentialFormatter.generatePadLeftNumber(
+                  siteResidentNotifier.value[index].id!),
+              textAlign: TextAlign.center,
+            ),
           ),
           onLongPress: () {
             int id = siteResidentNotifier.value[index].id!;
@@ -37,15 +39,27 @@ class SiteResidentData extends DataTableSource {
           },
         ),
         DataCell(
-          Text(
-            "${siteResidentNotifier.value[index].lastName} ${siteResidentNotifier.value[index].firstName}",
-            textAlign: TextAlign.center,
+          Center(
+            child: Text(
+              siteResidentNotifier.value[index].firstName,
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
         DataCell(
-          Text(
-            siteResidentNotifier.value[index].jobPosition,
-            textAlign: TextAlign.center,
+          Center(
+            child: Text(
+              siteResidentNotifier.value[index].lastName,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+        DataCell(
+          Center(
+            child: Text(
+              siteResidentNotifier.value[index].jobPosition,
+              textAlign: TextAlign.center,
+            ),
           ),
         )
       ],
