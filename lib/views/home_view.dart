@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/elements/custom_expansion_tile.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -9,8 +11,10 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   String name = "";
-  Text text = const Text("Bienvenido",
-      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16));
+  Text text = const Text(
+    "Ensayes",
+    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+  );
 
   @override
   void initState() {
@@ -25,10 +29,30 @@ class _HomeViewState extends State<HomeView> {
         automaticallyImplyLeading: false,
         title: text,
       ),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text("Estos son los ensayos que tienes pendiente hoy")),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CustomExpansionTile(
+                title: "Hoy",
+                children: const [],
+                onExpand: () {},
+              ),
+              CustomExpansionTile(
+                title: "Proximos",
+                children: [],
+                onExpand: () {},
+              ),
+              CustomExpansionTile(
+                title: "Atrasados",
+                children: [],
+                onExpand: () {},
+              )
+            ],
+          ),
+        ),
       ),
     );
   }

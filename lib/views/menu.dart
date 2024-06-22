@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_testing_order_form.dart';
-import 'package:masa_epico_concrete_manager/views/concrete_quality_sample.dart';
-import 'package:masa_epico_concrete_manager/views/concrete_quality_search.dart';
+import 'package:masa_epico_concrete_manager/views/concrete_testing_remissions_view.dart';
+import 'package:masa_epico_concrete_manager/views/record_tables.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_volumetric_weight_form.dart';
 import 'package:masa_epico_concrete_manager/views/customer_form.dart';
 import 'package:masa_epico_concrete_manager/views/home_view.dart';
@@ -26,7 +26,7 @@ class _MenuPageState extends State<MenuPage> {
     const ProjectSiteAndResidentForm(),
     const ConcreteTestingOrderForm(),
     const ConcreteVolumetricWeightForm(),
-    const ConcreteTestingSampleForm(),
+    const ConcreteRemissionForm(),
     const ConcreteQualitySearch(),
   ];
 
@@ -128,7 +128,7 @@ class _MenuPageState extends State<MenuPage> {
               },
             ),
             ListTile(
-              title: const Text('Registrar ensayo'),
+              title: const Text('Remisiones'),
               selected: _selectedIndex == 6,
               onTap: () {
                 // Update the state of the app

@@ -27,12 +27,17 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
   CustomerDao customerDao = CustomerDao(); // DAO for customers
   BuildingSiteDao projectSiteDao = BuildingSiteDao(); // DAO for project sites
   SiteResidentDao siteResidentDao = SiteResidentDao(); // DAO for site residents
-  ConcreteTestingOrderDao concreteTestingOrderDao = ConcreteTestingOrderDao(); // DAO for concrete testing orders
+  ConcreteTestingOrderDao concreteTestingOrderDao =
+      ConcreteTestingOrderDao(); // DAO for concrete testing orders
 
-  final ValueNotifierList<Customer> _customersNotifier = ValueNotifierList([]); // Notifier for customers
-  final ValueNotifierList<BuildingSite> _buildingSitesNotifier = ValueNotifierList([]);  // Notifier for project sites
-  final ValueNotifierList<SiteResident> _siteResidentsNotifier = ValueNotifierList([]);  // Notifier for site residents
-  final ValueNotifierList<ConcreteTestingOrder> _concreteTestingOrderNotifier = ValueNotifierList([]);  // Notifier for concrete testing orders
+  final ValueNotifierList<Customer> _customersNotifier =
+      ValueNotifierList([]); // Notifier for customers
+  final ValueNotifierList<BuildingSite> _buildingSitesNotifier =
+      ValueNotifierList([]); // Notifier for project sites
+  final ValueNotifierList<SiteResident> _siteResidentsNotifier =
+      ValueNotifierList([]); // Notifier for site residents
+  final ValueNotifierList<ConcreteTestingOrder> _concreteTestingOrderNotifier =
+      ValueNotifierList([]); // Notifier for concrete testing orders
 
   @override
   void initState() {
@@ -47,33 +52,49 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomDropdownFormField(
                 labelText: "Registro",
                 items: Entity.values.asNameMap().keys.toList(),
                 onChanged: (p0) {
-                  setState(() {
-                    _selected = Entity.values.byName(p0); // Update the selected entity
-                  });
+                  setState(
+                    () {
+                      _selected = Entity.values
+                          .byName(p0); // Update the selected entity
+                    },
+                  );
                 },
               ),
               const SizedBox(
                 height: 20,
               ),
-              if (_selected == Entity.Clientes)
-                generateCustomerDataTable()
-              else if (_selected == Entity.Obras)
-                generateProjectSiteDataTable()
-              else if (_selected == Entity.Residentes)
-                  generateSiteResidentDataTable()
-                else if (_selected == Entity.Muestras)
-                    generateConcreteTestingDataTable()
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDataTable(),
+                  )
+                ],
+              )
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildDataTable() {
+    switch (_selected) {
+      case Entity.Clientes:
+        return generateCustomerDataTable();
+      case Entity.Obras:
+        return generateProjectSiteDataTable();
+      case Entity.Residentes:
+        return generateSiteResidentDataTable();
+      case Entity.Muestras:
+        return generateConcreteTestingDataTable();
+      default:
+        return Container(); // Return an empty container for an undefined entity
+    }
   }
 
   // Helper method to generate Customer Data Table
@@ -107,9 +128,9 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
   // Method to load data for all tables
   void _loadDataTables() {
     customerDao.findAll().then(
-          (value) {
+      (value) {
         setState(
-              () {
+          () {
             _customersNotifier.value = value; // Update customers notifier
           },
         );
@@ -117,27 +138,30 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
     );
 
     projectSiteDao.findAll().then(
-          (value) {
+      (value) {
         setState(
-              () {
-            _buildingSitesNotifier.value = value; // Update project sites notifier
+          () {
+            _buildingSitesNotifier.value =
+                value; // Update project sites notifier
           },
         );
       },
     );
 
     siteResidentDao.findAll().then(
-          (value) {
+      (value) {
         setState(() {
-          _siteResidentsNotifier.value = value; // Update site residents notifier
+          _siteResidentsNotifier.value =
+              value; // Update site residents notifier
         });
       },
     );
 
     concreteTestingOrderDao.findAll().then(
-          (value) {
+      (value) {
         setState(() {
-          _concreteTestingOrderNotifier.value = value; // Update concrete testing orders notifier
+          _concreteTestingOrderNotifier.value =
+              value; // Update concrete testing orders notifier
         });
       },
     );

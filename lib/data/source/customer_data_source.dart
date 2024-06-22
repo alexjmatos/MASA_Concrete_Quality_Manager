@@ -16,10 +16,12 @@ class CustomerData extends DataTableSource {
     return DataRow(
       cells: [
         DataCell(
-          Text(
-            SequentialFormatter.generatePadLeftNumber(
-                customersNotifier.value[index].id!),
-            textAlign: TextAlign.center,
+          Center(
+            child: Text(
+              SequentialFormatter.generatePadLeftNumber(
+                  customersNotifier.value[index].id!),
+              textAlign: TextAlign.center,
+            ),
           ),
           onLongPress: () {
             int id = customersNotifier.value[index].id!;
@@ -39,15 +41,19 @@ class CustomerData extends DataTableSource {
           },
         ),
         DataCell(
-          Text(
-            customersNotifier.value[index].identifier,
-            textAlign: TextAlign.center,
+          Center(
+            child: Text(
+              customersNotifier.value[index].identifier,
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
         DataCell(
-          Text(
-            customersNotifier.value[index].companyName,
-            textAlign: TextAlign.center,
+          Center(
+            child: Text(
+              customersNotifier.value[index].companyName,
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       ],

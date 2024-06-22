@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:masa_epico_concrete_manager/models/project_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 
+import 'concrete_testing_remission.dart';
 import 'concrete_volumetric_weight.dart';
 import 'customer.dart';
 
@@ -18,19 +19,21 @@ class ConcreteTestingOrder {
   BuildingSite buildingSite;
   SiteResident siteResident;
   ConcreteVolumetricWeight? concreteVolumetricWeight;
+  List<ConcreteTestingRemission>? concreteSamples;
 
-  ConcreteTestingOrder(
-      {this.id,
-      this.designResistance,
-      this.slumping,
-      this.volume,
-      this.tma,
-      this.designAge,
-      this.testingDate,
-      required this.customer,
-      required this.buildingSite,
-      required this.siteResident,
-      this.concreteVolumetricWeight});
+  ConcreteTestingOrder({
+    this.id,
+    this.designResistance,
+    this.slumping,
+    this.volume,
+    this.tma,
+    this.designAge,
+    this.testingDate,
+    required this.customer,
+    required this.buildingSite,
+    required this.siteResident,
+    this.concreteVolumetricWeight,
+  });
 
   Map<String, Object?> toMap() {
     return {
@@ -66,26 +69,28 @@ class ConcreteTestingOrder {
         customer: customer,
         siteResident: siteResident);
 
-    Map<String, dynamic> additives = json.decode((source["additives"] ?? "{}") as String);
-    Map<String, num> parsedMap = additives.map((key, value) => MapEntry(key, value as num));
+    Map<String, dynamic> additives =
+        json.decode((source["additives"] ?? "{}") as String);
+    Map<String, num> parsedMap =
+        additives.map((key, value) => MapEntry(key, value as num));
 
     ConcreteVolumetricWeight concreteVolumetricWeight =
         ConcreteVolumetricWeight(
             (source["concrete_volumetric_weight_id"] ?? 0) as int?,
-            (source["tare_weight_gr"] ?? 0) as num?,
-            (source["material_tare_weight_gr"] ?? 0) as num?,
-            (source["material_weight_gr"] ?? 0) as num?,
-            (source["tare_volume_cm3"] ?? 0) as num?,
-            (source["volumetric_weight_gr_cm3"] ?? 0) as num?,
-            (source["volume_load_m3"] ?? 0) as num?,
-            (source["cement_quantity_kg"] ?? 0) as num?,
-            (source["coarse_aggregate_kg"] ?? 0) as num?,
-            (source["fine_aggregate_kg"] ?? 0) as num?,
+            (source["tare_weight_gr"] ?? 0) as num,
+            (source["material_tare_weight_gr"] ?? 0) as num,
+            (source["material_weight_gr"] ?? 0) as num,
+            (source["tare_volume_cm3"] ?? 0) as num,
+            (source["volumetric_weight_gr_cm3"] ?? 0) as num,
+            (source["volume_load_m3"] ?? 0) as num,
+            (source["cement_quantity_kg"] ?? 0) as num,
+            (source["coarse_aggregate_kg"] ?? 0) as num,
+            (source["fine_aggregate_kg"] ?? 0) as num,
             (source["water_kg"] ?? 0) as num?,
             parsedMap,
-            (source["total_load_kg"] ?? 0) as num?,
-            (source["total_load_volumetric_weight_relation"] ?? 0) as num?,
-            (source["percentage"] ?? 0) as num?);
+            (source["total_load_kg"] ?? 0) as num,
+            (source["total_load_volumetric_weight_relation"] ?? 0) as num,
+            (source["percentage"] ?? 0) as num);
 
     return ConcreteTestingOrder(
         id: (source["id"] ?? 0) as int,
