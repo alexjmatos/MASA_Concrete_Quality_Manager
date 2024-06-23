@@ -5,11 +5,11 @@ import 'package:masa_epico_concrete_manager/data/table/testing_order_data_table.
 import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/value_notifier_list.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
-import 'package:masa_epico_concrete_manager/models/project_site.dart';
+import 'package:masa_epico_concrete_manager/models/building_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
-import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
+import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 
 import '../data/table/customer_data_table.dart';
@@ -150,19 +150,23 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
 
     siteResidentDao.findAll().then(
       (value) {
-        setState(() {
-          _siteResidentsNotifier.value =
-              value; // Update site residents notifier
-        });
+        setState(
+          () {
+            _siteResidentsNotifier.value =
+                value; // Update site residents notifier
+          },
+        );
       },
     );
 
     concreteTestingOrderDao.findAll().then(
       (value) {
-        setState(() {
-          _concreteTestingOrderNotifier.value =
-              value; // Update concrete testing orders notifier
-        });
+        setState(
+          () {
+            _concreteTestingOrderNotifier.value =
+                value; // Update concrete testing orders notifier
+          },
+        );
       },
     );
   }

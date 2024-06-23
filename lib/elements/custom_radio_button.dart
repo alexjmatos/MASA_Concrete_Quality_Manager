@@ -7,6 +7,7 @@ class CustomRadioButton extends StatefulWidget {
   final TextStyle? textStyle;
   final Color activeColor;
   final Color inactiveColor;
+  final bool horizontalOrientation;
 
   const CustomRadioButton({
     super.key,
@@ -16,6 +17,7 @@ class CustomRadioButton extends StatefulWidget {
     this.textStyle,
     this.activeColor = Colors.blue,
     this.inactiveColor = Colors.grey,
+    this.horizontalOrientation = true,
   });
 
   @override
@@ -40,11 +42,29 @@ class _CustomRadioButtonState extends State<CustomRadioButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: widget.options.map((option) {
-        return Expanded(
-          child: RadioListTile<String>(
+    if (widget.horizontalOrientation) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: widget.options.map((option) {
+          return Expanded(
+            child: RadioListTile<String>(
+              title: Text(
+                option,
+                style: widget.textStyle ?? const TextStyle(fontSize: 16),
+              ),
+              value: option,
+              groupValue: _selectedValue,
+              onChanged: _handleRadioValueChange,
+              activeColor: widget.activeColor,
+              selectedTileColor: widget.inactiveColor,
+            ),
+          );
+        }).toList(),
+      );
+    } else {
+      return Column(
+        children: widget.options.map((option) {
+          return RadioListTile<String>(
             title: Text(
               option,
               style: widget.textStyle ?? const TextStyle(fontSize: 16),
@@ -54,9 +74,9 @@ class _CustomRadioButtonState extends State<CustomRadioButton> {
             onChanged: _handleRadioValueChange,
             activeColor: widget.activeColor,
             selectedTileColor: widget.inactiveColor,
-          ),
-        );
-      }).toList(),
-    );
+          );
+        }).toList(),
+      );
+    }
   }
 }

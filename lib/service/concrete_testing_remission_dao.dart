@@ -47,7 +47,7 @@ class ConcreteTestingRemissionDao {
         JOIN
     building_sites site ON ord.building_site_id = site.id
         JOIN
-    site_residents res ON ord.site_resident_id = res.id;
+    site_residents res ON ord.site_resident_id = res.id ORDER BY id DESC;
     """);
     return result.map((e) => ConcreteTestingRemission.toModel(e)).toList();
   }

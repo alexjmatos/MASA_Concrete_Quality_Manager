@@ -16,11 +16,11 @@ import '../../elements/quantity_form_field.dart';
 import '../../elements/value_notifier_list.dart';
 import '../../models/concrete_testing_order.dart';
 import '../../models/customer.dart';
-import '../../models/project_site.dart';
+import '../../models/building_site.dart';
 import '../../models/site_resident.dart';
 import '../../service/concrete_volumetric_weight_dao.dart';
 import '../../service/customer_dao.dart';
-import '../../service/project_site_dao.dart';
+import '../../service/building_site_dao.dart';
 import '../../service/site_resident_dao.dart';
 import '../../utils/component_utils.dart';
 import '../../utils/sequential_counter_generator.dart';
@@ -525,9 +525,11 @@ class _ConcreteTestingOrderDetailsState
                 title: const Text("Bloquear"),
                 value: setTareVolume,
                 onChanged: (value) {
-                  setState(() {
-                    setTareVolume = !setTareVolume;
-                  });
+                  setState(
+                    () {
+                      setTareVolume = !setTareVolume;
+                    },
+                  );
                 },
               ),
             ),

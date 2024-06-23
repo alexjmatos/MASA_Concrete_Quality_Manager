@@ -9,9 +9,10 @@ import 'package:masa_epico_concrete_manager/views/project_site_form.dart';
 import 'package:masa_epico_concrete_manager/views/site_resident_form.dart';
 
 class MenuPage extends StatefulWidget {
-  const MenuPage({super.key, required this.title});
+  const MenuPage({super.key, required this.title, required this.isTablet});
 
   final String title;
+  final bool isTablet;
 
   @override
   State<MenuPage> createState() => _MenuPageState();
@@ -26,7 +27,7 @@ class _MenuPageState extends State<MenuPage> {
     const ProjectSiteAndResidentForm(),
     const ConcreteTestingOrderForm(),
     const ConcreteVolumetricWeightForm(),
-    const ConcreteRemissionForm(),
+     const ConcreteRemissionForm(),
     const ConcreteQualitySearch(),
   ];
 

@@ -1,5 +1,5 @@
 import 'package:injector/injector.dart';
-import 'package:masa_epico_concrete_manager/models/project_site.dart';
+import 'package:masa_epico_concrete_manager/models/building_site.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:sqflite/sqflite.dart';

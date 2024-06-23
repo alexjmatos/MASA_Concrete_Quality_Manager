@@ -6,9 +6,10 @@ import 'package:masa_epico_concrete_manager/models/concrete_testing_remission.da
 class ConcreteRemissionDataTable extends StatelessWidget {
   final ValueNotifierList<ConcreteTestingRemission>
       concreteTestingRemissionNotifier;
+  final int rowsPerPage;
 
   const ConcreteRemissionDataTable(
-      {super.key, required this.concreteTestingRemissionNotifier});
+      {super.key, required this.concreteTestingRemissionNotifier, this.rowsPerPage = 10});
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +91,7 @@ class ConcreteRemissionDataTable extends StatelessWidget {
               ),
             ),
           ],
-          rowsPerPage: 8,
+          rowsPerPage: rowsPerPage,
           source: ConcreteRemissionData(
               context: context,
               concreteTestingRemissionNotifier:

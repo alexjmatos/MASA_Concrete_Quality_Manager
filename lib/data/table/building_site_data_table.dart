@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/data/source/building_site_data_source.dart';
-import 'package:masa_epico_concrete_manager/models/project_site.dart';
+import 'package:masa_epico_concrete_manager/models/building_site.dart';
 
 class ProjectSiteDataTable extends StatelessWidget {
   final ValueNotifier<List<BuildingSite>> projectSitesNotifier;

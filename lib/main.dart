@@ -6,15 +6,13 @@ import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.d
 import 'package:masa_epico_concrete_manager/views/menu.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
-    // DeviceOrientation.portraitUp,
-    // DeviceOrientation.portraitDown,
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight
-  ]);
+
   // Use this static instance
   final injector = Injector.appInstance;
   await dotenv.load(fileName: "dev.env");
@@ -32,9 +30,28 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Initialize ScreenUtil
+    ScreenUtil.init(context);
+
+    // Determine if the device is a tablet
+    bool isTablet = ScreenUtil().screenWidth > 600;
+
+    // Set orientation based on device type
+    if (isTablet) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeRight,
+        DeviceOrientation.landscapeLeft,
+      ]);
+    } else {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }
+
     return MaterialApp(
       title: appTitle,
-      home: const MenuPage(title: appTitle),
+      home: MenuPage(title: appTitle, isTablet: isTablet),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: true),
       locale: const Locale("es"),
