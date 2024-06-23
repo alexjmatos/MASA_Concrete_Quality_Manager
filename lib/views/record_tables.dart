@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/data/table/building_site_data_table.dart';
 import 'package:masa_epico_concrete_manager/data/table/site_resident_data_table.dart';
 import 'package:masa_epico_concrete_manager/data/table/testing_order_data_table.dart';
-import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
+import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
 import 'package:masa_epico_concrete_manager/elements/value_notifier_list.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 import 'package:masa_epico_concrete_manager/models/building_site.dart';
@@ -30,6 +30,8 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
   ConcreteTestingOrderDao concreteTestingOrderDao =
       ConcreteTestingOrderDao(); // DAO for concrete testing orders
 
+  final TextEditingController selectController = TextEditingController();
+
   final ValueNotifierList<Customer> _customersNotifier =
       ValueNotifierList([]); // Notifier for customers
   final ValueNotifierList<BuildingSite> _buildingSitesNotifier =
@@ -53,7 +55,7 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              CustomDropdownFormField(
+              CustomSelectDropdown(
                 labelText: "Registro",
                 items: Entity.values.asNameMap().keys.toList(),
                 onChanged: (p0) {

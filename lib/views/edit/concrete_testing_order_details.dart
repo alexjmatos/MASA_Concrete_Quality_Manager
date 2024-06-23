@@ -1,13 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_expansion_tile.dart';
+import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_volumetric_weight.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 
 import '../../constants/constants.dart';
 import '../../elements/autocomplete.dart';
-import '../../elements/custom_dropdown_form_field.dart';
 import '../../elements/custom_number_form_field.dart';
 import '../../elements/custom_text_form_field.dart';
 import '../../elements/elevated_button_dialog.dart';
@@ -383,7 +382,7 @@ class _ConcreteTestingOrderDetailsState
       const Divider(),
       const SizedBox(height: 20),
       if (!widget.readOnly)
-        CustomDropdownFormField(
+        CustomSelectDropdown(
           labelText: "F'C (kg/cm2)",
           items: Constants.CONCRETE_COMPRESSION_RESISTANCES,
           onChanged: (p0) => _designResistanceController.text = p0,
@@ -418,7 +417,7 @@ class _ConcreteTestingOrderDetailsState
         maxLength: 2,
       ),
       if (!widget.readOnly)
-        CustomDropdownFormField(
+        CustomSelectDropdown(
             labelText: "Edad de diseño",
             items: Constants.CONCRETE_DESIGN_AGES,
             onChanged: (p0) => _designAgeController.text = p0,

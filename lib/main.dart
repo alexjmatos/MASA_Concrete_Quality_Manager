@@ -6,8 +6,6 @@ import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.d
 import 'package:masa_epico_concrete_manager/views/menu.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() async {

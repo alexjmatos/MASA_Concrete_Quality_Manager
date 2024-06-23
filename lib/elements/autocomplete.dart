@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'formatters.dart';
 
@@ -43,7 +42,7 @@ class _AutoCompleteElementState extends State<AutoCompleteElement> {
         validator: (value) {
           if (value!.isEmpty) {
             return "El campo no puede quedar vacio";
-          } else if (!widget.options.contains(value.toUpperCase())) {
+          } else if (!widget.options.contains(value)) {
             return "Entrada no valida";
           }
           return null;

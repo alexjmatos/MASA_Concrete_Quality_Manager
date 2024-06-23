@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/constants/constants.dart';
 import 'package:masa_epico_concrete_manager/elements/autocomplete.dart';
-import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_number_form_field.dart';
+import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
@@ -109,7 +109,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                 ),
                 const Divider(),
                 const SizedBox(height: 20),
-                CustomDropdownFormField(
+                CustomSelectDropdown(
                   labelText: "F'C (kg/cm2)",
                   items: Constants.CONCRETE_COMPRESSION_RESISTANCES,
                   onChanged: (p0) => _designResistanceController.text = p0,
@@ -134,7 +134,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                   validatorText: "",
                   maxLength: 2,
                 ),
-                CustomDropdownFormField(
+                CustomSelectDropdown(
                   labelText: "Edad de diseño",
                   items: Constants.CONCRETE_DESIGN_AGES,
                   onChanged: (p0) {
@@ -240,8 +240,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   void setSelectedCustomer(String selected) async {
     _customerController.text = selected;
     selectedCustomer = await customerDao.findById(
-        SequentialFormatter.getIdNumberFromConsecutive(
-            selected.split("-")[0]));
+        SequentialFormatter.getIdNumberFromConsecutive(selected.split("-")[0]));
 
     projectSiteDao.findByClientId(selectedCustomer.id!).then((value) {
       projectSites = value;

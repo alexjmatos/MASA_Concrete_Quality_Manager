@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
+import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
@@ -95,7 +95,7 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
                     readOnly: widget.readOnly,
                   ),
                 if (!widget.readOnly)
-                  CustomDropdownFormField(
+                  CustomSelectDropdown(
                     labelText: "Cliente",
                     items: selectionCustomers,
                     onChanged: (p0) {
@@ -122,7 +122,7 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
                     readOnly: widget.readOnly,
                   ),
                 if (!widget.readOnly)
-                  CustomDropdownFormField(
+                  CustomSelectDropdown(
                     labelText: "Residentes",
                     items: selectionSiteResidents,
                     onChanged: (p0) {
@@ -218,7 +218,9 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
     }).then((value) {
       setState(() {
         selectionCustomers = customers
-            .map((customer) => SequentialFormatter.generateSequentialFormatFromCustomer(customer))
+            .map((customer) =>
+                SequentialFormatter.generateSequentialFormatFromCustomer(
+                    customer))
             .toList();
       });
     });
@@ -250,7 +252,8 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
           ));
 
           _customerController.text = selectionCustomers[selectedCustomerIndex];
-          _siteResidentController.text = selectionSiteResidents[selectedSiteResidentIndex];
+          _siteResidentController.text =
+              selectionSiteResidents[selectedSiteResidentIndex];
         });
       },
     );
