@@ -1,51 +1,81 @@
-import 'package:masa_epico_concrete_manager/models/concrete_testing_remission.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
+import 'package:masa_epico_concrete_manager/models/building_site.dart';
+import 'package:masa_epico_concrete_manager/models/site_resident.dart';
+
+import 'concrete_testing_sample_cilinder.dart';
+import 'customer.dart';
 
 class ConcreteTestingSample {
   int? id;
-  int testingAge;
-  DateTime testingDate;
-  int? totalLoad;
-  int? designResistance;
-  num? median;
-  num? percentage;
-  ConcreteTestingRemission concreteTestingRemission;
+  DateTime? plantTime;
+  num? realSlumping;
+  num? temperature;
+  String? location;
+  ConcreteTestingOrder concreteTestingOrder;
+  List<ConcreteTestingSampleCylinder> concreteSampleCylinders;
 
   ConcreteTestingSample(
       {this.id,
-      required this.testingAge,
-      required this.testingDate,
-      required this.totalLoad,
-      required this.designResistance,
-      this.median,
-      this.percentage,
-      required this.concreteTestingRemission});
+      this.plantTime,
+      this.realSlumping,
+      this.temperature,
+      this.location,
+      required this.concreteTestingOrder,
+      required this.concreteSampleCylinders});
 
   Map<String, Object?> toMap() {
     return {
       "id": id,
-      "testing_age_days": testingAge,
-      "testing_date": testingDate.millisecondsSinceEpoch,
-      "total_load_kg": totalLoad,
-      "resistance_kgf_cm2": designResistance,
-      "median": median,
-      "percentage": percentage,
-      "concrete_testing_remission_id": concreteTestingRemission.id
+      "plant_time": plantTime?.millisecondsSinceEpoch,
+      "real_slumping_cm": realSlumping,
+      "temperature": temperature,
+      "location": location,
+      "concrete_testing_order_id": concreteTestingOrder.id
     };
   }
 
-  ConcreteTestingSample toModel(Map<String, Object?> map) {
-    ConcreteTestingRemission concreteTestingRemission =
-        ConcreteTestingRemission.toModel(map);
+  static ConcreteTestingSample toModel(Map<String, Object?> map) {
+    Customer customer = Customer(
+      id: (map["customer_id"] ?? 0) as int,
+      identifier: (map["customer_identifier"] ?? "") as String,
+      companyName: (map["customer_company_name"] ?? "") as String,
+    );
 
+    SiteResident siteResident = SiteResident(
+        id: (map["site_resident_id"] ?? 0) as int,
+        firstName: (map["site_resident_first_name"] ?? "") as String,
+        lastName: (map["site_resident_last_name"] ?? "") as String,
+        jobPosition: (map["site_resident_job_position"] ?? "") as String);
+
+    BuildingSite buildingSite = BuildingSite(
+        id: (map["building_site_id"] ?? 0) as int,
+        siteName: (map["building_site_name"] ?? "") as String,
+        customer: customer,
+        siteResident: siteResident);
+
+    ConcreteTestingOrder concreteTestingOrder = ConcreteTestingOrder(
+        id: (map["order_id"] ?? 0) as int,
+        designResistance: (map["design_resistance"] ?? "") as String,
+        slumping: (map["slumping_cm"] ?? "") as int,
+        volume: (map["volume_m3"] ?? "") as int,
+        tma: (map["tma_mm"] ?? "") as int,
+        designAge: (map["design_age"] ?? "") as String,
+        testingDate: DateTime.fromMillisecondsSinceEpoch(
+            (map["order_testing_date"] ?? DateTime.now().millisecondsSinceEpoch)
+                as int),
+        customer: customer,
+        buildingSite: buildingSite,
+        siteResident: siteResident);
+
+    List<ConcreteTestingSampleCylinder> concreteSamples = [];
     return ConcreteTestingSample(
         id: map["id"] as int,
-        testingAge: map["testing_age_days"] as int,
-        testingDate: DateTime.fromMillisecondsSinceEpoch((map["testing_date"] ??
+        plantTime: DateTime.fromMillisecondsSinceEpoch((map["plant_time"] ??
             DateTime.now().millisecondsSinceEpoch) as int),
-        totalLoad: map["total_load_kg"] as int?,
-        designResistance: map["resistance_kgf_cm2"] as int?,
-        median: map["median"] as num?,
-        percentage: map["percentage"] as num?,
-        concreteTestingRemission: concreteTestingRemission);
+        realSlumping: (map["real_slumping_cm"] ?? 0) as num,
+        temperature: (map["temperature_celsius"] ?? 0) as num,
+        location: (map["location"] ?? "") as String,
+        concreteTestingOrder: concreteTestingOrder,
+        concreteSampleCylinders: concreteSamples);
   }
 }

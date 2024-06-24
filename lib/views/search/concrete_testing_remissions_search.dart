@@ -9,22 +9,23 @@ import 'package:masa_epico_concrete_manager/service/concrete_testing_remission_d
 import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 
-import '../elements/custom_select_dropdown.dart';
-import '../elements/value_notifier_list.dart';
-import '../filters/composite_filter.dart';
-import '../filters/filter_criteria.dart';
-import '../models/concrete_testing_remission.dart';
-import '../models/building_site.dart';
+import '../../elements/value_notifier_list.dart';
+import '../../filters/composite_filter.dart';
+import '../../filters/filter_criteria.dart';
+import '../../models/concrete_testing_sample.dart';
+import '../../models/building_site.dart';
 
-class ConcreteRemissionForm extends StatefulWidget {
-  const ConcreteRemissionForm({super.key});
+class ConcreteTestingRemissionSearch extends StatefulWidget {
+  const ConcreteTestingRemissionSearch({super.key});
 
   @override
-  State<ConcreteRemissionForm> createState() => _ConcreteRemissionFormState();
+  State<ConcreteTestingRemissionSearch> createState() =>
+      _ConcreteTestingRemissionSearchState();
 }
 
-class _ConcreteRemissionFormState extends State<ConcreteRemissionForm> {
-  final ValueNotifierList<ConcreteTestingRemission>
+class _ConcreteTestingRemissionSearchState
+    extends State<ConcreteTestingRemissionSearch> {
+  final ValueNotifierList<ConcreteTestingSample>
       concreteTestingRemissionNotifier = ValueNotifierList([]);
 
   final BuildingSiteDao buildingSiteDao = BuildingSiteDao();
@@ -38,7 +39,7 @@ class _ConcreteRemissionFormState extends State<ConcreteRemissionForm> {
   int designAgeIndex = -2;
 
   List<BuildingSite> buildingSites = [];
-  List<ConcreteTestingRemission> concreteTestingRemissions = [];
+  List<ConcreteTestingSample> concreteTestingRemissions = [];
   List<String> selectionBuildingSites = [];
 
   bool isTablet = true;
@@ -164,72 +165,57 @@ class _ConcreteRemissionFormState extends State<ConcreteRemissionForm> {
       onPressed: () => filter(),
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        title: const Text(
-          'Remisiones',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              if (isTablet)
-                Row(
-                  children: [
-                    Expanded(flex: 3, child: _autoCompleteElement),
-                    const SizedBox(width: 16),
-                    Expanded(flex: 2, child: _resistanceDropdown),
-                    const SizedBox(width: 16),
-                    Expanded(flex: 2, child: _ageDropdown),
-                    const SizedBox(width: 16),
-                    Expanded(flex: 1, child: _clearButton),
-                    const SizedBox(width: 16),
-                    Expanded(flex: 1, child: _searchButton),
-                  ],
-                ),
-              if (!isTablet)
-                Column(
-                  children: [
-                    _autoCompleteElement,
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(flex: 3, child: _resistanceDropdown),
-                        Expanded(flex: 1, child: _clearButton),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(flex: 3, child: _ageDropdown),
-                        Expanded(flex: 1, child: _searchButton),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        if (isTablet)
+          Row(
+            children: [
+              Expanded(flex: 3, child: _autoCompleteElement),
+              const SizedBox(width: 16),
+              Expanded(flex: 2, child: _resistanceDropdown),
+              const SizedBox(width: 16),
+              Expanded(flex: 2, child: _ageDropdown),
+              const SizedBox(width: 16),
+              Expanded(flex: 1, child: _clearButton),
+              const SizedBox(width: 16),
+              Expanded(flex: 1, child: _searchButton),
+            ],
+          ),
+        if (!isTablet)
+          Column(
+            children: [
+              _autoCompleteElement,
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(
-                    child: ConcreteRemissionDataTable(
-                      concreteTestingRemissionNotifier:
-                          concreteTestingRemissionNotifier,
-                      rowsPerPage: isTablet ? 8 : 7,
-                    ),
-                  ),
+                  Expanded(flex: 3, child: _resistanceDropdown),
+                  Expanded(flex: 1, child: _clearButton),
                 ],
-              )
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(flex: 3, child: _ageDropdown),
+                  Expanded(flex: 1, child: _searchButton),
+                ],
+              ),
+              const SizedBox(height: 16),
             ],
           ),
-        ),
-      ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: ConcreteRemissionDataTable(
+                concreteTestingRemissionNotifier:
+                    concreteTestingRemissionNotifier,
+                rowsPerPage: isTablet ? 8 : 7,
+              ),
+            ),
+          ],
+        )
+      ],
     );
   }
 

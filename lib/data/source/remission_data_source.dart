@@ -4,13 +4,13 @@ import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 
 import '../../elements/value_notifier_list.dart';
 import '../../models/concrete_testing_order.dart';
-import '../../models/concrete_testing_remission.dart';
+import '../../models/concrete_testing_sample.dart';
 import '../../utils/sequential_counter_generator.dart';
 import '../../views/edit/concrete_testing_order_details.dart';
 
 class ConcreteRemissionData extends DataTableSource {
   final BuildContext context;
-  final ValueNotifierList<ConcreteTestingRemission>
+  final ValueNotifierList<ConcreteTestingSample>
       concreteTestingRemissionNotifier;
 
   ConcreteRemissionData(

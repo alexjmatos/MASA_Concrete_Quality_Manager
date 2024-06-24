@@ -6,11 +6,13 @@ import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart
 import 'package:masa_epico_concrete_manager/elements/value_notifier_list.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 import 'package:masa_epico_concrete_manager/models/building_site.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_testing_sample.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
+import 'package:masa_epico_concrete_manager/views/search/concrete_testing_remissions_search.dart';
 
 import '../data/table/customer_data_table.dart';
 import '../models/customer.dart';
@@ -94,6 +96,8 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
         return generateSiteResidentDataTable();
       case Entity.Muestras:
         return generateConcreteTestingDataTable();
+      case Entity.Remisiones:
+        return generateConcreteTestingRemissionSearchView();
       default:
         return Container(); // Return an empty container for an undefined entity
     }
@@ -125,6 +129,10 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
     return ConcreteTestingDataTable(
       concreteTestingOrdersNotifier: _concreteTestingOrderNotifier,
     );
+  }
+
+  ConcreteTestingRemissionSearch generateConcreteTestingRemissionSearchView(){
+    return const ConcreteTestingRemissionSearch();
   }
 
   // Method to load data for all tables
@@ -179,5 +187,6 @@ enum Entity {
   Clientes,
   Obras,
   Residentes,
-  Muestras;
+  Muestras,
+  Remisiones;
 }

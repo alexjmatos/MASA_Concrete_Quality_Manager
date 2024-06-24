@@ -67,4 +67,12 @@ class Constants {
 
   static const double DATA_TABLE_HORIZONTAL_MARGIN = 24;
   static const double DATA_TABLE_COLUMN_SPACING = 56;
+  static const String DESIGN_AGE_KEY = "DESIGN_AGE_DAYS";
+  static const String TESTING_DATE_KEY = "TESTING_DATE";
+  static const Map<int, List<int>> DESIGN_AGES = {
+    3: [1, 2, 3, 3],
+    7: [1, 3, 7, 7],
+    14: [3, 7, 14, 14],
+    28: [7, 14, 28, 28]
+  };
 }

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:masa_epico_concrete_manager/models/building_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 
-import 'concrete_testing_remission.dart';
+import 'concrete_testing_sample.dart';
 import 'concrete_volumetric_weight.dart';
 import 'customer.dart';
 
@@ -19,7 +19,7 @@ class ConcreteTestingOrder {
   BuildingSite buildingSite;
   SiteResident siteResident;
   ConcreteVolumetricWeight? concreteVolumetricWeight;
-  List<ConcreteTestingRemission>? concreteSamples;
+  List<ConcreteTestingSample>? concreteSamples;
 
   ConcreteTestingOrder({
     this.id,

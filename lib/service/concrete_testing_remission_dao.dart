@@ -1,7 +1,7 @@
 import 'package:injector/injector.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../models/concrete_testing_remission.dart';
+import '../models/concrete_testing_sample.dart';
 import '../utils/sequential_counter_generator.dart';
 
 class ConcreteTestingRemissionDao {
@@ -13,7 +13,7 @@ class ConcreteTestingRemissionDao {
     db = injector.get<Database>();
   }
 
-  Future<List<ConcreteTestingRemission>> findAll() async {
+  Future<List<ConcreteTestingSample>> findAll() async {
     var result = await db.rawQuery("""
     SELECT
     rem.id AS id,
@@ -49,6 +49,6 @@ class ConcreteTestingRemissionDao {
         JOIN
     site_residents res ON ord.site_resident_id = res.id ORDER BY id DESC;
     """);
-    return result.map((e) => ConcreteTestingRemission.toModel(e)).toList();
+    return result.map((e) => ConcreteTestingSample.toModel(e)).toList();
   }
 }

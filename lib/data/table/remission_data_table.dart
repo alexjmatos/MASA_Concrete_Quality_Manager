@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/data/source/remission_data_source.dart';
 import 'package:masa_epico_concrete_manager/elements/value_notifier_list.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_testing_remission.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_testing_sample.dart';
 
 class ConcreteRemissionDataTable extends StatelessWidget {
-  final ValueNotifierList<ConcreteTestingRemission>
+  final ValueNotifierList<ConcreteTestingSample>
       concreteTestingRemissionNotifier;
   final int rowsPerPage;
 
