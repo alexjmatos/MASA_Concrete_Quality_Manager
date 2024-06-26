@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:masa_epico_concrete_manager/constants/constants.dart';
-import 'package:masa_epico_concrete_manager/data/table/remission_data_table.dart';
+import 'package:masa_epico_concrete_manager/data/table/concrete_sample_data_table.dart';
 import 'package:masa_epico_concrete_manager/elements/autocomplete.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_icon_button.dart';
 
-import 'package:masa_epico_concrete_manager/service/concrete_testing_remission_dao.dart';
+import 'package:masa_epico_concrete_manager/service/concrete_testing_sample_dao.dart';
 import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 
@@ -15,31 +15,29 @@ import '../../filters/filter_criteria.dart';
 import '../../models/concrete_testing_sample.dart';
 import '../../models/building_site.dart';
 
-class ConcreteTestingRemissionSearch extends StatefulWidget {
-  const ConcreteTestingRemissionSearch({super.key});
+class ConcreteTestingSampleSearch extends StatefulWidget {
+  const ConcreteTestingSampleSearch({super.key});
 
   @override
-  State<ConcreteTestingRemissionSearch> createState() =>
-      _ConcreteTestingRemissionSearchState();
+  State<ConcreteTestingSampleSearch> createState() =>
+      _ConcreteTestingSampleSearchState();
 }
 
-class _ConcreteTestingRemissionSearchState
-    extends State<ConcreteTestingRemissionSearch> {
+class _ConcreteTestingSampleSearchState
+    extends State<ConcreteTestingSampleSearch> {
   final ValueNotifierList<ConcreteTestingSample>
-      concreteTestingRemissionNotifier = ValueNotifierList([]);
+      concreteTestingSampleNotifier = ValueNotifierList([]);
 
   final BuildingSiteDao buildingSiteDao = BuildingSiteDao();
-  final ConcreteTestingRemissionDao concreteTestingRemissionDao =
-      ConcreteTestingRemissionDao();
+  final ConcreteTestingSampleDao concreteTestingSampleDao =
+      ConcreteTestingSampleDao();
 
   BuildingSite? selectedBuildingSite;
   String? selectedDesignResistance;
   String? selectedDesignAge;
-  int designResistanceIndex = -2;
-  int designAgeIndex = -2;
 
   List<BuildingSite> buildingSites = [];
-  List<ConcreteTestingSample> concreteTestingRemissions = [];
+  List<ConcreteTestingSample> concreteTestingSamples = [];
   List<String> selectionBuildingSites = [];
 
   bool isTablet = true;
@@ -55,17 +53,13 @@ class _ConcreteTestingRemissionSearchState
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) {
-        _loadData();
-      },
-    );
+    _loadData();
   }
 
   void _loadData() {
-    concreteTestingRemissionDao.findAll().then((value) {
-      concreteTestingRemissions = value;
-      concreteTestingRemissionNotifier.value = value;
+    concreteTestingSampleDao.findAll().then((value) {
+      concreteTestingSamples = value;
+      concreteTestingSampleNotifier.set(value);
     });
 
     buildingSiteDao.findAll().then((value) {
@@ -207,9 +201,9 @@ class _ConcreteTestingRemissionSearchState
         Row(
           children: [
             Expanded(
-              child: ConcreteRemissionDataTable(
-                concreteTestingRemissionNotifier:
-                    concreteTestingRemissionNotifier,
+              child: ConcreteSamplesDataTable(
+                concreteTestingSampleNotifier:
+                    concreteTestingSampleNotifier,
                 rowsPerPage: isTablet ? 8 : 7,
               ),
             ),
@@ -232,8 +226,8 @@ class _ConcreteTestingRemissionSearchState
       DesignAgeCriteria(selectedDesignAge),
     ]);
 
-    concreteTestingRemissionNotifier.value = concreteTestingRemissions
+    concreteTestingSampleNotifier.set(concreteTestingSamples
         .where((element) => criteria.matches(element))
-        .toList();
+        .toList());
   }
 }

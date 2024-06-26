@@ -42,7 +42,8 @@ class _AutoCompleteElementState extends State<AutoCompleteElement> {
         validator: (value) {
           if (value!.isEmpty) {
             return "El campo no puede quedar vacio";
-          } else if (!widget.options.contains(value)) {
+          } else if (!widget.options
+              .any((element) => element.toUpperCase() == value.toUpperCase())) {
             return "Entrada no valida";
           }
           return null;

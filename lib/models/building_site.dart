@@ -38,4 +38,9 @@ class BuildingSite {
       jobPosition: (map?["job_position"] ?? "") as String
     ));
   }
+
+  @override
+  String toString() {
+    return 'BuildingSite{id: $id, siteName: $siteName, siteResident: $siteResident, customer: $customer}';
+  }
 }

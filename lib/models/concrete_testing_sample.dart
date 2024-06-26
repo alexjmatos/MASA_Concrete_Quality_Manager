@@ -1,13 +1,16 @@
+import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 import 'package:masa_epico_concrete_manager/models/building_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 
+import '../utils/utils.dart';
 import 'concrete_testing_sample_cilinder.dart';
 import 'customer.dart';
 
 class ConcreteTestingSample {
   int? id;
-  DateTime? plantTime;
+  TimeOfDay? plantTime;
+  TimeOfDay? buildingSiteTime;
   num? realSlumping;
   num? temperature;
   String? location;
@@ -17,6 +20,7 @@ class ConcreteTestingSample {
   ConcreteTestingSample(
       {this.id,
       this.plantTime,
+      this.buildingSiteTime,
       this.realSlumping,
       this.temperature,
       this.location,
@@ -26,9 +30,10 @@ class ConcreteTestingSample {
   Map<String, Object?> toMap() {
     return {
       "id": id,
-      "plant_time": plantTime?.millisecondsSinceEpoch,
+      "plant_time": plantTime?.toString(),
+      "building_site_time": buildingSiteTime?.toString(),
       "real_slumping_cm": realSlumping,
-      "temperature": temperature,
+      "temperature_celsius": temperature,
       "location": location,
       "concrete_testing_order_id": concreteTestingOrder.id
     };
@@ -70,8 +75,8 @@ class ConcreteTestingSample {
     List<ConcreteTestingSampleCylinder> concreteSamples = [];
     return ConcreteTestingSample(
         id: map["id"] as int,
-        plantTime: DateTime.fromMillisecondsSinceEpoch((map["plant_time"] ??
-            DateTime.now().millisecondsSinceEpoch) as int),
+        plantTime: Utils.stringToTimeOfDay((map["plant_time"] ?? "") as String),
+        buildingSiteTime: Utils.stringToTimeOfDay((map["building_site_time"] ?? "") as String),
         realSlumping: (map["real_slumping_cm"] ?? 0) as num,
         temperature: (map["temperature_celsius"] ?? 0) as num,
         location: (map["location"] ?? "") as String,

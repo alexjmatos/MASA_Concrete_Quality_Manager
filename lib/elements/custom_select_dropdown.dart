@@ -24,7 +24,7 @@ class CustomSelectDropdown extends StatelessWidget {
         .toList();
   }
 
-  String? getValue(){
+  String? getValue() {
     String? value;
     try {
       value = items[defaultValueIndex];
@@ -53,6 +53,15 @@ class CustomSelectDropdown extends StatelessWidget {
       elevation: 16,
       style: const TextStyle(color: Colors.black, fontSize: 16),
       dropdownColor: Colors.white,
+      validator: (value) {
+        if (value == null) {
+          return "El campo no puede quedar vacio";
+        } else if (!items
+            .any((element) => element == value)) {
+          return "Entrada no valida";
+        }
+        return null;
+      },
     );
   }
 }

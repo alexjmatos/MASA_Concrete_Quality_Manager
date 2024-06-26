@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
 class InputTimePicker extends StatefulWidget {
-  const InputTimePicker({super.key});
+  final TextEditingController timeController = TextEditingController();
+
+  InputTimePicker({super.key});
 
   @override
-  State<InputTimePicker> createState() => _InputTimePickerState();
+  State<InputTimePicker> createState() => InputTimePickerState();
 }
 
-class _InputTimePickerState extends State<InputTimePicker> {
+class InputTimePickerState extends State<InputTimePicker> {
   TimeOfDay? selectedTime;
-  final TextEditingController _timeController = TextEditingController();
 
   @override
   void initState() {
@@ -20,7 +21,7 @@ class _InputTimePickerState extends State<InputTimePicker> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _timeController.text = selectedTime!.format(context);
+    widget.timeController.text = selectedTime!.format(context);
   }
 
   Future<void> _selectTime(BuildContext context) async {
@@ -31,15 +32,19 @@ class _InputTimePickerState extends State<InputTimePicker> {
     if (picked != null && picked != selectedTime) {
       setState(() {
         selectedTime = picked;
-        _timeController.text = picked.format(context);
+        widget.timeController.text = picked.format(context);
       });
     }
   }
 
   @override
   void dispose() {
-    _timeController.dispose();
+    widget.timeController.dispose();
     super.dispose();
+  }
+
+  TimeOfDay? getSelectedTime() {
+    return selectedTime;
   }
 
   @override
@@ -49,7 +54,7 @@ class _InputTimePickerState extends State<InputTimePicker> {
       children: [
         TextFormField(
           textAlign: TextAlign.center,
-          controller: _timeController,
+          controller: widget.timeController,
           decoration: const InputDecoration(
             isDense: true,
             contentPadding: EdgeInsets.all(4),

@@ -8,8 +8,6 @@ class InputNumberField extends StatelessWidget {
   InputNumberField(
       {super.key, this.acceptDecimalPoint = true});
 
-
-
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -17,7 +15,6 @@ class InputNumberField extends StatelessWidget {
       textAlign: TextAlign.center,
       decoration: const InputDecoration(
         isDense: true,
-        contentPadding: EdgeInsets.all(4),
         fillColor: Colors.white,
         filled: true,
         border: OutlineInputBorder(

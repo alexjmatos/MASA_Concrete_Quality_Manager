@@ -1,14 +1,15 @@
 import 'package:injector/injector.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../constants/constants.dart';
 import '../models/concrete_testing_sample.dart';
 import '../utils/sequential_counter_generator.dart';
 
-class ConcreteTestingRemissionDao {
+class ConcreteTestingSampleDao {
   late final Database db;
   final SequentialFormatter sequentialIdGenerator = SequentialFormatter();
 
-  ConcreteTestingRemissionDao() {
+  ConcreteTestingSampleDao() {
     final injector = Injector.appInstance;
     db = injector.get<Database>();
   }
@@ -16,12 +17,13 @@ class ConcreteTestingRemissionDao {
   Future<List<ConcreteTestingSample>> findAll() async {
     var result = await db.rawQuery("""
     SELECT
-    rem.id AS id,
-    rem.plant_time,
-    rem.real_slumping_cm,
-    rem.temperature_celsius,
-    rem.location,
-    rem.concrete_testing_order_id,
+    sam.id AS id,
+    sam.plant_time,
+    sam.building_site_time,
+    sam.real_slumping_cm,
+    sam.temperature_celsius,
+    sam.location,
+    sam.concrete_testing_order_id,
     ord.id AS order_id,
     ord.design_resistance,
     ord.slumping_cm,
@@ -39,9 +41,9 @@ class ConcreteTestingRemissionDao {
     res.last_name AS site_resident_last_name,
     res.job_position AS site_resident_job_position
     FROM
-    concrete_testing_remissions rem
+    concrete_testing_samples sam
         JOIN
-    concrete_testing_orders ord ON rem.concrete_testing_order_id = ord.id
+    concrete_testing_orders ord ON sam.concrete_testing_order_id = ord.id
         JOIN
     customers cust ON ord.customer_id = cust.id
         JOIN
@@ -50,5 +52,13 @@ class ConcreteTestingRemissionDao {
     site_residents res ON ord.site_resident_id = res.id ORDER BY id DESC;
     """);
     return result.map((e) => ConcreteTestingSample.toModel(e)).toList();
+  }
+
+  Future<void> addAll(List<ConcreteTestingSample> samples) async {
+    Batch batch = db.batch();
+    for (var element in samples) {
+      batch.insert(Constants.CONCRETE_TESTING_SAMPLES, element.toMap());
+    }
+    await batch.commit(noResult: true);
   }
 }

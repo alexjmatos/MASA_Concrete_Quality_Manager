@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_testing_order_form.dart';
-import 'package:masa_epico_concrete_manager/views/search/concrete_testing_remissions_search.dart';
+import 'package:masa_epico_concrete_manager/views/search/concrete_testing_sample_search.dart';
 import 'package:masa_epico_concrete_manager/views/record_tables.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_volumetric_weight_form.dart';
 import 'package:masa_epico_concrete_manager/views/customer_form.dart';

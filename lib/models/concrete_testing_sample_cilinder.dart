@@ -48,4 +48,9 @@ class ConcreteTestingSampleCylinder {
         percentage: map["percentage"] as num?,
         concreteTestingRemission: concreteTestingRemission);
   }
+
+  @override
+  String toString() {
+    return 'ConcreteTestingSampleCylinder{id: $id, testingAge: $testingAge, testingDate: $testingDate, totalLoad: $totalLoad, designResistance: $designResistance, median: $median, percentage: $percentage, concreteTestingRemission: $concreteTestingRemission}';
+  }
 }

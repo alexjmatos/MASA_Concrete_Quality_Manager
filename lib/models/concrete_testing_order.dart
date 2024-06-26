@@ -98,7 +98,7 @@ class ConcreteTestingOrder {
         slumping: (source["slumping_cm"] ?? 0) as int,
         volume: (source["volume_m3"] ?? 0) as int,
         tma: (source["tma_mm"] ?? 0) as int,
-        designAge: (source["design_age"] ?? 0) as String,
+        designAge: (source["design_age"] ?? "0") as String,
         testingDate: DateTime.fromMillisecondsSinceEpoch(
             (source["testing_date"] ?? DateTime.now().millisecondsSinceEpoch)
                 as int),
@@ -106,5 +106,10 @@ class ConcreteTestingOrder {
         buildingSite: buildingSite,
         siteResident: siteResident,
         concreteVolumetricWeight: concreteVolumetricWeight);
+  }
+
+  @override
+  String toString() {
+    return 'ConcreteTestingOrder{id: $id, designResistance: $designResistance, slumping: $slumping, volume: $volume, tma: $tma, designAge: $designAge, testingDate: $testingDate, customer: $customer, buildingSite: $buildingSite, siteResident: $siteResident, concreteVolumetricWeight: $concreteVolumetricWeight, concreteSamples: $concreteSamples}';
   }
 }

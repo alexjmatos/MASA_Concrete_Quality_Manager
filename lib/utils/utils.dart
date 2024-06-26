@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
 import '../constants/constants.dart';
 
 class Utils {
@@ -36,5 +39,14 @@ class Utils {
         };
       },
     ).toList();
+  }
+
+  static TimeOfDay? stringToTimeOfDay(String tod) {
+    final format = DateFormat.jm();
+    try {
+      return TimeOfDay.fromDateTime(format.parse(tod));
+    } on FormatException {
+      return null;
+    }
   }
 }

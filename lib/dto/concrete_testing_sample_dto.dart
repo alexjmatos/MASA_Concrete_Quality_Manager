@@ -11,17 +11,19 @@ class ConcreteTestingSampleDTO {
   InputNumberField volume;
   InputTimePicker timePlant;
   InputTimePicker timeBuildingSite;
+  InputNumberField temperature;
   InputNumberField realSlumping;
   InputTextField location;
   List<InputNumberField> designAges = [];
   List<InputTextField> testingDates = [];
 
-  ConcreteTestingSampleDTO({
-      required this.id,
+  ConcreteTestingSampleDTO(
+      {required this.id,
       required this.remission,
       required this.volume,
       required this.timePlant,
       required this.timeBuildingSite,
+      required this.temperature,
       required this.realSlumping,
       required this.location,
       required this.designAges,

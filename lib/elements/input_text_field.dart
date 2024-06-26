@@ -16,7 +16,6 @@ class InputTextField extends StatelessWidget {
       maxLines: lines,
       decoration: const InputDecoration(
         isDense: true,
-        contentPadding: EdgeInsets.all(4),
         fillColor: Colors.white,
         filled: true,
         border: OutlineInputBorder(

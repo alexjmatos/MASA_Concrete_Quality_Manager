@@ -116,22 +116,19 @@ class ConcreteTestingOrderDao {
             LEFT JOIN
         concrete_volumetric_weight cvw ON cto.concrete_volumetric_weight_id = cvw.id;
     """);
-    return mapEntities(result);
-  }
-
-  Future<List<ConcreteTestingOrder>> mapEntities(
-      List<Map<String, Object?>> result) async {
-    // Map the results to a list of futures
-    var futures = result.map((e) => mapToEntity(e)).toList();
-    // Wait for all futures to complete
-    return await Future.wait(futures);
+    return result.map(
+      (e) {
+        return ConcreteTestingOrder.toModel(e);
+      },
+    ).toList();
   }
 
   Future<ConcreteTestingOrder> mapToEntity(Map<String, Object?> source) async {
     return ConcreteTestingOrder.toModel(source);
   }
 
-  Future<ConcreteTestingOrder> update(ConcreteTestingOrder selectedConcreteTestingOrder) async {
+  Future<ConcreteTestingOrder> update(
+      ConcreteTestingOrder selectedConcreteTestingOrder) async {
     await db.update(
         Constants.CONCRETE_TESTING_ORDERS, selectedConcreteTestingOrder.toMap(),
         where: "id = ?", whereArgs: [selectedConcreteTestingOrder.id!]);

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/data/source/remission_data_source.dart';
+import 'package:masa_epico_concrete_manager/data/source/concrete_sample_data_source.dart';
 import 'package:masa_epico_concrete_manager/elements/value_notifier_list.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_sample.dart';
 
-class ConcreteRemissionDataTable extends StatelessWidget {
+class ConcreteSamplesDataTable extends StatelessWidget {
   final ValueNotifierList<ConcreteTestingSample>
-      concreteTestingRemissionNotifier;
+      concreteTestingSampleNotifier;
   final int rowsPerPage;
 
-  const ConcreteRemissionDataTable(
-      {super.key, required this.concreteTestingRemissionNotifier, this.rowsPerPage = 10});
+  const ConcreteSamplesDataTable(
+      {super.key, required this.concreteTestingSampleNotifier, this.rowsPerPage = 10});
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: concreteTestingRemissionNotifier,
+      valueListenable: concreteTestingSampleNotifier,
       builder: (context, value, child) {
         return PaginatedDataTable(
           columns: const [
@@ -92,10 +92,10 @@ class ConcreteRemissionDataTable extends StatelessWidget {
             ),
           ],
           rowsPerPage: rowsPerPage,
-          source: ConcreteRemissionData(
+          source: ConcreteSamplesData(
               context: context,
-              concreteTestingRemissionNotifier:
-                  concreteTestingRemissionNotifier),
+              concreteTestingSamplesNotifier:
+                  concreteTestingSampleNotifier),
         );
       },
     );

@@ -24,4 +24,10 @@ class ValueNotifierList<T> extends ValueNotifier<List<T>> {
           'Index $index is out of bounds for List of length ${value.length}');
     }
   }
+
+  void set(List<T> newList) {
+    value = newList;
+  }
+
+
 }

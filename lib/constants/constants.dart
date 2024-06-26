@@ -45,6 +45,7 @@ class Constants {
       "project_site_resident";
   static const String CONCRETE_TESTING_ORDERS = "concrete_testing_orders";
   static const String CONCRETE_VOLUMETRIC_WEIGHT = "concrete_volumetric_weight";
+  static const String CONCRETE_TESTING_SAMPLES = "concrete_testing_samples";
 
   static const int LEADING_ZEROS = 4;
   static const int TARE_WEIGHT = 3480;
