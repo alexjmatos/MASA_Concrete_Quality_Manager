@@ -41,8 +41,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   final SiteResidentDAO siteResidentDao = SiteResidentDAO();
   final ConcreteTestingOrderDAO concreteTestingOrderDao =
       ConcreteTestingOrderDAO();
-  final ConcreteSampleDAO concreteTestingSampleDao =
-      ConcreteSampleDAO();
+  final ConcreteSampleDAO concreteTestingSampleDao = ConcreteSampleDAO();
 
   static List<Customer> clients = [];
   static List<String> availableClients = [];
@@ -380,10 +379,9 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
       return ConcreteSample(
           concreteTestingOrder: order,
           remission: sample.remission.controller.text,
-          plantTime:
-              Utils.stringToTimeOfDay(sample.timePlant.timeController.text),
-          buildingSiteTime: Utils.stringToTimeOfDay(
-              sample.timeBuildingSite.timeController.text),
+          plantTime: Utils.parseTimeOfDay(sample.timePlant.timeController.text),
+          buildingSiteTime:
+              Utils.parseTimeOfDay(sample.timeBuildingSite.timeController.text),
           realSlumping: num.tryParse(sample.realSlumping.controller.text),
           temperature: num.tryParse(sample.temperature.controller.text),
           location: sample.location.controller.text,
@@ -481,8 +479,8 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
         id: Utils.generateUniqueId(),
         remission: InputTextField(lines: 3),
         volume: volumeInput,
-        timePlant: InputTimePicker(),
-        timeBuildingSite: InputTimePicker(),
+        timePlant: InputTimePicker(timeOfDay: TimeOfDay.now(),),
+        timeBuildingSite: InputTimePicker(timeOfDay: TimeOfDay.now(),),
         temperature: InputNumberField(),
         realSlumping: InputNumberField(acceptDecimalPoint: true),
         location: InputTextField(lines: 3),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class InputTimePicker extends StatefulWidget {
+  final TimeOfDay timeOfDay;
   final TextEditingController timeController = TextEditingController();
-
-  InputTimePicker({super.key});
+  InputTimePicker({super.key, required this.timeOfDay});
 
   @override
   State<InputTimePicker> createState() => InputTimePickerState();
@@ -15,7 +15,7 @@ class InputTimePickerState extends State<InputTimePicker> {
   @override
   void initState() {
     super.initState();
-    selectedTime = TimeOfDay.now();
+    selectedTime = widget.timeOfDay;
   }
 
   @override

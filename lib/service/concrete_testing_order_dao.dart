@@ -54,8 +54,6 @@ class ConcreteTestingOrderDAO {
     WHERE
             cto.id = ?;
     """, [id]);
-
-
     return mapToEntity(result.first).then((order) async {
       // RETRIEVE THE SAMPLES AND CYLINDERS
       order.concreteSamples = await concreteSampleDao.findByOrderId(order.id);

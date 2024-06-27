@@ -38,8 +38,8 @@ class ConcreteSample {
       "id": id,
       "remission": remission,
       "volume": volume,
-      "plant_time": plantTime?.toString(),
-      "building_site_time": buildingSiteTime?.toString(),
+      "plant_time": Utils.formatTimeOfDay(plantTime!),
+      "building_site_time": Utils.formatTimeOfDay(buildingSiteTime!),
       "real_slumping_cm": realSlumping,
       "temperature_celsius": temperature,
       "location": location,
@@ -70,9 +70,9 @@ class ConcreteSample {
     ConcreteTestingOrder concreteTestingOrder = ConcreteTestingOrder(
         id: (map["order_id"] ?? 0) as int,
         designResistance: (map["design_resistance"] ?? "") as String,
-        slumping: (map["slumping_cm"] ?? "") as int,
-        volume: (map["volume_m3"] ?? "") as int,
-        tma: (map["tma_mm"] ?? "") as int,
+        slumping: (map["slumping_cm"] ?? 0) as int,
+        volume: (map["volume_m3"] ?? 0) as int,
+        tma: (map["tma_mm"] ?? 0) as int,
         designAge: (map["design_age"] ?? "") as String,
         testingDate: DateTime.fromMillisecondsSinceEpoch(
             (map["order_testing_date"] ?? DateTime.now().millisecondsSinceEpoch)
@@ -85,8 +85,8 @@ class ConcreteSample {
         id: map["id"] as int,
         remission: map["remission"] as String?,
         volume: map["volume"] as num?,
-        plantTime: Utils.stringToTimeOfDay((map["plant_time"] ?? "") as String),
-        buildingSiteTime: Utils.stringToTimeOfDay(
+        plantTime: Utils.parseTimeOfDay((map["plant_time"] ?? "") as String),
+        buildingSiteTime: Utils.parseTimeOfDay(
             (map["building_site_time"] ?? "") as String),
         realSlumping: (map["real_slumping_cm"] ?? 0) as num,
         temperature: (map["temperature_celsius"] ?? 0) as num,

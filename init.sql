@@ -95,8 +95,8 @@ VALUES ('EPICO CONCRETOS', 'RFC001'),
        ('ARQCOZ CONSTRUCTORA', 'RFC002');
 
 INSERT INTO site_residents (first_name, last_name, job_position)
-VALUES ('MIRIAM', 'MATOS', 'MANAGER'),
-       ('EMILIANO', 'MERINO', 'ENGINEER');
+VALUES ('MIRIAM', 'MATOS', 'GERENTE'),
+       ('EMILIANO', 'MERINO', 'INGENIERO');
 
 INSERT INTO building_sites (site_name, customer_id, site_resident_id)
 VALUES ('IDIMSA', 1, 1),
@@ -105,9 +105,30 @@ VALUES ('IDIMSA', 1, 1),
 INSERT INTO concrete_testing_orders(id, design_resistance, slumping_cm, volume_m3, tma_mm, design_age, testing_date,
                                     customer_id, building_site_id, site_resident_id)
 VALUES (1, '250', 14, 7, 20, '28', 1716319147750, 1, 1, 1),
-       (2, '350', 14, 7, 20, '28', 1716319147750, 1, 1, 1);
+       (2, '350', 14, 7, 20, '28', 1716319147750, 1, 2, 2);
 
 INSERT INTO concrete_samples (remission, volume, plant_time, building_site_time, real_slumping_cm, temperature_celsius,
                               location, concrete_testing_order_id, concrete_volumetric_weight_id)
 VALUES ('REM123', 7, '08:00', '09:00', 14.5, 25, 'EJE A', 1, null),
-       ('REM124', 7, '09:00', '10:00', 16.5, 28, 'EJE B', 2, null);
+       ('REM124', 7, '09:00', '10:00', 16.5, 28, 'EJE B', 1, null);
+
+INSERT INTO concrete_cylinders (testing_age_days, testing_date, total_load_kg, diameter_cm, resistance_kgf_cm2,
+                                median, percentage, concrete_sample_id)
+VALUES (7, 1716319147750, 250, 10, 300, 290, 95, 1),
+       (14, 1716319147751, 270, 12, 320, 310, 98, 1),
+       (28, 1716319147751, 270, 12, 320, 310, 98, 1),
+       (28, 1716319147751, 270, 12, 320, 310, 98, 1);
+
+INSERT INTO concrete_cylinders (testing_age_days, testing_date, total_load_kg, diameter_cm, resistance_kgf_cm2,
+                                median, percentage, concrete_sample_id)
+VALUES (3, 1716319147750, 250, 10, 300, 290, 95, 1),
+       (7, 1716319147751, 270, 12, 320, 310, 98, 1),
+       (14, 1716319147751, 270, 12, 320, 310, 98, 1),
+       (14, 1716319147751, 270, 12, 320, 310, 98, 1);
+
+INSERT INTO concrete_cylinders (testing_age_days, testing_date, total_load_kg, diameter_cm, resistance_kgf_cm2,
+                                median, percentage, concrete_sample_id)
+VALUES (3, 1716319147750, 250, 10, 300, 290, 95, 2),
+       (7, 1716319147751, 270, 12, 320, 310, 98, 2),
+       (28, 1716319147751, 270, 12, 320, 310, 98, 2),
+       (28, 1716319147751, 270, 12, 320, 310, 98, 2);

@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:masa_epico_concrete_manager/dto/concrete_sample_details_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_expansion_tile.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
+import 'package:masa_epico_concrete_manager/elements/custom_time_picker_form.dart';
+import 'package:masa_epico_concrete_manager/elements/input_time_picker_field.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_volumetric_weight.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 
@@ -694,7 +696,8 @@ class _ConcreteTestingOrderDetailsState
 
   List<Widget> buildConcreteSamplesInfo() {
     return samples.map<Widget>((ConcreteSample sample) {
-      ConcreteSampleDetailsDTO details = ConcreteSampleDetailsDTO.fromModel(sample);
+      ConcreteSampleDetailsDTO details =
+          ConcreteSampleDetailsDTO.fromModel(sample);
       return ExpansionTile(
         title: Text(
             "${SequentialFormatter.generatePadLeftNumber(sample.id)} - ${sample.remission}"),
@@ -705,26 +708,37 @@ class _ConcreteTestingOrderDetailsState
               labelText: "Remision",
               validatorText: ""),
           const SizedBox(height: 20),
-          CustomTextFormField(
+          CustomNumberFormField(
               controller: details.volumeController,
               labelText: "Volumen",
               validatorText: ""),
+          CustomTimePickerForm(
+            timeOfDay: sample.plantTime!,
+            label: "Hora en planta",
+            orientation: PickerOrientation.horizontal,
+          ),
           const SizedBox(height: 20),
-          CustomTextFormField(
+          CustomTimePickerForm(
+            timeOfDay: sample.buildingSiteTime!,
+            label: "Hora en obra",
+            orientation: PickerOrientation.horizontal,
+          ),
+          const SizedBox(height: 20),
+          CustomNumberFormField(
               controller: details.temperature,
               labelText: "Temperatura (°C)",
               validatorText: ""),
-          const SizedBox(height: 20),
-          CustomTextFormField(
+          CustomNumberFormField(
               controller: details.realSlumpingController,
-              labelText: "Revenimiento real",
+              labelText: "Revenimiento real (cm)",
               validatorText: ""),
-          const SizedBox(height: 20),
           CustomTextFormField(
               controller: details.locationController,
               labelText: "Ubicacion / Elemento",
               validatorText: ""),
           const SizedBox(height: 20),
+          // INSERT THE DATA FOR CYLINDERS
+          generateDataTable(sample),
         ],
       );
     }).toList();
@@ -974,4 +988,55 @@ class _ConcreteTestingOrderDetailsState
   }
 
   void updateConcreteSamples() {}
+
+  Widget generateDataTable(ConcreteSample sample) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: DataTable(
+            columnSpacing: 12,
+            horizontalMargin: 12,
+            dataRowMaxHeight: double.infinity,
+            headingRowColor: WidgetStateProperty.resolveWith(
+                (states) => Colors.grey.shade300),
+            headingTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+            border: TableBorder.all(width: 1, color: Colors.grey),
+            columns: const [
+              DataColumn(
+                  label: Expanded(
+                      child:
+                          Text('EDAD DE ENSAYE', textAlign: TextAlign.center))),
+              DataColumn(
+                  label: Expanded(
+                      child: Text('FECHA DE ENSAYE',
+                          textAlign: TextAlign.center))),
+            ],
+            rows: sample.concreteSampleCylinders
+                .map(
+                  (entry) => DataRow(
+                    key: ValueKey(entry.id),
+                    onLongPress: () {},
+                    cells: [
+                      DataCell(
+                        Center(
+                          child: Text(
+                            entry.testingAge.toString(),
+                          ),
+                        ),
+                      ),
+                      DataCell(Center(
+                        child: Text(
+                          Constants.formatter.format(entry.testingDate),
+                        ),
+                      )),
+                    ],
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      ],
+    );
+  }
 }

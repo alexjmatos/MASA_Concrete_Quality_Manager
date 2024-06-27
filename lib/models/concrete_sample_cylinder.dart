@@ -3,9 +3,9 @@ class ConcreteSampleCylinder {
   int? id;
   int testingAge;
   DateTime testingDate;
-  int? totalLoad;
+  num? totalLoad;
   num? diameter;
-  int? resistance;
+  num? resistance;
   num? median;
   num? percentage;
   int? concreteTestingSampleId;
@@ -41,9 +41,9 @@ class ConcreteSampleCylinder {
         testingAge: map["testing_age_days"] as int,
         testingDate: DateTime.fromMillisecondsSinceEpoch((map["testing_date"] ??
             DateTime.now().millisecondsSinceEpoch) as int),
-        totalLoad: map["total_load_kg"] as int?,
+        totalLoad: map["total_load_kg"] as num?,
         diameter: map["diameter"] as num?,
-        resistance: map["resistance_kgf_cm2"] as int?,
+        resistance: map["resistance_kgf_cm2"] as num?,
         median: map["median"] as num?,
         percentage: map["percentage"] as num?,
         concreteTestingSampleId: map["concrete_sample_id"] as int?);

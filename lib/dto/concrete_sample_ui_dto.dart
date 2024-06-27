@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/elements/input_text_field.dart';
 import 'package:masa_epico_concrete_manager/elements/input_time_picker_field.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_sample.dart';
@@ -31,8 +32,8 @@ class ConcreteSampleUiDTO {
     return ConcreteSampleUiDTO(id: model.id.toString(),
         remission: InputTextField(),
         volume: InputNumberField(),
-        timePlant: InputTimePicker(),
-        timeBuildingSite: InputTimePicker(),
+        timePlant: InputTimePicker(timeOfDay: TimeOfDay.now(),),
+        timeBuildingSite: InputTimePicker(timeOfDay: TimeOfDay.now(),),
         temperature: InputNumberField(),
         realSlumping: InputNumberField(),
         location: InputTextField(),

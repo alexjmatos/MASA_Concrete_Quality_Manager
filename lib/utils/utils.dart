@@ -41,12 +41,23 @@ class Utils {
     ).toList();
   }
 
-  static TimeOfDay? stringToTimeOfDay(String tod) {
-    final format = DateFormat.jm();
-    try {
-      return TimeOfDay.fromDateTime(format.parse(tod));
-    } on FormatException {
-      return null;
-    }
+  static TimeOfDay parseTimeOfDay(String timeString) {
+    final parts = timeString.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = int.parse(parts[1]);
+
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
+
+  static String formatTimeOfDay(TimeOfDay time) {
+    final int hour = time.hour;
+    final int minute = time.minute;
+
+    // Ensuring two-digit formatting for hour and minute
+    final String hourString = hour.toString().padLeft(2, '0');
+    final String minuteString = minute.toString().padLeft(2, '0');
+
+    return '$hourString:$minuteString';
   }
 }
