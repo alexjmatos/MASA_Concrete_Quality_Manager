@@ -6,19 +6,19 @@ import 'package:sqflite/sqflite.dart';
 
 import '../constants/constants.dart';
 
-class BuildingSiteDao {
+class BuildingSiteDAO {
   late final Database db;
-  final SiteResidentDao siteResidentDao = SiteResidentDao();
-  final CustomerDao customerDao = CustomerDao();
+  final SiteResidentDAO siteResidentDao = SiteResidentDAO();
+  final CustomerDAO customerDao = CustomerDAO();
 
-  BuildingSiteDao() {
+  BuildingSiteDAO() {
     final injector = Injector.appInstance;
     db = injector.get<Database>();
   }
 
   Future<BuildingSite> add(BuildingSite projectSite) async {
     // ADD PROJECT SITE TO THE project_sites table
-    int id = await db.insert(Constants.PROJECT_SITES, projectSite.toMap(),
+    int id = await db.insert(Constants.BUILDING_SITES, projectSite.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
     return findById(id);
   }
@@ -37,7 +37,7 @@ class BuildingSiteDao {
   }
 
   Future<List<BuildingSite>> findByClientId(int clientId) async {
-    List<Map<String, Object?>> records = await db.query(Constants.PROJECT_SITES,
+    List<Map<String, Object?>> records = await db.query(Constants.BUILDING_SITES,
         where: "customer_id = ?", whereArgs: [clientId]);
     return records.map((e) => BuildingSite.toModel(e)).toList();
   }
@@ -56,7 +56,7 @@ class BuildingSiteDao {
 
   Future<BuildingSite> update(BuildingSite toBeUpdated) async {
     // Update the Building Site
-    await db.update(Constants.PROJECT_SITES, toBeUpdated.toMap(),
+    await db.update(Constants.BUILDING_SITES, toBeUpdated.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace,
         where: "id = ?",
         whereArgs: [toBeUpdated.id]);

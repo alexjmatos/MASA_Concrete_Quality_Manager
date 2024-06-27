@@ -32,9 +32,9 @@ class ConcreteVolumetricWeightForm extends StatefulWidget {
 class _ConcreteVolumetricWeightState
     extends State<ConcreteVolumetricWeightForm> {
   final _formKey = GlobalKey<FormState>();
-  ConcreteTestingOrderDao concreteTestingOrderDao = ConcreteTestingOrderDao();
-  ConcreteVolumetricWeightDao concreteVolumetricWeightDao =
-      ConcreteVolumetricWeightDao();
+  ConcreteTestingOrderDAO concreteTestingOrderDao = ConcreteTestingOrderDAO();
+  ConcreteVolumetricWeightDAO concreteVolumetricWeightDao =
+      ConcreteVolumetricWeightDAO();
 
   List<ConcreteTestingOrder> concreteTestingOrders = [];
   List<String> selectableConcreteTestingOrders = [];
@@ -483,7 +483,7 @@ class _ConcreteVolumetricWeightState
     // ADD THE CONCRETE VOLUMETRIC WEIGHT
     await concreteVolumetricWeightDao.add(concreteVolumetricWeight).then(
         (value) =>
-            selectedConcreteTestingOrder?.concreteVolumetricWeight = value);
+            selectedConcreteTestingOrder?.concreteSamples?.firstOrNull?.concreteVolumetricWeight = value);
     // UPDATE THE CONCRETE TESTING ORDER
 
     await concreteTestingOrderDao

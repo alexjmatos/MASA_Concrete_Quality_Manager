@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/constants/constants.dart';
-import 'package:masa_epico_concrete_manager/dto/concrete_testing_sample_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_sample_ui_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/autocomplete.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_icon_button.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_number_form_field.dart';
@@ -9,16 +9,16 @@ import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart
 import 'package:masa_epico_concrete_manager/elements/input_text_field.dart';
 import 'package:masa_epico_concrete_manager/elements/input_time_picker_field.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_testing_sample.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_sample.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_sample_cylinder.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
 import 'package:masa_epico_concrete_manager/models/building_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
-import 'package:masa_epico_concrete_manager/service/concrete_testing_sample_dao.dart';
+import 'package:masa_epico_concrete_manager/service/concrete_sample_dao.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
-import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 
 import '../elements/elevated_button_dialog.dart';
 import '../elements/input_number_field.dart';
@@ -36,13 +36,13 @@ class ConcreteTestingOrderForm extends StatefulWidget {
 class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   final _formKey = GlobalKey<FormState>();
 
-  final CustomerDao customerDao = CustomerDao();
-  final BuildingSiteDao projectSiteDao = BuildingSiteDao();
-  final SiteResidentDao siteResidentDao = SiteResidentDao();
-  final ConcreteTestingOrderDao concreteTestingOrderDao =
-      ConcreteTestingOrderDao();
-  final ConcreteTestingSampleDao concreteTestingSampleDao =
-      ConcreteTestingSampleDao();
+  final CustomerDAO customerDao = CustomerDAO();
+  final BuildingSiteDAO projectSiteDao = BuildingSiteDAO();
+  final SiteResidentDAO siteResidentDao = SiteResidentDAO();
+  final ConcreteTestingOrderDAO concreteTestingOrderDao =
+      ConcreteTestingOrderDAO();
+  final ConcreteSampleDAO concreteTestingSampleDao =
+      ConcreteSampleDAO();
 
   static List<Customer> clients = [];
   static List<String> availableClients = [];
@@ -67,7 +67,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   final TextEditingController _testingDateController = TextEditingController();
 
   DateTime selectedDate = DateTime.now();
-  List<ConcreteTestingSampleDTO> rows = [];
+  List<ConcreteSampleUiDTO> rows = [];
   late TimeOfDay timePlant;
   late TimeOfDay timeBuildingSite;
 
@@ -220,7 +220,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                         buttonColor: Colors.green,
                         icon: Icons.add,
                         onPressed: () {
-                          ConcreteTestingSampleDTO value =
+                          ConcreteSampleUiDTO value =
                               _buildConcreteTestingSampleDTO(
                                   designAgeAndTesting: Utils
                                       .generateTestingDatesBasedOnDesignDays(
@@ -340,11 +340,11 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                     description: "Presiona OK para realizar la operacion",
                     onOkPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        await addConcreteQualityOrder().then(
-                          (value) {
-                            addConcreteTestingSamples(value);
-                          },
-                        ).whenComplete(() => Navigator.pop(context));
+                        await addConcreteQualityOrder()
+                            .then((value) => addConcreteTestingSamples(value))
+                            .then((value) => addConcreteTestingCylinders(value))
+                            .then((value) => updateConcreteTestingSample())
+                            .whenComplete(() => Navigator.pop(context));
                       } else {
                         Navigator.pop(context, 'Cancelar');
                       }
@@ -374,10 +374,12 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
     return concreteTestingOrderDao.add(concreteTestingOrder);
   }
 
-  void addConcreteTestingSamples(ConcreteTestingOrder order) {
-    List<ConcreteTestingSample> samples = rows.map((sample) {
-      return ConcreteTestingSample(
+  Future<List<int>> addConcreteTestingSamples(
+      ConcreteTestingOrder order) async {
+    List<ConcreteSample> samples = rows.map((sample) {
+      return ConcreteSample(
           concreteTestingOrder: order,
+          remission: sample.remission.controller.text,
           plantTime:
               Utils.stringToTimeOfDay(sample.timePlant.timeController.text),
           buildingSiteTime: Utils.stringToTimeOfDay(
@@ -388,17 +390,36 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
           concreteSampleCylinders: []);
     }).toList();
 
-    concreteTestingSampleDao.addAll(samples).then(
-      (value) {
-        ComponentUtils.generateSuccessMessage(context,
-            "Orden de muestreo - ${SequentialFormatter.generatePadLeftNumber(order.id!)} agregada con exito");
-      },
-    ).onError(
-      (error, stackTrace) {
-        ComponentUtils.generateErrorMessage(context);
-      },
-    );
+    return concreteTestingSampleDao.addAll(samples);
   }
+
+  Future<List<int>> addConcreteTestingCylinders(List<int> identifiers) {
+    List<ConcreteSampleCylinder> cylinders =
+        Iterable.generate(rows.length, (index) => index)
+            .map((i) {
+              return Iterable.generate(
+                rows[i].designAges.length,
+                (index) => index,
+              ).map((j) {
+                var dto = rows.elementAt(i);
+                var testingAge =
+                    int.tryParse(dto.designAges.elementAt(j).controller.text) ??
+                        0;
+                var testingDate = DateTime.tryParse(
+                        dto.testingDates.elementAt(j).controller.text) ??
+                    DateTime.now();
+                return ConcreteSampleCylinder(
+                    testingAge: testingAge,
+                    testingDate: testingDate,
+                    concreteTestingSampleId: identifiers.elementAt(i));
+              }).toList();
+            })
+            .expand((element) => element)
+            .toList();
+    return concreteTestingSampleDao.addAllCylinders(cylinders);
+  }
+
+  void updateConcreteTestingSample() {}
 
   void loadData() {
     customerDao.findAll().then((value) {
@@ -451,12 +472,12 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
     });
   }
 
-  ConcreteTestingSampleDTO _buildConcreteTestingSampleDTO(
+  ConcreteSampleUiDTO _buildConcreteTestingSampleDTO(
       {required List<Map<String, dynamic>> designAgeAndTesting}) {
     InputNumberField volumeInput = InputNumberField();
     volumeInput.controller.text = "7";
 
-    return ConcreteTestingSampleDTO(
+    return ConcreteSampleUiDTO(
         id: Utils.generateUniqueId(),
         remission: InputTextField(lines: 3),
         volume: volumeInput,
@@ -517,7 +538,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
     );
   }
 
-  Future<List<ConcreteTestingSampleDTO>> updateDataTableRows(
+  Future<List<ConcreteSampleUiDTO>> updateDataTableRows(
       {required bool updateDesignAges,
       required bool updateTestingDates}) async {
     if (rows.isNotEmpty) {
@@ -555,5 +576,19 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
     } else {
       return rows;
     }
+  }
+
+  List<ConcreteSampleCylinder> generateConcreteSampleCylinders(
+      ConcreteSampleUiDTO dto) {
+    return Iterable.generate(dto.designAges.length, (index) => index).map((i) {
+      int? testingAge =
+          int.tryParse(dto.designAges.elementAt(i).controller.text) ?? 0;
+      DateTime testingDate =
+          DateTime.tryParse(dto.testingDates.elementAt(i).controller.text) ??
+              DateTime.now();
+
+      return ConcreteSampleCylinder(
+          testingAge: testingAge, testingDate: testingDate);
+    }).toList();
   }
 }

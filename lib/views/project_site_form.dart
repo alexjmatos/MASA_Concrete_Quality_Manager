@@ -23,9 +23,9 @@ class _ProjectSiteAndResidentFormState
     extends State<ProjectSiteAndResidentForm> {
   final _formKey = GlobalKey<FormState>();
 
-  final BuildingSiteDao projectSiteDao = BuildingSiteDao();
-  final CustomerDao customerDao = CustomerDao();
-  final SiteResidentDao siteResidentDao = SiteResidentDao();
+  final BuildingSiteDAO projectSiteDao = BuildingSiteDAO();
+  final CustomerDAO customerDao = CustomerDAO();
+  final SiteResidentDAO siteResidentDao = SiteResidentDAO();
 
   // Data for General Site Project Info
   final TextEditingController _obraController = TextEditingController();

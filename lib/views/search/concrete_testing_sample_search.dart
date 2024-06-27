@@ -5,14 +5,14 @@ import 'package:masa_epico_concrete_manager/data/table/concrete_sample_data_tabl
 import 'package:masa_epico_concrete_manager/elements/autocomplete.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_icon_button.dart';
 
-import 'package:masa_epico_concrete_manager/service/concrete_testing_sample_dao.dart';
+import 'package:masa_epico_concrete_manager/service/concrete_sample_dao.dart';
 import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 
 import '../../elements/value_notifier_list.dart';
 import '../../filters/composite_filter.dart';
 import '../../filters/filter_criteria.dart';
-import '../../models/concrete_testing_sample.dart';
+import '../../models/concrete_sample.dart';
 import '../../models/building_site.dart';
 
 class ConcreteTestingSampleSearch extends StatefulWidget {
@@ -25,19 +25,19 @@ class ConcreteTestingSampleSearch extends StatefulWidget {
 
 class _ConcreteTestingSampleSearchState
     extends State<ConcreteTestingSampleSearch> {
-  final ValueNotifierList<ConcreteTestingSample>
+  final ValueNotifierList<ConcreteSample>
       concreteTestingSampleNotifier = ValueNotifierList([]);
 
-  final BuildingSiteDao buildingSiteDao = BuildingSiteDao();
-  final ConcreteTestingSampleDao concreteTestingSampleDao =
-      ConcreteTestingSampleDao();
+  final BuildingSiteDAO buildingSiteDao = BuildingSiteDAO();
+  final ConcreteSampleDAO concreteTestingSampleDao =
+      ConcreteSampleDAO();
 
   BuildingSite? selectedBuildingSite;
   String? selectedDesignResistance;
   String? selectedDesignAge;
 
   List<BuildingSite> buildingSites = [];
-  List<ConcreteTestingSample> concreteTestingSamples = [];
+  List<ConcreteSample> concreteTestingSamples = [];
   List<String> selectionBuildingSites = [];
 
   bool isTablet = true;

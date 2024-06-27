@@ -16,6 +16,7 @@ class ConcreteVolumetricWeight {
   num? totalLoad;
   num? totalLoadVolumetricWeightRelation;
   num? percentage;
+  int? concreteSampleId;
 
   ConcreteVolumetricWeight(
       this.id,

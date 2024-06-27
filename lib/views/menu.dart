@@ -8,7 +8,7 @@ import 'package:masa_epico_concrete_manager/views/home_view.dart';
 import 'package:masa_epico_concrete_manager/views/project_site_form.dart';
 import 'package:masa_epico_concrete_manager/views/site_resident_form.dart';
 
-import 'concrete_testing_sample_form.dart';
+import 'concrete_sample_form.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key, required this.title, required this.isTablet});
@@ -28,8 +28,6 @@ class _MenuPageState extends State<MenuPage> {
     const SiteResidentForm(),
     const ProjectSiteAndResidentForm(),
     const ConcreteTestingOrderForm(),
-    const ConcreteVolumetricWeightForm(),
-    const ConcreteTestingRemissionForm(),
     const ConcreteQualitySearch(),
   ];
 
@@ -121,31 +119,11 @@ class _MenuPageState extends State<MenuPage> {
               },
             ),
             ListTile(
-              title: const Text('Peso volumetrico'),
+              title: const Text('Registros'),
               selected: _selectedIndex == 5,
               onTap: () {
                 // Update the state of the app
                 _onItemTapped(5);
-                // Then close the drawer
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Remisiones'),
-              selected: _selectedIndex == 6,
-              onTap: () {
-                // Update the state of the app
-                _onItemTapped(6);
-                // Then close the drawer
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Registros'),
-              selected: _selectedIndex == 7,
-              onTap: () {
-                // Update the state of the app
-                _onItemTapped(7);
                 // Then close the drawer
                 Navigator.pop(context);
               },

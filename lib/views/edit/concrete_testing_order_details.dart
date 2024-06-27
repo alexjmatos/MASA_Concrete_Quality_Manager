@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_sample_details_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_expansion_tile.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_volumetric_weight.dart';
@@ -14,6 +15,7 @@ import '../../elements/formatters.dart';
 import '../../elements/quantity_form_field.dart';
 import '../../elements/value_notifier_list.dart';
 import '../../models/concrete_testing_order.dart';
+import '../../models/concrete_sample.dart';
 import '../../models/customer.dart';
 import '../../models/building_site.dart';
 import '../../models/site_resident.dart';
@@ -44,13 +46,13 @@ class _ConcreteTestingOrderDetailsState
     extends State<ConcreteTestingOrderDetails> {
   final _formKey = GlobalKey<FormState>();
 
-  final CustomerDao customerDao = CustomerDao();
-  final BuildingSiteDao buildingSiteDao = BuildingSiteDao();
-  final SiteResidentDao siteResidentDao = SiteResidentDao();
-  final ConcreteTestingOrderDao concreteTestingOrderDao =
-      ConcreteTestingOrderDao();
-  final ConcreteVolumetricWeightDao concreteVolumetricWeightDao =
-      ConcreteVolumetricWeightDao();
+  final CustomerDAO customerDao = CustomerDAO();
+  final BuildingSiteDAO buildingSiteDao = BuildingSiteDAO();
+  final SiteResidentDAO siteResidentDao = SiteResidentDAO();
+  final ConcreteTestingOrderDAO concreteTestingOrderDao =
+      ConcreteTestingOrderDAO();
+  final ConcreteVolumetricWeightDAO concreteVolumetricWeightDao =
+      ConcreteVolumetricWeightDAO();
 
   static List<Customer> clients = [];
   static List<String> availableClients = [];
@@ -117,140 +119,131 @@ class _ConcreteTestingOrderDetailsState
   bool setTareVolume = true;
 
   List<Map<String, String>> additivesRows = [];
+  List<ConcreteSample> samples = [];
 
   @override
   void initState() {
     super.initState();
-    _setConcreteTestingOrderFields();
-    _loadData();
+    _setConcreteTestingOrderFields().then((value) => _loadData());
   }
 
-  void _setConcreteTestingOrderFields() async {
-    await concreteTestingOrderDao
-        .findById(widget.id)
-        .then((value) => selectedConcreteTestingOrder = value)
-        .whenComplete(
-      () {
-        setState(
-          () {
-            selectedCustomer = selectedConcreteTestingOrder.customer;
-            _customerController.text =
-                SequentialFormatter.generateSequentialFormatFromCustomer(
-                    selectedConcreteTestingOrder.customer);
+  Future<void> _setConcreteTestingOrderFields() async {
+    selectedConcreteTestingOrder =
+        await concreteTestingOrderDao.findById(widget.id);
 
-            selectedBuildingSite = selectedConcreteTestingOrder.buildingSite;
-            _buildingSiteController.text =
-                SequentialFormatter.generateSequentialFormatFromBuildingSite(
-                    selectedConcreteTestingOrder.buildingSite);
+    setState(() {
+      selectedCustomer = selectedConcreteTestingOrder.customer;
+      _customerController.text =
+          SequentialFormatter.generateSequentialFormatFromCustomer(
+              selectedConcreteTestingOrder.customer);
 
-            selectedSiteResident = selectedConcreteTestingOrder.siteResident;
-            _siteResidentController.text =
-                SequentialFormatter.generateSequentialFormatFromSiteResident(
-                    selectedConcreteTestingOrder.siteResident);
+      selectedBuildingSite = selectedConcreteTestingOrder.buildingSite;
+      _buildingSiteController.text =
+          SequentialFormatter.generateSequentialFormatFromBuildingSite(
+              selectedConcreteTestingOrder.buildingSite);
 
-            _designResistanceController.text =
-                selectedConcreteTestingOrder.designResistance!;
+      selectedSiteResident = selectedConcreteTestingOrder.siteResident;
+      _siteResidentController.text =
+          SequentialFormatter.generateSequentialFormatFromSiteResident(
+              selectedConcreteTestingOrder.siteResident);
 
-            designResistanceIndex = Constants.CONCRETE_COMPRESSION_RESISTANCES
-                .indexOf(selectedConcreteTestingOrder.designResistance!);
+      _designResistanceController.text =
+          selectedConcreteTestingOrder.designResistance!;
 
-            _slumpingController.text =
-                selectedConcreteTestingOrder.slumping.toString();
+      designResistanceIndex = Constants.CONCRETE_COMPRESSION_RESISTANCES
+          .indexOf(selectedConcreteTestingOrder.designResistance!);
 
-            _volumeController.text =
-                selectedConcreteTestingOrder.volume.toString();
+      _slumpingController.text =
+          selectedConcreteTestingOrder.slumping.toString();
 
-            _tmaController.text = selectedConcreteTestingOrder.tma.toString();
+      _volumeController.text = selectedConcreteTestingOrder.volume.toString();
 
-            _designAgeController.text = selectedConcreteTestingOrder.designAge!;
+      _tmaController.text = selectedConcreteTestingOrder.tma.toString();
 
-            designAgeIndex = Constants.CONCRETE_DESIGN_AGES
-                .indexOf(selectedConcreteTestingOrder.designAge!);
+      _designAgeController.text = selectedConcreteTestingOrder.designAge!;
 
-            selectedDate = selectedConcreteTestingOrder.testingDate!;
+      designAgeIndex = Constants.CONCRETE_DESIGN_AGES
+          .indexOf(selectedConcreteTestingOrder.designAge!);
 
-            _testingDateController.text = Constants.formatter
-                .format(selectedConcreteTestingOrder.testingDate!);
+      selectedDate = selectedConcreteTestingOrder.testingDate!;
 
-            final selectedConcreteVolumetricWeight =
-                selectedConcreteTestingOrder.concreteVolumetricWeight;
+      _testingDateController.text =
+          Constants.formatter.format(selectedConcreteTestingOrder.testingDate!);
 
-            if (selectedConcreteVolumetricWeight != null) {
-              _concreteTestingOrderController.text = SequentialFormatter
-                  .generateSequentialFormatFromConcreteTestingOrder(
-                      selectedConcreteTestingOrder);
-              _tareWeightController.text =
-                  (selectedConcreteVolumetricWeight.tareWeight ?? 0.0)
-                      .toStringAsFixed(1);
-              _materialTareWeightController.text =
-                  (selectedConcreteVolumetricWeight.materialTareWeight ?? 0.0)
-                      .toStringAsFixed(1);
-              _materialWeightController.text =
-                  (selectedConcreteVolumetricWeight.materialWeight ?? 0.0)
-                      .toStringAsFixed(1);
-              _tareVolumeController.text =
-                  (selectedConcreteVolumetricWeight.tareVolume ?? 0.0)
-                      .toStringAsFixed(3);
-              _volumetricWeightController.text =
-                  (selectedConcreteVolumetricWeight.volumetricWeight ?? 0.0)
-                      .toStringAsFixed(1);
-              _cementController.text =
-                  (selectedConcreteVolumetricWeight.cementQuantity ?? 0.0)
-                      .toStringAsFixed(1);
-              _coarseAggregateController.text =
-                  (selectedConcreteVolumetricWeight.coarseAggregateQuantity ??
-                          0.0)
-                      .toStringAsFixed(1);
-              _fineAggregateController.text =
-                  (selectedConcreteVolumetricWeight.fineAggregateQuantity ??
-                          0.0)
-                      .toStringAsFixed(1);
-              _waterController.text =
-                  (selectedConcreteVolumetricWeight.waterQuantity ?? 0.0)
-                      .toStringAsFixed(1);
+      final selectedConcreteVolumetricWeight = selectedConcreteTestingOrder
+          .concreteSamples?.first.concreteVolumetricWeight;
 
-              additivesRows =
-                  selectedConcreteVolumetricWeight.additives.entries.map(
-                (e) {
-                  Map<String, String> temp = {};
-                  temp.putIfAbsent(
-                    "Aditivo",
-                    () => e.key,
-                  );
-                  temp.putIfAbsent(
-                    "Cantidad (lt)",
-                    () => e.value.toStringAsFixed(2),
-                  );
-                  return temp;
-                },
-              ).toList();
+      samples = selectedConcreteTestingOrder.concreteSamples!;
 
-              _totalLoadController.text =
-                  (selectedConcreteVolumetricWeight.totalLoad ?? 0.0)
-                      .toStringAsFixed(1);
-              _totalLoadVolumetricWeightController.text =
-                  (selectedConcreteVolumetricWeight
-                              .totalLoadVolumetricWeightRelation ??
-                          0.0)
-                      .toStringAsFixed(1);
-              _percentageController.text =
-                  (selectedConcreteVolumetricWeight.percentage ?? 0.0)
-                      .toStringAsFixed(1);
+      if (selectedConcreteVolumetricWeight != null) {
+        _concreteTestingOrderController.text = SequentialFormatter
+            .generateSequentialFormatFromConcreteTestingOrder(
+                selectedConcreteTestingOrder);
+        _tareWeightController.text =
+            (selectedConcreteVolumetricWeight.tareWeight ?? 0.0)
+                .toStringAsFixed(1);
+        _materialTareWeightController.text =
+            (selectedConcreteVolumetricWeight.materialTareWeight ?? 0.0)
+                .toStringAsFixed(1);
+        _materialWeightController.text =
+            (selectedConcreteVolumetricWeight.materialWeight ?? 0.0)
+                .toStringAsFixed(1);
+        _tareVolumeController.text =
+            (selectedConcreteVolumetricWeight.tareVolume ?? 0.0)
+                .toStringAsFixed(3);
+        _volumetricWeightController.text =
+            (selectedConcreteVolumetricWeight.volumetricWeight ?? 0.0)
+                .toStringAsFixed(1);
+        _cementController.text =
+            (selectedConcreteVolumetricWeight.cementQuantity ?? 0.0)
+                .toStringAsFixed(1);
+        _coarseAggregateController.text =
+            (selectedConcreteVolumetricWeight.coarseAggregateQuantity ?? 0.0)
+                .toStringAsFixed(1);
+        _fineAggregateController.text =
+            (selectedConcreteVolumetricWeight.fineAggregateQuantity ?? 0.0)
+                .toStringAsFixed(1);
+        _waterController.text =
+            (selectedConcreteVolumetricWeight.waterQuantity ?? 0.0)
+                .toStringAsFixed(1);
 
-              // SET GLOBAL VARIABLES
-              volumetricWeight =
-                  selectedConcreteVolumetricWeight.volumetricWeight ?? 0.0;
-              totalLoad = selectedConcreteVolumetricWeight.totalLoad ?? 0.0;
-              totalLoadVolumetricWeightRelation =
-                  selectedConcreteVolumetricWeight
-                          .totalLoadVolumetricWeightRelation ??
-                      0.0;
-              percentage = selectedConcreteVolumetricWeight.percentage ?? 0.0;
-            }
+        additivesRows = selectedConcreteVolumetricWeight.additives.entries.map(
+          (e) {
+            Map<String, String> temp = {};
+            temp.putIfAbsent(
+              "Aditivo",
+              () => e.key,
+            );
+            temp.putIfAbsent(
+              "Cantidad (lt)",
+              () => e.value.toStringAsFixed(2),
+            );
+            return temp;
           },
-        );
-      },
-    );
+        ).toList();
+
+        _totalLoadController.text =
+            (selectedConcreteVolumetricWeight.totalLoad ?? 0.0)
+                .toStringAsFixed(1);
+        _totalLoadVolumetricWeightController.text =
+            (selectedConcreteVolumetricWeight
+                        .totalLoadVolumetricWeightRelation ??
+                    0.0)
+                .toStringAsFixed(1);
+        _percentageController.text =
+            (selectedConcreteVolumetricWeight.percentage ?? 0.0)
+                .toStringAsFixed(1);
+
+        // SET GLOBAL VARIABLES
+        volumetricWeight =
+            selectedConcreteVolumetricWeight.volumetricWeight ?? 0.0;
+        totalLoad = selectedConcreteVolumetricWeight.totalLoad ?? 0.0;
+        totalLoadVolumetricWeightRelation = selectedConcreteVolumetricWeight
+                .totalLoadVolumetricWeightRelation ??
+            0.0;
+        percentage = selectedConcreteVolumetricWeight.percentage ?? 0.0;
+      }
+    });
   }
 
   Future<void> _loadData() async {
@@ -307,7 +300,12 @@ class _ConcreteTestingOrderDetailsState
                   onExpand: () {},
                 ),
                 CustomExpansionTile(
-                  title: "Peso volumetrico",
+                  title: "Muestras",
+                  children: buildConcreteSamplesInfo(),
+                  onExpand: () => updateConcreteSamples(),
+                ),
+                CustomExpansionTile(
+                  title: "Pesos volumetricos",
                   children: buildVolumetricWeightInfo(),
                   onExpand: () => updateTotalLoad(),
                 ),
@@ -694,6 +692,44 @@ class _ConcreteTestingOrderDetailsState
     ];
   }
 
+  List<Widget> buildConcreteSamplesInfo() {
+    return samples.map<Widget>((ConcreteSample sample) {
+      ConcreteSampleDetailsDTO details = ConcreteSampleDetailsDTO.fromModel(sample);
+      return ExpansionTile(
+        title: Text(
+            "${SequentialFormatter.generatePadLeftNumber(sample.id)} - ${sample.remission}"),
+        children: <Widget>[
+          const SizedBox(height: 20),
+          CustomTextFormField(
+              controller: details.remissionController,
+              labelText: "Remision",
+              validatorText: ""),
+          const SizedBox(height: 20),
+          CustomTextFormField(
+              controller: details.volumeController,
+              labelText: "Volumen",
+              validatorText: ""),
+          const SizedBox(height: 20),
+          CustomTextFormField(
+              controller: details.temperature,
+              labelText: "Temperatura (°C)",
+              validatorText: ""),
+          const SizedBox(height: 20),
+          CustomTextFormField(
+              controller: details.realSlumpingController,
+              labelText: "Revenimiento real",
+              validatorText: ""),
+          const SizedBox(height: 20),
+          CustomTextFormField(
+              controller: details.locationController,
+              labelText: "Ubicacion / Elemento",
+              validatorText: ""),
+          const SizedBox(height: 20),
+        ],
+      );
+    }).toList();
+  }
+
   Future<void> updateConcreteQualityOrder() async {
     selectedConcreteTestingOrder.slumping =
         int.tryParse(_slumpingController.text);
@@ -708,7 +744,8 @@ class _ConcreteTestingOrderDetailsState
     selectedConcreteTestingOrder.siteResident = selectedSiteResident;
 
     final ConcreteVolumetricWeight? concreteVolumetricWeight =
-        selectedConcreteTestingOrder.concreteVolumetricWeight;
+        selectedConcreteTestingOrder
+            .concreteSamples?.first.concreteVolumetricWeight;
     int volume = int.tryParse(_volumeController.text) ?? 7;
     num? tareWeight = num.tryParse(_tareWeightController.text);
     num? materialTareWeight = num.tryParse(_materialTareWeightController.text);
@@ -781,7 +818,8 @@ class _ConcreteTestingOrderDetailsState
     }
 
     if (result != null) {
-      selectedConcreteTestingOrder.concreteVolumetricWeight = result;
+      selectedConcreteTestingOrder
+          .concreteSamples?.firstOrNull?.concreteVolumetricWeight = result;
     }
 
     return concreteTestingOrderDao
@@ -934,4 +972,6 @@ class _ConcreteTestingOrderDetailsState
         totalLoadVolumetricWeightRelation.toStringAsFixed(2).toString();
     _percentageController.text = percentage.toStringAsFixed(2).toString();
   }
+
+  void updateConcreteSamples() {}
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/data/source/concrete_sample_data_source.dart';
 import 'package:masa_epico_concrete_manager/elements/value_notifier_list.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_testing_sample.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_sample.dart';
 
 class ConcreteSamplesDataTable extends StatelessWidget {
-  final ValueNotifierList<ConcreteTestingSample>
+  final ValueNotifierList<ConcreteSample>
       concreteTestingSampleNotifier;
   final int rowsPerPage;
 

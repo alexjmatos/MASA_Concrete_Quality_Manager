@@ -6,7 +6,7 @@ import '../models/concrete_testing_order.dart';
 import '../models/customer.dart';
 
 class SequentialFormatter {
-  static String generatePadLeftNumber(int id) {
+  static String generatePadLeftNumber(int? id) {
     return id.toString().padLeft(Constants.LEADING_ZEROS, '0');
   }
 

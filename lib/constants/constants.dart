@@ -39,13 +39,12 @@ class Constants {
 
   static const String USERS = "users";
   static const String CUSTOMERS = "customers";
-  static const String PROJECT_SITES = "building_sites";
+  static const String BUILDING_SITES = "building_sites";
   static const String SITE_RESIDENTS = "site_residents";
-  static const String MANY_TO_MANY_PROJECT_SITES_SITE_RESIDENTS =
-      "project_site_resident";
   static const String CONCRETE_TESTING_ORDERS = "concrete_testing_orders";
+  static const String CONCRETE_TESTING_SAMPLES = "concrete_samples";
+  static const String CONCRETE_TESTING_CYLINDERS = "concrete_cylinders";
   static const String CONCRETE_VOLUMETRIC_WEIGHT = "concrete_volumetric_weight";
-  static const String CONCRETE_TESTING_SAMPLES = "concrete_testing_samples";
 
   static const int LEADING_ZEROS = 4;
   static const int TARE_WEIGHT = 3480;

@@ -29,9 +29,9 @@ class BuildingSiteDetails extends StatefulWidget {
 class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
   final _formKey = GlobalKey<FormState>();
 
-  final BuildingSiteDao projectSiteDao = BuildingSiteDao();
-  final CustomerDao customerDao = CustomerDao();
-  final SiteResidentDao siteResidentDao = SiteResidentDao();
+  final BuildingSiteDAO projectSiteDao = BuildingSiteDAO();
+  final CustomerDAO customerDao = CustomerDAO();
+  final SiteResidentDAO siteResidentDao = SiteResidentDAO();
 
   // Data for General Site Project Info
   final TextEditingController _obraController = TextEditingController();

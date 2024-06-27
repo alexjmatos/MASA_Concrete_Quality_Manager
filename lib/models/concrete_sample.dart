@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
-import 'package:masa_epico_concrete_manager/models/building_site.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_volumetric_weight.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 
 import '../utils/utils.dart';
-import 'concrete_testing_sample_cilinder.dart';
+import 'building_site.dart';
+import 'concrete_sample_cylinder.dart';
 import 'customer.dart';
 
-class ConcreteTestingSample {
+class ConcreteSample {
   int? id;
+  String? remission;
+  num? volume;
   TimeOfDay? plantTime;
   TimeOfDay? buildingSiteTime;
   num? realSlumping;
   num? temperature;
   String? location;
   ConcreteTestingOrder concreteTestingOrder;
-  List<ConcreteTestingSampleCylinder> concreteSampleCylinders;
+  ConcreteVolumetricWeight? concreteVolumetricWeight;
+  List<ConcreteSampleCylinder> concreteSampleCylinders;
 
-  ConcreteTestingSample(
+  ConcreteSample(
       {this.id,
+      this.remission,
+      this.volume,
       this.plantTime,
       this.buildingSiteTime,
       this.realSlumping,
@@ -30,6 +36,8 @@ class ConcreteTestingSample {
   Map<String, Object?> toMap() {
     return {
       "id": id,
+      "remission": remission,
+      "volume": volume,
       "plant_time": plantTime?.toString(),
       "building_site_time": buildingSiteTime?.toString(),
       "real_slumping_cm": realSlumping,
@@ -39,7 +47,8 @@ class ConcreteTestingSample {
     };
   }
 
-  static ConcreteTestingSample toModel(Map<String, Object?> map) {
+  static ConcreteSample toModel(Map<String, Object?> map) {
+    List<ConcreteSampleCylinder> concreteSamples = [];
     Customer customer = Customer(
       id: (map["customer_id"] ?? 0) as int,
       identifier: (map["customer_identifier"] ?? "") as String,
@@ -72,11 +81,13 @@ class ConcreteTestingSample {
         buildingSite: buildingSite,
         siteResident: siteResident);
 
-    List<ConcreteTestingSampleCylinder> concreteSamples = [];
-    return ConcreteTestingSample(
+    return ConcreteSample(
         id: map["id"] as int,
+        remission: map["remission"] as String?,
+        volume: map["volume"] as num?,
         plantTime: Utils.stringToTimeOfDay((map["plant_time"] ?? "") as String),
-        buildingSiteTime: Utils.stringToTimeOfDay((map["building_site_time"] ?? "") as String),
+        buildingSiteTime: Utils.stringToTimeOfDay(
+            (map["building_site_time"] ?? "") as String),
         realSlumping: (map["real_slumping_cm"] ?? 0) as num,
         temperature: (map["temperature_celsius"] ?? 0) as num,
         location: (map["location"] ?? "") as String,

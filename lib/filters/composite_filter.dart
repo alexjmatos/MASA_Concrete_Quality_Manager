@@ -1,4 +1,4 @@
-import '../models/concrete_testing_sample.dart';
+import '../models/concrete_sample.dart';
 import 'filter_criteria.dart';
 
 class CompositeFilter implements FilterCriteria {
@@ -7,7 +7,7 @@ class CompositeFilter implements FilterCriteria {
   CompositeFilter(this.criteria);
 
   @override
-  bool matches(ConcreteTestingSample element) {
+  bool matches(ConcreteSample element) {
     for (var criterion in criteria) {
       if (!criterion.matches(element)) {
         return false;

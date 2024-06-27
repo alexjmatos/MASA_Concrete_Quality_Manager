@@ -1,9 +1,9 @@
 // Interface for filter criteria
 import '../models/building_site.dart';
-import '../models/concrete_testing_sample.dart';
+import '../models/concrete_sample.dart';
 
 abstract class FilterCriteria {
-  bool matches(ConcreteTestingSample element);
+  bool matches(ConcreteSample element);
 }
 
 // Concrete implementations for each criterion
@@ -13,7 +13,7 @@ class BuildingSiteCriteria implements FilterCriteria {
   BuildingSiteCriteria(this.selectedBuildingSite);
 
   @override
-  bool matches(ConcreteTestingSample element) {
+  bool matches(ConcreteSample element) {
     return selectedBuildingSite == null ||
         element.concreteTestingOrder.buildingSite.id ==
             selectedBuildingSite?.id;
@@ -26,7 +26,7 @@ class DesignResistanceCriteria implements FilterCriteria {
   DesignResistanceCriteria(this.selectedDesignResistance);
 
   @override
-  bool matches(ConcreteTestingSample element) {
+  bool matches(ConcreteSample element) {
     return selectedDesignResistance == null ||
         element.concreteTestingOrder.designResistance ==
             selectedDesignResistance;
@@ -39,7 +39,7 @@ class DesignAgeCriteria implements FilterCriteria {
   DesignAgeCriteria(this.selectedDesignAge);
 
   @override
-  bool matches(ConcreteTestingSample element) {
+  bool matches(ConcreteSample element) {
     return selectedDesignAge == null ||
         element.concreteTestingOrder.designAge == selectedDesignAge;
   }

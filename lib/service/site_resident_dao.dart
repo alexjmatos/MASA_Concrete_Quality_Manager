@@ -3,10 +3,10 @@ import 'package:masa_epico_concrete_manager/constants/constants.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:sqflite/sqflite.dart';
 
-class SiteResidentDao {
+class SiteResidentDAO {
   late final Database db;
 
-  SiteResidentDao() {
+  SiteResidentDAO() {
     final injector = Injector.appInstance;
     db = injector.get<Database>();
   }

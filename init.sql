@@ -50,40 +50,44 @@ CREATE TABLE IF NOT EXISTS concrete_volumetric_weight
 
 CREATE TABLE IF NOT EXISTS concrete_testing_orders
 (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    design_resistance VARCHAR(255),
+    slumping_cm       INTEGER,
+    volume_m3         INTEGER,
+    tma_mm            INTEGER,
+    design_age        VARCHAR(255),
+    testing_date      INTEGER,
+    customer_id       INTEGER REFERENCES customers (id),
+    building_site_id  INTEGER REFERENCES building_sites (id),
+    site_resident_id  INTEGER REFERENCES site_residents (id)
+);
+
+CREATE TABLE IF NOT EXISTS concrete_samples
+(
     id                            INTEGER PRIMARY KEY AUTOINCREMENT,
-    design_resistance             VARCHAR(255),
-    slumping_cm                   INTEGER,
-    volume_m3                     INTEGER,
-    tma_mm                        INTEGER,
-    design_age                    VARCHAR(255),
-    testing_date                  INTEGER,
-    customer_id                   INTEGER REFERENCES customers (id),
-    building_site_id              INTEGER REFERENCES building_sites (id),
-    site_resident_id              INTEGER REFERENCES site_residents (id),
+    remission                     VARCHAR(255),
+    volume                        REAL,
+    plant_time                    VARCHAR(255),
+    building_site_time            VARCHAR(255),
+    real_slumping_cm              REAL,
+    temperature_celsius           REAL,
+    location                      VARCHAR(255),
+    concrete_testing_order_id     INTEGER REFERENCES concrete_testing_orders (id),
     concrete_volumetric_weight_id INTEGER REFERENCES concrete_volumetric_weight (id)
+
 );
 
-CREATE TABLE IF NOT EXISTS concrete_testing_samples
+CREATE TABLE IF NOT EXISTS concrete_cylinders
 (
-    id                        INTEGER PRIMARY KEY AUTOINCREMENT,
-    plant_time                VARCHAR(255),
-    building_site_time        VARCHAR(255),
-    real_slumping_cm          REAL,
-    temperature_celsius       REAL,
-    location                  VARCHAR(255),
-    concrete_testing_order_id INTEGER REFERENCES concrete_testing_orders (id)
-);
-
-CREATE TABLE IF NOT EXISTS concrete_testing_cylinder_samples
-(
-    id                            INTEGER PRIMARY KEY AUTOINCREMENT,
-    testing_age_days              INTEGER,
-    testing_date                  INTEGER,
-    total_load_kg                 REAL,
-    resistance_kgf_cm2            REAL,
-    median                        REAL,
-    percentage                    REAL,
-    concrete_testing_sample_id INTEGER REFERENCES concrete_testing_samples (id)
+    id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+    testing_age_days   INTEGER,
+    testing_date       INTEGER,
+    total_load_kg      REAL,
+    diameter_cm        REAL,
+    resistance_kgf_cm2 REAL,
+    median             REAL,
+    percentage         REAL,
+    concrete_sample_id INTEGER REFERENCES concrete_samples (id)
 );
 
 INSERT INTO customers (identifier, company_name)
@@ -95,9 +99,15 @@ VALUES ('MIRIAM', 'MATOS', 'MANAGER'),
        ('EMILIANO', 'MERINO', 'ENGINEER');
 
 INSERT INTO building_sites (site_name, customer_id, site_resident_id)
-VALUES ('SITE A', 1, 1),
-       ('SITE B', 2, 2);
+VALUES ('IDIMSA', 1, 1),
+       ('CASA OSIO', 2, 2);
 
 INSERT INTO concrete_testing_orders(id, design_resistance, slumping_cm, volume_m3, tma_mm, design_age, testing_date,
-                                    customer_id, building_site_id, site_resident_id, concrete_volumetric_weight_id)
-VALUES (1, '250', 14, 7, 20, '28', 1716319147750, 1, 1, 1, null);
+                                    customer_id, building_site_id, site_resident_id)
+VALUES (1, '250', 14, 7, 20, '28', 1716319147750, 1, 1, 1),
+       (2, '350', 14, 7, 20, '28', 1716319147750, 1, 1, 1);
+
+INSERT INTO concrete_samples (remission, volume, plant_time, building_site_time, real_slumping_cm, temperature_celsius,
+                              location, concrete_testing_order_id, concrete_volumetric_weight_id)
+VALUES ('REM123', 7, '08:00', '09:00', 14.5, 25, 'EJE A', 1, null),
+       ('REM124', 7, '09:00', '10:00', 16.5, 28, 'EJE B', 2, null);

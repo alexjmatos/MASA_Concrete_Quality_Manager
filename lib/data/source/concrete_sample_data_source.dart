@@ -4,13 +4,13 @@ import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 
 import '../../elements/value_notifier_list.dart';
 import '../../models/concrete_testing_order.dart';
-import '../../models/concrete_testing_sample.dart';
+import '../../models/concrete_sample.dart';
 import '../../utils/sequential_counter_generator.dart';
 import '../../views/edit/concrete_testing_order_details.dart';
 
 class ConcreteSamplesData extends DataTableSource {
   final BuildContext context;
-  final ValueNotifierList<ConcreteTestingSample>
+  final ValueNotifierList<ConcreteSample>
       concreteTestingSamplesNotifier;
 
   ConcreteSamplesData(
@@ -24,7 +24,7 @@ class ConcreteSamplesData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              "M - ${SequentialFormatter.generatePadLeftNumber(concreteSample.id ?? 0)}",
+              "MASA - ${SequentialFormatter.generatePadLeftNumber(concreteSample.id ?? 0)}",
               textAlign: TextAlign.center,
             ),
           ),
