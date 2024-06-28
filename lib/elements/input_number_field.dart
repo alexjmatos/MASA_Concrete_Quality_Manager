@@ -4,15 +4,17 @@ import 'package:flutter/services.dart';
 class InputNumberField extends StatelessWidget {
   final bool acceptDecimalPoint;
   final TextEditingController controller = TextEditingController();
+  final bool readOnly;
 
   InputNumberField(
-      {super.key, this.acceptDecimalPoint = true});
+      {super.key, this.acceptDecimalPoint = true, this.readOnly = false});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
       textAlign: TextAlign.center,
+      readOnly: readOnly,
       decoration: const InputDecoration(
         isDense: true,
         fillColor: Colors.white,

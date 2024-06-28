@@ -48,12 +48,12 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
   static List<SiteResident> siteResidents = [];
   static List<String> selectionSiteResidents = [];
 
-  late BuildingSite selectedProjectSite;
+  late BuildingSite selectedBuildingSite;
   SiteResident? selectedSiteResident;
   Customer? selectedCustomer;
 
-  int selectedCustomerIndex = 0;
-  int selectedSiteResidentIndex = 0;
+  int selectedCustomerIndex = -1;
+  int selectedSiteResidentIndex = -1;
 
   @override
   void initState() {
@@ -178,12 +178,12 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
   }
 
   void updateProjectSite() {
-    selectedProjectSite.id = widget.id;
-    selectedProjectSite.siteName = _obraController.text;
-    selectedProjectSite.customer = selectedCustomer;
-    selectedProjectSite.siteResident = selectedSiteResident;
+    selectedBuildingSite.id = widget.id;
+    selectedBuildingSite.siteName = _obraController.text;
+    selectedBuildingSite.customer = selectedCustomer;
+    selectedBuildingSite.siteResident = selectedSiteResident;
 
-    Future<BuildingSite> future = projectSiteDao.update(selectedProjectSite);
+    Future<BuildingSite> future = projectSiteDao.update(selectedBuildingSite);
 
     future.then((value) {
       ComponentUtils.generateSuccessMessage(context,
@@ -203,13 +203,12 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
   Future<void> loadProjectSiteData() async {
     await projectSiteDao.findById(widget.id).then(
       (value) {
-        selectedProjectSite = value;
-        selectedCustomer = value.customer!;
-        selectedSiteResident = value.siteResident!;
-
-        selectedSiteResident = selectedProjectSite.siteResident;
-        selectedCustomer = selectedProjectSite.customer;
-        _obraController.text = selectedProjectSite.siteName!;
+        selectedBuildingSite = value;
+        selectedCustomer = value.customer;
+        selectedSiteResident = value.siteResident;
+        selectedSiteResident = selectedBuildingSite.siteResident;
+        selectedCustomer = selectedBuildingSite.customer;
+        _obraController.text = selectedBuildingSite.siteName!;
       },
     );
 
@@ -246,14 +245,16 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
           selectedCustomerIndex = customers.indexOf(customers.firstWhere(
             (element) => element.id == selectedCustomer?.id!,
           ));
-          selectedSiteResidentIndex =
-              siteResidents.indexOf(siteResidents.firstWhere(
-            (element) => element.id == selectedSiteResident?.id!,
-          ));
 
+          if (selectedSiteResident != null) {
+            selectedSiteResidentIndex =
+                siteResidents.indexOf(siteResidents.firstWhere(
+              (element) => element.id == selectedSiteResident?.id!,
+            ));
+            _siteResidentController.text =
+            selectionSiteResidents[selectedSiteResidentIndex];
+          }
           _customerController.text = selectionCustomers[selectedCustomerIndex];
-          _siteResidentController.text =
-              selectionSiteResidents[selectedSiteResidentIndex];
         });
       },
     );

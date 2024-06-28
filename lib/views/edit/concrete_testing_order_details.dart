@@ -28,6 +28,7 @@ import '../../service/site_resident_dao.dart';
 import '../../utils/component_utils.dart';
 import '../../utils/sequential_counter_generator.dart';
 import '../../utils/utils.dart';
+import 'package:collection/collection.dart';
 
 class ConcreteTestingOrderDetails extends StatefulWidget {
   final int id;
@@ -698,49 +699,51 @@ class _ConcreteTestingOrderDetailsState
     return samples.map<Widget>((ConcreteSample sample) {
       ConcreteSampleDetailsDTO details =
           ConcreteSampleDetailsDTO.fromModel(sample);
+      List<Widget> widgets = [];
+      widgets.addAll([
+        const SizedBox(height: 20),
+        CustomTextFormField(
+            controller: details.remissionController,
+            labelText: "Remision",
+            validatorText: ""),
+        const SizedBox(height: 20),
+        CustomNumberFormField(
+            controller: details.volumeController,
+            labelText: "Volumen",
+            validatorText: ""),
+        CustomTimePickerForm(
+          timeOfDay: sample.plantTime!,
+          label: "Hora en planta",
+          orientation: PickerOrientation.horizontal,
+        ),
+        const SizedBox(height: 20),
+        CustomTimePickerForm(
+          timeOfDay: sample.buildingSiteTime!,
+          label: "Hora en obra",
+          orientation: PickerOrientation.horizontal,
+        ),
+        const SizedBox(height: 20),
+        CustomNumberFormField(
+            controller: details.temperature,
+            labelText: "Temperatura (°C)",
+            validatorText: ""),
+        CustomNumberFormField(
+            controller: details.realSlumpingController,
+            labelText: "Revenimiento real (cm)",
+            validatorText: ""),
+        CustomTextFormField(
+            controller: details.locationController,
+            labelText: "Ubicacion / Elemento",
+            validatorText: ""),
+        const SizedBox(height: 20),
+      ]);
+
+      widgets.addAll(generateDataTable(sample));
+
       return ExpansionTile(
-        title: Text(
-            "${SequentialFormatter.generatePadLeftNumber(sample.id)} - ${sample.remission}"),
-        children: <Widget>[
-          const SizedBox(height: 20),
-          CustomTextFormField(
-              controller: details.remissionController,
-              labelText: "Remision",
-              validatorText: ""),
-          const SizedBox(height: 20),
-          CustomNumberFormField(
-              controller: details.volumeController,
-              labelText: "Volumen",
-              validatorText: ""),
-          CustomTimePickerForm(
-            timeOfDay: sample.plantTime!,
-            label: "Hora en planta",
-            orientation: PickerOrientation.horizontal,
-          ),
-          const SizedBox(height: 20),
-          CustomTimePickerForm(
-            timeOfDay: sample.buildingSiteTime!,
-            label: "Hora en obra",
-            orientation: PickerOrientation.horizontal,
-          ),
-          const SizedBox(height: 20),
-          CustomNumberFormField(
-              controller: details.temperature,
-              labelText: "Temperatura (°C)",
-              validatorText: ""),
-          CustomNumberFormField(
-              controller: details.realSlumpingController,
-              labelText: "Revenimiento real (cm)",
-              validatorText: ""),
-          CustomTextFormField(
-              controller: details.locationController,
-              labelText: "Ubicacion / Elemento",
-              validatorText: ""),
-          const SizedBox(height: 20),
-          // INSERT THE DATA FOR CYLINDERS
-          generateDataTable(sample),
-        ],
-      );
+          title: Text(
+              "${SequentialFormatter.generatePadLeftNumber(sample.id)} - ${sample.remission}"),
+          children: widgets);
     }).toList();
   }
 
@@ -989,54 +992,126 @@ class _ConcreteTestingOrderDetailsState
 
   void updateConcreteSamples() {}
 
-  Widget generateDataTable(ConcreteSample sample) {
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: DataTable(
-            columnSpacing: 12,
-            horizontalMargin: 12,
-            dataRowMaxHeight: double.infinity,
-            headingRowColor: WidgetStateProperty.resolveWith(
-                (states) => Colors.grey.shade300),
-            headingTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-            border: TableBorder.all(width: 1, color: Colors.grey),
-            columns: const [
-              DataColumn(
-                  label: Expanded(
-                      child:
-                          Text('EDAD DE ENSAYE', textAlign: TextAlign.center))),
-              DataColumn(
-                  label: Expanded(
-                      child: Text('FECHA DE ENSAYE',
-                          textAlign: TextAlign.center))),
+  List<Widget> generateDataTable(ConcreteSample sample) {
+    var groupBySampleNumber =
+        groupBy(sample.concreteSampleCylinders, (cy) => cy.sampleNumber);
+
+    return groupBySampleNumber.values.map((value) {
+      return Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: DataTable(
+                  columnSpacing: 12,
+                  horizontalMargin: 12,
+                  dataRowMaxHeight: double.infinity,
+                  headingRowColor: WidgetStateProperty.resolveWith(
+                      (states) => Colors.grey.shade300),
+                  headingTextStyle:
+                      const TextStyle(fontWeight: FontWeight.bold),
+                  border: TableBorder.all(width: 1, color: Colors.grey),
+                  columns: const [
+                    DataColumn(
+                        label: Expanded(
+                            child: Text('EDAD DE ENSAYE',
+                                textAlign: TextAlign.center))),
+                    DataColumn(
+                        label: Expanded(
+                            child: Text('FECHA DE ENSAYE',
+                                textAlign: TextAlign.center))),
+                    DataColumn(
+                        label: Expanded(
+                            child: Text('CARGA TOTAL (KG)',
+                                textAlign: TextAlign.center))),
+                    DataColumn(
+                        label: Expanded(
+                            child: Text('DIAMETRO (CM)',
+                                textAlign: TextAlign.center))),
+                    DataColumn(
+                        label: Expanded(
+                            child: Text('RESISTENCIA (KGF/CM2)',
+                                textAlign: TextAlign.center))),
+                    DataColumn(
+                        label: Expanded(
+                            child: Text('PORCENTAJE',
+                                textAlign: TextAlign.center))),
+                    DataColumn(
+                        label: Expanded(
+                            child:
+                                Text('PROMEDIO', textAlign: TextAlign.center))),
+                  ],
+                  rows: value
+                      .map(
+                        (entry) => DataRow(
+                          key: ValueKey(entry.id),
+                          onLongPress: () {},
+                          cells: [
+                            DataCell(
+                              Center(
+                                child: Text(
+                                  entry.testingAge.toString(),
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Center(
+                                child: Text(
+                                  Constants.formatter.format(entry.testingDate),
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Center(
+                                child: Text(entry.totalLoad == null
+                                    ? ""
+                                    : entry.totalLoad!.toStringAsFixed(1)),
+                              ),
+                            ),
+                            DataCell(
+                              Center(
+                                child: Text(entry.diameter == null
+                                    ? ""
+                                    : entry.diameter!.toStringAsFixed(1)),
+                              ),
+                            ),
+                            DataCell(
+                              Center(
+                                child: Text(
+                                  entry.resistance == null
+                                      ? ""
+                                      : entry.resistance!.toStringAsFixed(1),
+                                ),
+                              ),
+                            ),
+                            DataCell(
+                              Center(
+                                child: Text(entry.percentage == null
+                                    ? ""
+                                    : entry.percentage!.toStringAsFixed(1)),
+                              ),
+                            ),
+                            DataCell(
+                              Center(
+                                child: Text(entry.median == null
+                                    ? ""
+                                    : entry.median!.toStringAsFixed(1)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
             ],
-            rows: sample.concreteSampleCylinders
-                .map(
-                  (entry) => DataRow(
-                    key: ValueKey(entry.id),
-                    onLongPress: () {},
-                    cells: [
-                      DataCell(
-                        Center(
-                          child: Text(
-                            entry.testingAge.toString(),
-                          ),
-                        ),
-                      ),
-                      DataCell(Center(
-                        child: Text(
-                          Constants.formatter.format(entry.testingDate),
-                        ),
-                      )),
-                    ],
-                  ),
-                )
-                .toList(),
           ),
-        ),
-      ],
-    );
+          const SizedBox(
+            height: 20,
+          )
+        ],
+      );
+    }).toList();
   }
 }

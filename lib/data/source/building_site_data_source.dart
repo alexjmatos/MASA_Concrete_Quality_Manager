@@ -23,13 +23,16 @@ class BuildingSiteData extends DataTableSource {
           ),
           onLongPress: () {
             int id = buildingSiteNotifier.value[index].id!;
-            ComponentUtils.executeEditOrDelete(context, BuildingSiteDetails(
-                id: id,
-                readOnly: true,
-                projectSitesNotifier: buildingSiteNotifier), BuildingSiteDetails(
-                id: id,
-                readOnly: false,
-                projectSitesNotifier: buildingSiteNotifier));
+            ComponentUtils.executeEditOrDelete(
+                context,
+                BuildingSiteDetails(
+                    id: id,
+                    readOnly: true,
+                    projectSitesNotifier: buildingSiteNotifier),
+                BuildingSiteDetails(
+                    id: id,
+                    readOnly: false,
+                    projectSitesNotifier: buildingSiteNotifier));
           },
         ),
         DataCell(
@@ -51,9 +54,9 @@ class BuildingSiteData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              "${buildingSiteNotifier.value[index].siteResident!
-                  .lastName} ${buildingSiteNotifier.value[index].siteResident!
-                  .firstName}",
+              buildingSiteNotifier.value[index].siteResident != null
+                  ? "${buildingSiteNotifier.value[index].siteResident!.lastName} ${buildingSiteNotifier.value[index].siteResident!.firstName}"
+                  : "",
               textAlign: TextAlign.center,
             ),
           ),

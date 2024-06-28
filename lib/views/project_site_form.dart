@@ -94,6 +94,7 @@ class _ProjectSiteAndResidentFormState
                 AutoCompleteElement(
                   fieldName: "Residentes de obra (Busqueda)",
                   options: selectionSiteResidents,
+                  validate: false,
                   onChanged: (p0) {
                     _selectedSiteResident = siteResidents.firstWhere(
                         (element) =>
@@ -185,6 +186,7 @@ class _ProjectSiteAndResidentFormState
         SequentialFormatter.getIdNumberFromConsecutive(
             _customerController.text));
 
+    print(toBeAdded.toMap());
     Future<BuildingSite> future = projectSiteDao.add(toBeAdded);
 
     future.then((value) {
@@ -192,6 +194,7 @@ class _ProjectSiteAndResidentFormState
           "Obra ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.siteName} agregada con exito");
       loadCustomerAndSiteResidentData();
     }).onError((error, stackTrace) {
+      print(stackTrace);
       ComponentUtils.generateErrorMessage(context);
     });
   }

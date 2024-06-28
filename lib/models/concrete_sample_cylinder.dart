@@ -1,6 +1,6 @@
-
 class ConcreteSampleCylinder {
   int? id;
+  int? sampleNumber;
   int testingAge;
   DateTime testingDate;
   num? totalLoad;
@@ -8,10 +8,11 @@ class ConcreteSampleCylinder {
   num? resistance;
   num? median;
   num? percentage;
-  int? concreteTestingSampleId;
+  int? concreteSampleId;
 
   ConcreteSampleCylinder(
       {this.id,
+      this.sampleNumber,
       required this.testingAge,
       required this.testingDate,
       this.totalLoad,
@@ -19,11 +20,12 @@ class ConcreteSampleCylinder {
       this.resistance,
       this.median,
       this.percentage,
-      this.concreteTestingSampleId});
+      this.concreteSampleId});
 
   Map<String, Object?> toMap() {
     return {
       "id": id,
+      "building_site_sample_number": sampleNumber,
       "testing_age_days": testingAge,
       "testing_date": testingDate.millisecondsSinceEpoch,
       "total_load_kg": totalLoad,
@@ -31,22 +33,23 @@ class ConcreteSampleCylinder {
       "resistance_kgf_cm2": resistance,
       "median": median,
       "percentage": percentage,
-      "concrete_sample_id": concreteTestingSampleId
+      "concrete_sample_id": concreteSampleId
     };
   }
 
   static ConcreteSampleCylinder toModel(Map<String, Object?> map) {
     return ConcreteSampleCylinder(
         id: map["id"] as int,
+        sampleNumber: map["building_site_sample_number"] as int?,
         testingAge: map["testing_age_days"] as int,
         testingDate: DateTime.fromMillisecondsSinceEpoch((map["testing_date"] ??
             DateTime.now().millisecondsSinceEpoch) as int),
         totalLoad: map["total_load_kg"] as num?,
-        diameter: map["diameter"] as num?,
+        diameter: map["diameter_cm"] as num?,
         resistance: map["resistance_kgf_cm2"] as num?,
         median: map["median"] as num?,
         percentage: map["percentage"] as num?,
-        concreteTestingSampleId: map["concrete_sample_id"] as int?);
+        concreteSampleId: map["concrete_sample_id"] as int?);
   }
 
   @override

@@ -49,7 +49,6 @@ class Utils {
     return TimeOfDay(hour: hour, minute: minute);
   }
 
-
   static String formatTimeOfDay(TimeOfDay time) {
     final int hour = time.hour;
     final int minute = time.minute;
@@ -59,5 +58,10 @@ class Utils {
     final String minuteString = minute.toString().padLeft(2, '0');
 
     return '$hourString:$minuteString';
+  }
+
+  static DateTime convertToDateTime(String dateString) {
+    DateFormat dateFormat = DateFormat("dd-MM-yyyy");
+    return dateFormat.parse(dateString);
   }
 }

@@ -24,19 +24,22 @@ class BuildingSite {
   }
 
   static BuildingSite toModel(Map<String, Object?>? map) {
+    int? siteResidentId = map?["site_resident_id"] as int?;
     return BuildingSite(
-        id: map?["id"] as int,
-        siteName: map?["site_name"] as String,
-        customer: Customer(
-            id: (map?["customer_id"] ?? 0) as int,
-            identifier: (map?["identifier"] ?? "") as String,
-            companyName: (map?["company_name"] ?? "") as String),
-    siteResident: SiteResident(
-      id: (map?["site_resident_id"] ?? 0) as int,
-      firstName: (map?["first_name"] ?? "") as String,
-      lastName: (map?["last_name"] ?? "") as String,
-      jobPosition: (map?["job_position"] ?? "") as String
-    ));
+      id: map?["id"] as int,
+      siteName: map?["site_name"] as String,
+      customer: Customer(
+          id: (map?["customer_id"] ?? 0) as int,
+          identifier: (map?["identifier"] ?? "") as String,
+          companyName: (map?["company_name"] ?? "") as String),
+      siteResident: (siteResidentId != null)
+          ? SiteResident(
+              id: siteResidentId,
+              firstName: (map?["first_name"] ?? "") as String,
+              lastName: (map?["last_name"] ?? "") as String,
+              jobPosition: (map?["job_position"] ?? "") as String)
+          : null,
+    );
   }
 
   @override

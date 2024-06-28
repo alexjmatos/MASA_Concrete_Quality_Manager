@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../utils/utils.dart';
+
 class InputTimePicker extends StatefulWidget {
   final TimeOfDay timeOfDay;
   final TextEditingController timeController = TextEditingController();
+
   InputTimePicker({super.key, required this.timeOfDay});
 
   @override
@@ -21,7 +24,7 @@ class InputTimePickerState extends State<InputTimePicker> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    widget.timeController.text = selectedTime!.format(context);
+    widget.timeController.text = Utils.formatTimeOfDay(selectedTime!);
   }
 
   Future<void> _selectTime(BuildContext context) async {
@@ -32,7 +35,7 @@ class InputTimePickerState extends State<InputTimePicker> {
     if (picked != null && picked != selectedTime) {
       setState(() {
         selectedTime = picked;
-        widget.timeController.text = picked.format(context);
+        widget.timeController.text = Utils.formatTimeOfDay(picked);
       });
     }
   }

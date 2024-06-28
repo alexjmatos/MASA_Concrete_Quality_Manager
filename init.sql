@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS building_sites
     id               INTEGER PRIMARY KEY AUTOINCREMENT,
     site_name        VARCHAR(255),
     customer_id      INTEGER REFERENCES customers (id),
-    site_resident_id INTEGER REFERENCES site_residents (id)
+    site_resident_id INTEGER REFERENCES site_residents (id) NULL
 );
 
 CREATE TABLE IF NOT EXISTS concrete_volumetric_weight
@@ -79,15 +79,16 @@ CREATE TABLE IF NOT EXISTS concrete_samples
 
 CREATE TABLE IF NOT EXISTS concrete_cylinders
 (
-    id                 INTEGER PRIMARY KEY AUTOINCREMENT,
-    testing_age_days   INTEGER,
-    testing_date       INTEGER,
-    total_load_kg      REAL,
-    diameter_cm        REAL,
-    resistance_kgf_cm2 REAL,
-    median             REAL,
-    percentage         REAL,
-    concrete_sample_id INTEGER REFERENCES concrete_samples (id)
+    id                          INTEGER PRIMARY KEY AUTOINCREMENT,
+    building_site_sample_number INTEGER,
+    testing_age_days            INTEGER,
+    testing_date                INTEGER,
+    total_load_kg               REAL,
+    diameter_cm                 REAL,
+    resistance_kgf_cm2          REAL,
+    median                      REAL,
+    percentage                  REAL,
+    concrete_sample_id          INTEGER REFERENCES concrete_samples (id)
 );
 
 INSERT INTO customers (identifier, company_name)
@@ -105,30 +106,33 @@ VALUES ('IDIMSA', 1, 1),
 INSERT INTO concrete_testing_orders(id, design_resistance, slumping_cm, volume_m3, tma_mm, design_age, testing_date,
                                     customer_id, building_site_id, site_resident_id)
 VALUES (1, '250', 14, 7, 20, '28', 1716319147750, 1, 1, 1),
-       (2, '350', 14, 7, 20, '28', 1716319147750, 1, 2, 2);
+       (2, '350', 14, 7, 20, '28', 1716319147750, 2, 2, 2);
 
 INSERT INTO concrete_samples (remission, volume, plant_time, building_site_time, real_slumping_cm, temperature_celsius,
                               location, concrete_testing_order_id, concrete_volumetric_weight_id)
 VALUES ('REM123', 7, '08:00', '09:00', 14.5, 25, 'EJE A', 1, null),
-       ('REM124', 7, '09:00', '10:00', 16.5, 28, 'EJE B', 1, null);
+       ('REM124', 7, '09:00', '10:00', 16.5, 28, 'EJE B', 2, null);
 
-INSERT INTO concrete_cylinders (testing_age_days, testing_date, total_load_kg, diameter_cm, resistance_kgf_cm2,
+INSERT INTO concrete_cylinders (building_site_sample_number, testing_age_days, testing_date, total_load_kg, diameter_cm,
+                                resistance_kgf_cm2,
                                 median, percentage, concrete_sample_id)
-VALUES (7, 1716319147750, 250, 10, 300, 290, 95, 1),
-       (14, 1716319147751, 270, 12, 320, 310, 98, 1),
-       (28, 1716319147751, 270, 12, 320, 310, 98, 1),
-       (28, 1716319147751, 270, 12, 320, 310, 98, 1);
+VALUES (1, 7, 1716319147750, 250, 10, 300, 290, 95, 1),
+       (1, 14, 1716319147751, 270, 12, 320, 310, 98, 1),
+       (1, 28, 1716319147751, 270, 12, 320, 310, 98, 1),
+       (1, 28, 1716319147751, 270, 12, 320, 310, 98, 1);
 
-INSERT INTO concrete_cylinders (testing_age_days, testing_date, total_load_kg, diameter_cm, resistance_kgf_cm2,
+INSERT INTO concrete_cylinders (building_site_sample_number, testing_age_days, testing_date, total_load_kg, diameter_cm,
+                                resistance_kgf_cm2,
                                 median, percentage, concrete_sample_id)
-VALUES (3, 1716319147750, 250, 10, 300, 290, 95, 1),
-       (7, 1716319147751, 270, 12, 320, 310, 98, 1),
-       (14, 1716319147751, 270, 12, 320, 310, 98, 1),
-       (14, 1716319147751, 270, 12, 320, 310, 98, 1);
+VALUES (2, 3, 1716319147750, 250, 10, 300, 290, 95, 1),
+       (2, 7, 1716319147751, 270, 12, 320, 310, 98, 1),
+       (2, 14, 1716319147751, 270, 12, 320, 310, 98, 1),
+       (2, 14, 1716319147751, 270, 12, 320, 310, 98, 1);
 
-INSERT INTO concrete_cylinders (testing_age_days, testing_date, total_load_kg, diameter_cm, resistance_kgf_cm2,
+INSERT INTO concrete_cylinders (building_site_sample_number, testing_age_days, testing_date, total_load_kg, diameter_cm,
+                                resistance_kgf_cm2,
                                 median, percentage, concrete_sample_id)
-VALUES (3, 1716319147750, 250, 10, 300, 290, 95, 2),
-       (7, 1716319147751, 270, 12, 320, 310, 98, 2),
-       (28, 1716319147751, 270, 12, 320, 310, 98, 2),
-       (28, 1716319147751, 270, 12, 320, 310, 98, 2);
+VALUES (1, 3, 1716319147750, 250, 10, 300, 290, 95, 2),
+       (1, 7, 1716319147751, 270, 12, 320, 310, 98, 2),
+       (1, 28, 1716319147751, 270, 12, 320, 310, 98, 2),
+       (1, 28, 1716319147751, 270, 12, 320, 310, 98, 2);

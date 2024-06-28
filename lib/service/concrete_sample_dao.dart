@@ -93,4 +93,22 @@ class ConcreteSampleDAO {
     }
     return finalResult;
   }
+
+  Future<int> findNextCounterByBuildingSite(int id) async {
+    var result = await db.rawQuery("""
+    SELECT
+    bs.id AS building_site_id,
+    COUNT(DISTINCT cc.building_site_sample_number) AS incremental_sample_number
+    FROM
+        building_sites bs
+            JOIN
+        concrete_testing_orders cto ON bs.id = cto.building_site_id
+            JOIN
+        concrete_samples cs ON cto.id = cs.concrete_testing_order_id
+            JOIN
+        concrete_cylinders cc ON cs.id = cc.concrete_sample_id
+    WHERE bs.id = ?;
+    """, [id]);
+    return (result.first["incremental_sample_number"] as int) + 1;
+  }
 }
