@@ -3,6 +3,8 @@ DROP TABLE IF EXISTS site_residents;
 DROP TABLE IF EXISTS building_sites;
 DROP TABLE IF EXISTS concrete_volumetric_weight;
 DROP TABLE IF EXISTS concrete_testing_orders;
+DROP TABLE IF EXISTS concrete_testing_samples;
+DROP TABLE IF EXISTS concrete_testing_cylinder_samples;
 
 CREATE TABLE IF NOT EXISTS customers
 (
@@ -24,7 +26,7 @@ CREATE TABLE IF NOT EXISTS building_sites
     id               INTEGER PRIMARY KEY AUTOINCREMENT,
     site_name        VARCHAR(255),
     customer_id      INTEGER REFERENCES customers (id),
-    site_resident_id INTEGER REFERENCES site_residents (id)
+    site_resident_id INTEGER REFERENCES site_residents (id) NULL
 );
 
 CREATE TABLE IF NOT EXISTS concrete_volumetric_weight
@@ -48,94 +50,89 @@ CREATE TABLE IF NOT EXISTS concrete_volumetric_weight
 
 CREATE TABLE IF NOT EXISTS concrete_testing_orders
 (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    design_resistance VARCHAR(255),
+    slumping_cm       INTEGER,
+    volume_m3         INTEGER,
+    tma_mm            INTEGER,
+    design_age        VARCHAR(255),
+    testing_date      INTEGER,
+    customer_id       INTEGER REFERENCES customers (id),
+    building_site_id  INTEGER REFERENCES building_sites (id),
+    site_resident_id  INTEGER REFERENCES site_residents (id)
+);
+
+CREATE TABLE IF NOT EXISTS concrete_samples
+(
     id                            INTEGER PRIMARY KEY AUTOINCREMENT,
-    design_resistance             VARCHAR(255),
-    slumping_cm                   INTEGER,
-    volume_m3                     INTEGER,
-    tma_mm                        INTEGER,
-    design_age                    VARCHAR(255),
-    testing_date                  INTEGER,
-    customer_id                   INTEGER REFERENCES customers (id),
-    building_site_id              INTEGER REFERENCES building_sites (id),
-    site_resident_id              INTEGER REFERENCES site_residents (id),
+    remission                     VARCHAR(255),
+    volume                        REAL,
+    plant_time                    VARCHAR(255),
+    building_site_time            VARCHAR(255),
+    real_slumping_cm              REAL,
+    temperature_celsius           REAL,
+    location                      VARCHAR(255),
+    concrete_testing_order_id     INTEGER REFERENCES concrete_testing_orders (id),
     concrete_volumetric_weight_id INTEGER REFERENCES concrete_volumetric_weight (id)
+
 );
 
-CREATE TABLE IF NOT EXISTS concrete_testing_remissions
+CREATE TABLE IF NOT EXISTS concrete_cylinders
 (
-    id                        INTEGER PRIMARY KEY AUTOINCREMENT,
-    plant_time                INTEGER,
-    real_slumping_cm          REAL,
-    temperature_celsius       REAL,
-    location                  VARCHAR(255),
-    concrete_testing_order_id INTEGER REFERENCES concrete_testing_orders (id)
+    id                          INTEGER PRIMARY KEY AUTOINCREMENT,
+    building_site_sample_number INTEGER,
+    testing_age_days            INTEGER,
+    testing_date                INTEGER,
+    total_load_kg               REAL,
+    diameter_cm                 REAL,
+    resistance_kgf_cm2          REAL,
+    median                      REAL,
+    percentage                  REAL,
+    concrete_sample_id          INTEGER REFERENCES concrete_samples (id)
 );
 
-CREATE TABLE IF NOT EXISTS concrete_testing_samples
-(
-    id                            INTEGER PRIMARY KEY AUTOINCREMENT,
-    testing_age_days              INTEGER,
-    testing_date                  INTEGER,
-    total_load_kg                 REAL,
-    resistance_kgf_cm2            REAL,
-    median                        REAL,
-    percentage                    REAL,
-    concrete_testing_remission_id INTEGER REFERENCES concrete_testing_remissions (id)
-);
+INSERT INTO customers (identifier, company_name)
+VALUES ('EPICO CONCRETOS', 'RFC001'),
+       ('ARQCOZ CONSTRUCTORA', 'RFC002');
 
-INSERT INTO customers (id, identifier, company_name)
-VALUES (NULL, 'SEDENA', 'MAPA750127PD2');
+INSERT INTO site_residents (first_name, last_name, job_position)
+VALUES ('MIRIAM', 'MATOS', 'GERENTE'),
+       ('EMILIANO', 'MERINO', 'INGENIERO');
 
-INSERT INTO site_residents (id, first_name, last_name, job_position)
-VALUES (NULL, 'EDUARDO', 'PAZ', 'INGENIERO');
-
-INSERT INTO site_residents (id, first_name, last_name, job_position)
-VALUES (NULL, 'ALEJANDRO', 'MATOS', 'INGENIERO');
-
-INSERT INTO building_sites (id, site_name, customer_id, site_resident_id)
-VALUES (NULL, 'LA MOLINA', 1, 1);
-
-INSERT INTO building_sites (id, site_name, customer_id, site_resident_id)
-VALUES (NULL, 'BECAN', 1, 2);
-
-INSERT INTO concrete_volumetric_weight(id,
-                                       tare_weight_gr,
-                                       material_tare_weight_gr,
-                                       material_weight_gr,
-                                       tare_volume_cm3,
-                                       volumetric_weight_gr_cm3,
-                                       volume_load_m3,
-                                       cement_quantity_kg,
-                                       coarse_aggregate_kg,
-                                       fine_aggregate_kg,
-                                       water_kg,
-                                       additives,
-                                       total_load_kg,
-                                       total_load_volumetric_weight_relation,
-                                       percentage)
-VALUES (1, 3480, 15180, 11700, 5.181, 2258, 7, 2924, 5518, 5398, 1500, '{"RETARDANTE": 4.46, "ADT383": 14.88}', 15358,
-        6.8, 97.17);
+INSERT INTO building_sites (site_name, customer_id, site_resident_id)
+VALUES ('IDIMSA', 1, 1),
+       ('CASA OSIO', 2, 2);
 
 INSERT INTO concrete_testing_orders(id, design_resistance, slumping_cm, volume_m3, tma_mm, design_age, testing_date,
-                                    customer_id, building_site_id, site_resident_id, concrete_volumetric_weight_id)
-VALUES (1, '250', 14, 7, 20, '28', 1716319147750, 1, 1, 1, 1);
+                                    customer_id, building_site_id, site_resident_id)
+VALUES (1, '250', 14, 7, 20, '28', 1716319147750, 1, 1, 1),
+       (2, '350', 14, 7, 20, '28', 1716319147750, 2, 2, 2);
 
-INSERT INTO concrete_testing_remissions(id, plant_time, real_slumping_cm, temperature_celsius, location,
-                                        concrete_testing_order_id)
-VALUES (1, 1718998133932, 16, 35, 'GUARDABALASCO', 1);
+INSERT INTO concrete_samples (remission, volume, plant_time, building_site_time, real_slumping_cm, temperature_celsius,
+                              location, concrete_testing_order_id, concrete_volumetric_weight_id)
+VALUES ('REM123', 7, '08:00', '09:00', 14.5, 25, 'EJE A', 1, null),
+       ('REM124', 7, '09:00', '10:00', 16.5, 28, 'EJE B', 2, null);
 
-INSERT INTO concrete_testing_samples(id, testing_age_days, testing_date, total_load_kg, resistance_kgf_cm2, median,
-                                     percentage, concrete_testing_remission_id)
-VALUES (1, 3, 1718998133932, 29140, 164.9, 164.9, 0.82, 1);
+INSERT INTO concrete_cylinders (building_site_sample_number, testing_age_days, testing_date, total_load_kg, diameter_cm,
+                                resistance_kgf_cm2,
+                                median, percentage, concrete_sample_id)
+VALUES (1, 7, 1716319147750, 250, 10, 300, 290, 95, 1),
+       (1, 14, 1716319147751, 270, 12, 320, 310, 98, 1),
+       (1, 28, 1716319147751, 270, 12, 320, 310, 98, 1),
+       (1, 28, 1716319147751, 270, 12, 320, 310, 98, 1);
 
-INSERT INTO concrete_testing_samples(id, testing_age_days, testing_date, total_load_kg, resistance_kgf_cm2, median,
-                                     percentage, concrete_testing_remission_id)
-VALUES (2, 7, 1718998133932, 33450, 189.29, 189.29, 0.95, 1);
+INSERT INTO concrete_cylinders (building_site_sample_number, testing_age_days, testing_date, total_load_kg, diameter_cm,
+                                resistance_kgf_cm2,
+                                median, percentage, concrete_sample_id)
+VALUES (2, 3, 1716319147750, 250, 10, 300, 290, 95, 1),
+       (2, 7, 1716319147751, 270, 12, 320, 310, 98, 1),
+       (2, 14, 1716319147751, 270, 12, 320, 310, 98, 1),
+       (2, 14, 1716319147751, 270, 12, 320, 310, 98, 1);
 
-INSERT INTO concrete_testing_samples(id, testing_age_days, testing_date, total_load_kg, resistance_kgf_cm2, median,
-                                     percentage, concrete_testing_remission_id)
-VALUES (3, 28, 1718998133932, 38000, 215.04, 215.04, 1.08, 1);
-
-INSERT INTO concrete_testing_samples(id, testing_age_days, testing_date, total_load_kg, resistance_kgf_cm2, median,
-                                     percentage, concrete_testing_remission_id)
-VALUES (4, 28, 1718998133932, 36450, 206.26, 206.26, 1.03, 1);
+INSERT INTO concrete_cylinders (building_site_sample_number, testing_age_days, testing_date, total_load_kg, diameter_cm,
+                                resistance_kgf_cm2,
+                                median, percentage, concrete_sample_id)
+VALUES (1, 3, 1716319147750, 250, 10, 300, 290, 95, 2),
+       (1, 7, 1716319147751, 270, 12, 320, 310, 98, 2),
+       (1, 28, 1716319147751, 270, 12, 320, 310, 98, 2),
+       (1, 28, 1716319147751, 270, 12, 320, 310, 98, 2);

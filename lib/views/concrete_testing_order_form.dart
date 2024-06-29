@@ -1,22 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/constants/constants.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_sample_ui_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/autocomplete.dart';
-import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
+import 'package:masa_epico_concrete_manager/elements/custom_icon_button.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_number_form_field.dart';
+import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
+import 'package:masa_epico_concrete_manager/elements/input_text_field.dart';
+import 'package:masa_epico_concrete_manager/elements/input_time_picker_field.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_sample.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_sample_cylinder.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
-import 'package:masa_epico_concrete_manager/models/project_site.dart';
+import 'package:masa_epico_concrete_manager/models/building_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
+import 'package:masa_epico_concrete_manager/service/concrete_sample_dao.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
-import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
+import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
-import 'package:masa_epico_concrete_manager/views/concrete_volumetric_weight_form.dart';
+import 'package:intl/intl.dart';
 
 import '../elements/elevated_button_dialog.dart';
+import '../elements/input_number_field.dart';
 import '../utils/sequential_counter_generator.dart';
+import '../utils/utils.dart';
 
 class ConcreteTestingOrderForm extends StatefulWidget {
   const ConcreteTestingOrderForm({super.key});
@@ -28,11 +37,13 @@ class ConcreteTestingOrderForm extends StatefulWidget {
 
 class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   final _formKey = GlobalKey<FormState>();
-  final CustomerDao customerDao = CustomerDao();
-  final BuildingSiteDao projectSiteDao = BuildingSiteDao();
-  final SiteResidentDao siteResidentDao = SiteResidentDao();
-  final ConcreteTestingOrderDao concreteTestingOrderDao =
-      ConcreteTestingOrderDao();
+
+  final CustomerDAO customerDao = CustomerDAO();
+  final BuildingSiteDAO projectSiteDao = BuildingSiteDAO();
+  final SiteResidentDAO siteResidentDao = SiteResidentDAO();
+  final ConcreteTestingOrderDAO concreteTestingOrderDao =
+      ConcreteTestingOrderDAO();
+  final ConcreteSampleDAO concreteSampleDao = ConcreteSampleDAO();
 
   static List<Customer> clients = [];
   static List<String> availableClients = [];
@@ -41,7 +52,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   static List<String> availableProjectSites = [];
 
   Customer selectedCustomer = Customer(identifier: "", companyName: "");
-  BuildingSite selectedProjectSite = BuildingSite();
+  BuildingSite selectedBuildingSite = BuildingSite();
   SiteResident selectedSiteResident =
       SiteResident(firstName: "", lastName: "", jobPosition: "");
 
@@ -57,11 +68,14 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   final TextEditingController _testingDateController = TextEditingController();
 
   DateTime selectedDate = DateTime.now();
+  List<ConcreteSampleUiDTO> rows = [];
+  late TimeOfDay timePlant;
+  late TimeOfDay timeBuildingSite;
 
   @override
   void initState() {
     super.initState();
-    loadCustomerData();
+    loadData();
   }
 
   @override
@@ -77,7 +91,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Form(
             key: _formKey,
             child: Column(
@@ -104,16 +118,16 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  'Informacion de la muestra',
+                  'Informacion general',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const Divider(),
                 const SizedBox(height: 20),
-                CustomDropdownFormField(
-                  labelText: "F'C (kg/cm2)",
+                CustomSelectDropdown(
+                  labelText: "F'C (kg/cm\u00B2)",
                   items: Constants.CONCRETE_COMPRESSION_RESISTANCES,
                   onChanged: (p0) => _designResistanceController.text = p0,
-                  defaultValueIndex: 2,
+                  defaultValueIndex: -1,
                 ),
                 const SizedBox(height: 20),
                 CustomNumberFormField(
@@ -124,7 +138,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                 ),
                 CustomNumberFormField(
                   controller: _volumeController,
-                  labelText: "Volumen (m3)",
+                  labelText: "Volumen total (m³)",
                   validatorText: "",
                   maxLength: 3,
                 ),
@@ -134,51 +148,205 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                   validatorText: "",
                   maxLength: 2,
                 ),
-                CustomDropdownFormField(
+                CustomSelectDropdown(
                   labelText: "Edad de diseño",
                   items: Constants.CONCRETE_DESIGN_AGES,
                   onChanged: (p0) {
                     _designAgeController.text = p0;
+                    updateDataTableRows(
+                            updateDesignAges: true, updateTestingDates: true)
+                        .then(
+                      (value) {
+                        setState(() {
+                          rows = value;
+                        });
+                      },
+                    );
                   },
                   defaultValueIndex: Constants.CONCRETE_DESIGN_AGES
                       .indexOf(Constants.CONCRETE_DESIGN_AGES.last),
                 ),
                 const SizedBox(height: 20),
-                CustomTextFormField.noValidation(
-                  controller: _testingDateController,
-                  labelText: "Fecha de muestreo",
-                  readOnly: true,
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomTextFormField.noValidation(
+                        controller: _testingDateController,
+                        labelText: "Fecha de muestreo",
+                        readOnly: true,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    CustomIconButton(
+                      icon: Icons.punch_clock,
+                      onPressed: () async {
+                        final DateTime? dateTime = await showDatePicker(
+                            context: context,
+                            initialDate: selectedDate,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(3000));
+                        if (dateTime != null) {
+                          setState(
+                            () {
+                              selectedDate = dateTime;
+                              _testingDateController.text =
+                                  Constants.formatter.format(selectedDate);
+                            },
+                          );
+                          updateDataTableRows(
+                                  updateDesignAges: false,
+                                  updateTestingDates: true)
+                              .then(
+                            (value) {
+                              setState(() {
+                                rows = value;
+                              });
+                            },
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                TextButton(
-                  onPressed: () async {
-                    final DateTime? dateTime = await showDatePicker(
-                        context: context,
-                        initialDate: selectedDate,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(3000));
-                    if (dateTime != null) {
-                      setState(() {
-                        selectedDate = dateTime;
-                        _testingDateController.text =
-                            Constants.formatter.format(selectedDate);
-                      });
-                    }
-                  },
-                  child: const Text("Seleccionar fecha de muestreo \u23F0"),
+                const SizedBox(height: 32),
+                Row(
+                  children: [
+                    const Text(
+                      'Muestras',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(width: 32),
+                    CustomIconButton(
+                        buttonColor: Colors.green,
+                        icon: Icons.add,
+                        onPressed: () {
+                          ConcreteSampleUiDTO value = _buildConcreteSampleDTO(
+                              designAgeAndTesting:
+                                  Utils.generateTestingDatesBasedOnDesignDays(
+                                      selectedDate,
+                                      int.tryParse(_designAgeController.text) ??
+                                          28));
+                          setState(() {
+                            rows.add(value);
+                          });
+                        }),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                ElevatedButtonDialog(
-                  title: "Agregar orden de muestreo",
-                  description: "Presiona OK para realizar la operacion",
-                  onOkPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      addConcreteQualityOrder();
-                      Navigator.pop(context);
-                    } else {
-                      Navigator.pop(context, 'Cancel');
-                    }
-                  },
+                const Divider(),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: DataTable(
+                        columnSpacing: 12,
+                        horizontalMargin: 12,
+                        dataRowMaxHeight: double.infinity,
+                        headingRowColor: WidgetStateProperty.resolveWith(
+                            (states) => Colors.grey.shade300),
+                        headingTextStyle:
+                            const TextStyle(fontWeight: FontWeight.bold),
+                        border: TableBorder.all(width: 1, color: Colors.grey),
+                        columns: const [
+                          DataColumn(
+                              label: Expanded(
+                                  child: Text('REMISION',
+                                      textAlign: TextAlign.center))),
+                          DataColumn(
+                              label: Expanded(
+                                  child: Text('VOLUMEN',
+                                      textAlign: TextAlign.center))),
+                          DataColumn(
+                              label: Expanded(
+                                  child: Text('HORA\nPLANTA',
+                                      textAlign: TextAlign.center))),
+                          DataColumn(
+                              label: Expanded(
+                                  child: Text('HORA\nOBRA',
+                                      textAlign: TextAlign.center))),
+                          DataColumn(
+                              label: Expanded(
+                                  child: Text('T (°C)',
+                                      textAlign: TextAlign.center))),
+                          DataColumn(
+                              label: Expanded(
+                                  child: Text('REV REAL',
+                                      textAlign: TextAlign.center))),
+                          DataColumn(
+                              label: Expanded(
+                                  child: Text('TRAMO / UBICACION',
+                                      textAlign: TextAlign.center))),
+                          DataColumn(
+                              label: Expanded(
+                                  child: Text('EDAD DE ENSAYE',
+                                      textAlign: TextAlign.center))),
+                          DataColumn(
+                              label: Expanded(
+                                  child: Text('FECHA DE ENSAYE',
+                                      textAlign: TextAlign.center))),
+                        ],
+                        rows: rows
+                            .map(
+                              (entry) => DataRow(
+                                key: ValueKey(entry.id),
+                                onLongPress: () =>
+                                    _showDeleteDialog(context, entry.id),
+                                cells: [
+                                  DataCell(entry.remission),
+                                  DataCell(entry.volume),
+                                  DataCell(entry.timePlant),
+                                  DataCell(entry.timeBuildingSite),
+                                  DataCell(entry.temperature),
+                                  DataCell(entry.realSlumping),
+                                  DataCell(entry.location),
+                                  DataCell(
+                                    Column(
+                                      children: entry.designAges.map<Widget>(
+                                        (e) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8),
+                                            child: e,
+                                          );
+                                        },
+                                      ).toList(),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Column(
+                                      children: entry.testingDates.map<Widget>(
+                                        (e) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8),
+                                            child: e,
+                                          );
+                                        },
+                                      ).toList(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Center(
+                  child: ElevatedButtonDialog(
+                    title: "Agregar orden de muestreo",
+                    description: "Presiona OK para realizar la operacion",
+                    onOkPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        addConcreteTestingOrder();
+                        Navigator.popUntil(context,
+                            ModalRoute.withName(Navigator.defaultRouteName));
+                      } else {
+                        Navigator.pop(context, 'Cancelar');
+                      }
+                    },
+                  ),
                 ),
               ],
             ),
@@ -188,7 +356,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
     );
   }
 
-  void addConcreteQualityOrder() {
+  void addConcreteTestingOrder() {
     ConcreteTestingOrder concreteTestingOrder = ConcreteTestingOrder(
         designResistance: _designResistanceController.text,
         slumping: int.tryParse(_slumpingController.text),
@@ -197,25 +365,75 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
         designAge: _designAgeController.text,
         testingDate: selectedDate,
         customer: selectedCustomer,
-        buildingSite: selectedProjectSite,
+        buildingSite: selectedBuildingSite,
         siteResident: selectedSiteResident);
 
     concreteTestingOrderDao.add(concreteTestingOrder).then((value) {
-      ComponentUtils.generateConfirmMessage(
-        context,
-        "Orden de muestreo - ${SequentialFormatter.generatePadLeftNumber(value.id!)} agregada con exito",
-        "¿Deseas realizar el registro del peso volumetrico?",
-        ConcreteVolumetricWeightForm.withTestingOrderId(
-          concreteTestingOrderId: value.id!,
-        ),
-      );
-    }).onError((error, stackTrace) {
-      ComponentUtils.generateErrorMessage(context);
-      print(stackTrace);
-    });
+      return addConcreteTestingSamples(value);
+    }).then(
+      (value) {
+        return addConcreteTestingCylinders(value);
+      },
+    ).then(
+      (value) {
+        int id = value["CONCRETE_TESTING_ORDER_ID"] as int;
+        ComponentUtils.generateSuccessMessage(context,
+            "Orden de muestreo ${SequentialFormatter.generatePadLeftNumber(id)} agregada con exito");
+      },
+    );
   }
 
-  void loadCustomerData() {
+  Future<Map<String, Object?>> addConcreteTestingSamples(
+      ConcreteTestingOrder order) async {
+    List<ConcreteSample> samples = rows.map((sample) {
+      return ConcreteSample(
+          concreteTestingOrder: order,
+          remission: sample.remission.controller.text,
+          volume: num.tryParse(sample.volume.controller.text),
+          plantTime: Utils.parseTimeOfDay(sample.timePlant.timeController.text),
+          buildingSiteTime:
+              Utils.parseTimeOfDay(sample.timeBuildingSite.timeController.text),
+          realSlumping: num.tryParse(sample.realSlumping.controller.text),
+          temperature: num.tryParse(sample.temperature.controller.text),
+          location: sample.location.controller.text,
+          concreteSampleCylinders: []);
+    }).toList();
+
+    var list = await concreteSampleDao.addAll(samples);
+    return {"CONCRETE_TESTING_ORDER_ID": order.id, "CONCRETE_SAMPLES": list};
+  }
+
+  Future<Map<String, Object?>> addConcreteTestingCylinders(
+      Map<String, Object?> previousResult) async {
+    List<int> identifiers = previousResult["CONCRETE_SAMPLES"] as List<int>;
+    for (var i in Iterable.generate(rows.length, (index) => index)) {
+      int sampleNumber = await concreteSampleDao
+          .findNextCounterByBuildingSite(selectedBuildingSite.id ?? 0);
+      var cylinders = Iterable.generate(
+        rows[i].designAges.length,
+        (index) => index,
+      ).map((j) {
+        var dto = rows.elementAt(i);
+        var testingAge =
+            int.tryParse(dto.designAges.elementAt(j).controller.text) ?? 0;
+        var testingDate = Utils.convertToDateTime(dto.testingDates.elementAt(j).controller.text);
+        return ConcreteSampleCylinder(
+            sampleNumber: sampleNumber,
+            testingAge: testingAge,
+            testingDate: testingDate,
+            concreteSampleId: identifiers.elementAt(i));
+      }).toList();
+      var result = await concreteSampleDao.addAllCylinders(cylinders);
+      previousResult.putIfAbsent(
+        "CONCRETE_CYLINDERS",
+        () => result,
+      );
+      return previousResult;
+    }
+    return previousResult;
+  }
+
+  void loadData() {
     customerDao.findAll().then((value) {
       clients = value;
     }).whenComplete(() {
@@ -228,10 +446,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
     }).then(
       (value) {
         _tmaController.text = "20";
-        _volumeController.text = "7";
         _testingDateController.text = Constants.formatter.format(selectedDate);
-        _designResistanceController.text =
-            Constants.CONCRETE_COMPRESSION_RESISTANCES[2];
         _designAgeController.text = Constants.CONCRETE_DESIGN_AGES.last;
       },
     );
@@ -240,8 +455,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   void setSelectedCustomer(String selected) async {
     _customerController.text = selected;
     selectedCustomer = await customerDao.findById(
-        SequentialFormatter.getIdNumberFromConsecutive(
-            selected.split("-")[0]));
+        SequentialFormatter.getIdNumberFromConsecutive(selected.split("-")[0]));
 
     projectSiteDao.findByClientId(selectedCustomer.id!).then((value) {
       projectSites = value;
@@ -256,17 +470,143 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
 
   void setSelectedProjectSite(String selected) {
     _projectSiteController.text = selected;
-    selectedProjectSite = projectSites.firstWhere((element) =>
+    selectedBuildingSite = projectSites.firstWhere((element) =>
         element.id ==
         SequentialFormatter.getIdNumberFromConsecutive(
             selected.split("-").first));
 
-    siteResidentDao.findByBuildingSiteId(selectedProjectSite.id!).then((value) {
+    siteResidentDao
+        .findByBuildingSiteId(selectedBuildingSite.id!)
+        .then((value) {
       setState(() {
         selectedSiteResident = value.first;
         _siteResidentController.text =
             "${SequentialFormatter.generatePadLeftNumber(selectedSiteResident.id!)} - ${selectedSiteResident.firstName} ${selectedSiteResident.lastName}";
       });
     });
+  }
+
+  ConcreteSampleUiDTO _buildConcreteSampleDTO(
+      {required List<Map<String, dynamic>> designAgeAndTesting}) {
+    InputNumberField volumeInput = InputNumberField();
+    volumeInput.controller.text = "7";
+
+    return ConcreteSampleUiDTO(
+        id: Utils.generateUniqueId(),
+        remission: InputTextField(lines: 3),
+        volume: volumeInput,
+        timePlant: InputTimePicker(
+          timeOfDay: TimeOfDay.now(),
+        ),
+        timeBuildingSite: InputTimePicker(
+          timeOfDay: TimeOfDay.now(),
+        ),
+        temperature: InputNumberField(),
+        realSlumping: InputNumberField(acceptDecimalPoint: true),
+        location: InputTextField(lines: 3),
+        designAges: designAgeAndTesting.map(
+          (e) {
+            InputNumberField designAge = InputNumberField(readOnly: true);
+            designAge.controller.text = e[Constants.DESIGN_AGE_KEY].toString();
+            return designAge;
+          },
+        ).toList(),
+        testingDates: designAgeAndTesting.map(
+          (e) {
+            InputTextField testingDate = InputTextField(readOnly: true);
+            DateTime temp = e[Constants.TESTING_DATE_KEY] as DateTime;
+            testingDate.controller.text = Constants.formatter.format(temp);
+            return testingDate;
+          },
+        ).toList());
+  }
+
+  void _showDeleteDialog(BuildContext context, String id) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Confirmacion'),
+          content: const Text('¿Deseas eliminar esta muestra?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  rows.remove(rows[0]);
+                });
+                Navigator.of(context).pop(); // Close the dialog
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Muestra eliminada'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              },
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<List<ConcreteSampleUiDTO>> updateDataTableRows(
+      {required bool updateDesignAges,
+      required bool updateTestingDates}) async {
+    if (rows.isNotEmpty) {
+      return Iterable.generate(rows.length, (index) => index).map(
+        (i) {
+          if (updateDesignAges) {
+            rows[i].designAges =
+                Iterable.generate(rows[i].designAges.length).map(
+              (j) {
+                rows[i].designAges[j].controller.text = Constants
+                    .DESIGN_AGES[int.tryParse(_designAgeController.text) ?? 0]!
+                    .elementAt(j)
+                    .toString();
+                return rows[i].designAges[j];
+              },
+            ).toList();
+          }
+          // UPDATE TESTING DATES
+          if (updateTestingDates) {
+            rows[i].testingDates =
+                Iterable.generate(rows[i].testingDates.length).map(
+              (j) {
+                DateTime temp = selectedDate.add(Duration(
+                    days: int.tryParse(rows[i].designAges[j].controller.text) ??
+                        0));
+                rows[i].testingDates[j].controller.text =
+                    Constants.formatter.format(temp);
+                return rows[i].testingDates[j];
+              },
+            ).toList();
+          }
+          return rows[i];
+        },
+      ).toList();
+    } else {
+      return rows;
+    }
+  }
+
+  List<ConcreteSampleCylinder> generateConcreteSampleCylinders(
+      ConcreteSampleUiDTO dto) {
+    return Iterable.generate(dto.designAges.length, (index) => index).map((i) {
+      int? testingAge =
+          int.tryParse(dto.designAges.elementAt(i).controller.text) ?? 0;
+      DateTime testingDate =
+          DateTime.tryParse(dto.testingDates.elementAt(i).controller.text) ??
+              DateTime.now();
+
+      return ConcreteSampleCylinder(
+          testingAge: testingAge, testingDate: testingDate);
+    }).toList();
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_testing_order_form.dart';
-import 'package:masa_epico_concrete_manager/views/concrete_testing_remissions_view.dart';
+import 'package:masa_epico_concrete_manager/views/search/concrete_testing_sample_search.dart';
 import 'package:masa_epico_concrete_manager/views/record_tables.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_volumetric_weight_form.dart';
 import 'package:masa_epico_concrete_manager/views/customer_form.dart';
@@ -8,10 +8,13 @@ import 'package:masa_epico_concrete_manager/views/home_view.dart';
 import 'package:masa_epico_concrete_manager/views/project_site_form.dart';
 import 'package:masa_epico_concrete_manager/views/site_resident_form.dart';
 
+import 'concrete_sample_form.dart';
+
 class MenuPage extends StatefulWidget {
-  const MenuPage({super.key, required this.title});
+  const MenuPage({super.key, required this.title, required this.isTablet});
 
   final String title;
+  final bool isTablet;
 
   @override
   State<MenuPage> createState() => _MenuPageState();
@@ -25,8 +28,6 @@ class _MenuPageState extends State<MenuPage> {
     const SiteResidentForm(),
     const ProjectSiteAndResidentForm(),
     const ConcreteTestingOrderForm(),
-    const ConcreteVolumetricWeightForm(),
-    const ConcreteRemissionForm(),
     const ConcreteQualitySearch(),
   ];
 
@@ -118,31 +119,11 @@ class _MenuPageState extends State<MenuPage> {
               },
             ),
             ListTile(
-              title: const Text('Peso volumetrico'),
+              title: const Text('Registros'),
               selected: _selectedIndex == 5,
               onTap: () {
                 // Update the state of the app
                 _onItemTapped(5);
-                // Then close the drawer
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Remisiones'),
-              selected: _selectedIndex == 6,
-              onTap: () {
-                // Update the state of the app
-                _onItemTapped(6);
-                // Then close the drawer
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Registros'),
-              selected: _selectedIndex == 7,
-              onTap: () {
-                // Update the state of the app
-                _onItemTapped(7);
                 // Then close the drawer
                 Navigator.pop(context);
               },

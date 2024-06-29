@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/data/table/building_site_data_table.dart';
 import 'package:masa_epico_concrete_manager/data/table/site_resident_data_table.dart';
-import 'package:masa_epico_concrete_manager/data/table/testing_order_data_table.dart';
-import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
+import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
 import 'package:masa_epico_concrete_manager/elements/value_notifier_list.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
-import 'package:masa_epico_concrete_manager/models/project_site.dart';
+import 'package:masa_epico_concrete_manager/models/building_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
-import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
+import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
+import 'package:masa_epico_concrete_manager/views/search/concrete_testing_sample_search.dart';
 
 import '../data/table/customer_data_table.dart';
+import '../data/table/testing_order_data_table.dart';
 import '../models/customer.dart';
 
 class ConcreteQualitySearch extends StatefulWidget {
@@ -23,12 +24,14 @@ class ConcreteQualitySearch extends StatefulWidget {
 }
 
 class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
-  Entity _selected = Entity.Clientes; // Default selected entity
-  CustomerDao customerDao = CustomerDao(); // DAO for customers
-  BuildingSiteDao projectSiteDao = BuildingSiteDao(); // DAO for project sites
-  SiteResidentDao siteResidentDao = SiteResidentDao(); // DAO for site residents
-  ConcreteTestingOrderDao concreteTestingOrderDao =
-      ConcreteTestingOrderDao(); // DAO for concrete testing orders
+  late Entity selected; // Default selected entity
+  CustomerDAO customerDao = CustomerDAO(); // DAO for customers
+  BuildingSiteDAO projectSiteDao = BuildingSiteDAO(); // DAO for project sites
+  SiteResidentDAO siteResidentDao = SiteResidentDAO(); // DAO for site residents
+  ConcreteTestingOrderDAO concreteTestingOrderDao =
+      ConcreteTestingOrderDAO(); // DAO for concrete testing orders
+
+  final TextEditingController selectController = TextEditingController();
 
   final ValueNotifierList<Customer> _customersNotifier =
       ValueNotifierList([]); // Notifier for customers
@@ -53,14 +56,20 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              CustomDropdownFormField(
+              CustomSelectDropdown(
                 labelText: "Registro",
-                items: Entity.values.asNameMap().keys.toList(),
+                items: Entity.values
+                    .asNameMap()
+                    .values
+                    .map((e) => e.value)
+                    .toList(),
                 onChanged: (p0) {
                   setState(
                     () {
-                      _selected = Entity.values
-                          .byName(p0); // Update the selected entity
+                      selected = Entity.values
+                          .asNameMap()
+                          .values
+                          .firstWhere((element) => element.value == p0);
                     },
                   );
                 },
@@ -83,14 +92,14 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
   }
 
   Widget _buildDataTable() {
-    switch (_selected) {
-      case Entity.Clientes:
+    switch (selected) {
+      case Entity.customers:
         return generateCustomerDataTable();
-      case Entity.Obras:
+      case Entity.sites:
         return generateProjectSiteDataTable();
-      case Entity.Residentes:
+      case Entity.residents:
         return generateSiteResidentDataTable();
-      case Entity.Muestras:
+      case Entity.orders:
         return generateConcreteTestingDataTable();
       default:
         return Container(); // Return an empty container for an undefined entity
@@ -125,44 +134,35 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
     );
   }
 
+  ConcreteTestingSampleSearch generateConcreteTestingRemissionSearchView() {
+    return const ConcreteTestingSampleSearch();
+  }
+
   // Method to load data for all tables
-  void _loadDataTables() {
-    customerDao.findAll().then(
+  Future<void> _loadDataTables() async {
+    selected = Entity.values.first;
+
+    await customerDao.findAll().then(
       (value) {
-        setState(
-          () {
-            _customersNotifier.value = value; // Update customers notifier
-          },
-        );
+        _customersNotifier.set(value); // Update customers notifier
       },
     );
 
-    projectSiteDao.findAll().then(
+    await projectSiteDao.findAll().then(
       (value) {
-        setState(
-          () {
-            _buildingSitesNotifier.value =
-                value; // Update project sites notifier
-          },
-        );
+        _buildingSitesNotifier.set(value);
       },
     );
 
-    siteResidentDao.findAll().then(
+    await siteResidentDao.findAll().then(
       (value) {
-        setState(() {
-          _siteResidentsNotifier.value =
-              value; // Update site residents notifier
-        });
+        _siteResidentsNotifier.set(value);
       },
     );
 
-    concreteTestingOrderDao.findAll().then(
+    await concreteTestingOrderDao.findAll().then(
       (value) {
-        setState(() {
-          _concreteTestingOrderNotifier.value =
-              value; // Update concrete testing orders notifier
-        });
+        _concreteTestingOrderNotifier.set(value);
       },
     );
   }
@@ -170,8 +170,16 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
 
 // Enum to define different entities
 enum Entity {
-  Clientes,
-  Obras,
-  Residentes,
-  Muestras;
+  orders("Ordenes de muestreo"),
+  sites("Obras"),
+  customers("Clientes"),
+  residents("Residentes de obra");
+
+  final String value;
+
+  const Entity(this.value);
+
+  String getValue() {
+    return value;
+  }
 }

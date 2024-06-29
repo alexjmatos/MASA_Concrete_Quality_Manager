@@ -1,4 +1,4 @@
-import 'package:masa_epico_concrete_manager/models/project_site.dart';
+import 'package:masa_epico_concrete_manager/models/building_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 
 import '../constants/constants.dart';
@@ -6,7 +6,7 @@ import '../models/concrete_testing_order.dart';
 import '../models/customer.dart';
 
 class SequentialFormatter {
-  static String generatePadLeftNumber(int id) {
+  static String generatePadLeftNumber(int? id) {
     return id.toString().padLeft(Constants.LEADING_ZEROS, '0');
   }
 

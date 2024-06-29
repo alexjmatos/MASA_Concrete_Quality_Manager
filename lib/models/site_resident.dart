@@ -1,4 +1,4 @@
-import 'package:masa_epico_concrete_manager/models/project_site.dart';
+import 'package:masa_epico_concrete_manager/models/building_site.dart';
 
 class SiteResident {
   int? id;

@@ -24,7 +24,7 @@ class SiteResidentDetails extends StatefulWidget {
 class _SiteResidentDetailsState extends State<SiteResidentDetails> {
   final _formKey = GlobalKey<FormState>();
 
-  final SiteResidentDao siteResidentDao = SiteResidentDao();
+  final SiteResidentDAO siteResidentDao = SiteResidentDAO();
 
   // Data for Site Resident
   final TextEditingController _nombresController = TextEditingController();

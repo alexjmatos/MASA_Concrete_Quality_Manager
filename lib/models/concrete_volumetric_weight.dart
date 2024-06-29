@@ -16,6 +16,7 @@ class ConcreteVolumetricWeight {
   num? totalLoad;
   num? totalLoadVolumetricWeightRelation;
   num? percentage;
+  int? concreteSampleId;
 
   ConcreteVolumetricWeight(
       this.id,
@@ -81,5 +82,10 @@ class ConcreteVolumetricWeight {
     } else {
       return null;
     }
+  }
+
+  @override
+  String toString() {
+    return 'ConcreteVolumetricWeight{id: $id, tareWeight: $tareWeight, materialTareWeight: $materialTareWeight, materialWeight: $materialWeight, tareVolume: $tareVolume, volumetricWeight: $volumetricWeight, volumeLoad: $volumeLoad, cementQuantity: $cementQuantity, coarseAggregateQuantity: $coarseAggregateQuantity, fineAggregateQuantity: $fineAggregateQuantity, waterQuantity: $waterQuantity, additives: $additives, totalLoad: $totalLoad, totalLoadVolumetricWeightRelation: $totalLoadVolumetricWeightRelation, percentage: $percentage}';
   }
 }

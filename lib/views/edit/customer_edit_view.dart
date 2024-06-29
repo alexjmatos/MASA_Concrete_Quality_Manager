@@ -25,7 +25,7 @@ class _CustomerDetailsState extends State<CustomerDetails> {
   final _formKey = GlobalKey<FormState>();
 
   late Customer customer;
-  final CustomerDao customerDao = CustomerDao();
+  final CustomerDAO customerDao = CustomerDAO();
 
   // Data for General Customer Info
   final TextEditingController _clienteController = TextEditingController();

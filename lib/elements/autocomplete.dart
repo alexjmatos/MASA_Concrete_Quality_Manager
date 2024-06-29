@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'formatters.dart';
 
@@ -9,6 +8,7 @@ class AutoCompleteElement extends StatefulWidget {
   final Function(String) onChanged;
   final TextEditingController controller;
   final bool readOnly;
+  final bool validate;
 
   const AutoCompleteElement(
       {super.key,
@@ -16,7 +16,8 @@ class AutoCompleteElement extends StatefulWidget {
       required this.options,
       required this.onChanged,
       required this.controller,
-      this.readOnly = false});
+      this.readOnly = false,
+      this.validate = true});
 
   @override
   State<AutoCompleteElement> createState() => _AutoCompleteElementState();
@@ -41,10 +42,14 @@ class _AutoCompleteElementState extends State<AutoCompleteElement> {
       return TextFormField(
         readOnly: widget.readOnly,
         validator: (value) {
-          if (value!.isEmpty) {
-            return "El campo no puede quedar vacio";
-          } else if (!widget.options.contains(value.toUpperCase())) {
-            return "Entrada no valida";
+          if (widget.validate) {
+            if (value!.isEmpty) {
+              return "El campo no puede quedar vacio";
+            } else if (!widget.options.any(
+                (element) => element.toUpperCase() == value.toUpperCase())) {
+              return "Entrada no valida";
+            }
+            return null;
           }
           return null;
         },

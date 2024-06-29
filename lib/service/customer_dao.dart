@@ -4,11 +4,11 @@ import 'package:masa_epico_concrete_manager/models/customer.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 import 'package:sqflite/sqflite.dart';
 
-class CustomerDao {
+class CustomerDAO {
   late final Database db;
   final SequentialFormatter sequentialIdGenerator = SequentialFormatter();
 
-  CustomerDao() {
+  CustomerDAO() {
     final injector = Injector.appInstance;
     db = injector.get<Database>();
   }

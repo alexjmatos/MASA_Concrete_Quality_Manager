@@ -1,22 +1,32 @@
+import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
-import 'package:masa_epico_concrete_manager/models/project_site.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_volumetric_weight.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 
-import 'concrete_testing_sample.dart';
+import '../utils/utils.dart';
+import 'building_site.dart';
+import 'concrete_sample_cylinder.dart';
 import 'customer.dart';
 
-class ConcreteTestingRemission {
+class ConcreteSample {
   int? id;
-  DateTime? plantTime;
+  String? remission;
+  num? volume;
+  TimeOfDay? plantTime;
+  TimeOfDay? buildingSiteTime;
   num? realSlumping;
   num? temperature;
   String? location;
   ConcreteTestingOrder concreteTestingOrder;
-  List<ConcreteTestingSample> concreteSampleCylinders;
+  ConcreteVolumetricWeight? concreteVolumetricWeight;
+  List<ConcreteSampleCylinder> concreteSampleCylinders;
 
-  ConcreteTestingRemission(
+  ConcreteSample(
       {this.id,
+      this.remission,
+      this.volume,
       this.plantTime,
+      this.buildingSiteTime,
       this.realSlumping,
       this.temperature,
       this.location,
@@ -26,15 +36,19 @@ class ConcreteTestingRemission {
   Map<String, Object?> toMap() {
     return {
       "id": id,
-      "plant_time": plantTime?.millisecondsSinceEpoch,
+      "remission": remission,
+      "volume": volume,
+      "plant_time": Utils.formatTimeOfDay(plantTime!),
+      "building_site_time": Utils.formatTimeOfDay(buildingSiteTime!),
       "real_slumping_cm": realSlumping,
-      "temperature": temperature,
+      "temperature_celsius": temperature,
       "location": location,
       "concrete_testing_order_id": concreteTestingOrder.id
     };
   }
 
-  static ConcreteTestingRemission toModel(Map<String, Object?> map) {
+  static ConcreteSample toModel(Map<String, Object?> map) {
+    List<ConcreteSampleCylinder> concreteSamples = [];
     Customer customer = Customer(
       id: (map["customer_id"] ?? 0) as int,
       identifier: (map["customer_identifier"] ?? "") as String,
@@ -56,9 +70,9 @@ class ConcreteTestingRemission {
     ConcreteTestingOrder concreteTestingOrder = ConcreteTestingOrder(
         id: (map["order_id"] ?? 0) as int,
         designResistance: (map["design_resistance"] ?? "") as String,
-        slumping: (map["slumping_cm"] ?? "") as int,
-        volume: (map["volume_m3"] ?? "") as int,
-        tma: (map["tma_mm"] ?? "") as int,
+        slumping: (map["slumping_cm"] ?? 0) as int,
+        volume: (map["volume_m3"] ?? 0) as int,
+        tma: (map["tma_mm"] ?? 0) as int,
         designAge: (map["design_age"] ?? "") as String,
         testingDate: DateTime.fromMillisecondsSinceEpoch(
             (map["order_testing_date"] ?? DateTime.now().millisecondsSinceEpoch)
@@ -67,11 +81,13 @@ class ConcreteTestingRemission {
         buildingSite: buildingSite,
         siteResident: siteResident);
 
-    List<ConcreteTestingSample> concreteSamples = [];
-    return ConcreteTestingRemission(
+    return ConcreteSample(
         id: map["id"] as int,
-        plantTime: DateTime.fromMillisecondsSinceEpoch((map["plant_time"] ??
-            DateTime.now().millisecondsSinceEpoch) as int),
+        remission: map["remission"] as String?,
+        volume: map["volume"] as num?,
+        plantTime: Utils.parseTimeOfDay((map["plant_time"] ?? "") as String),
+        buildingSiteTime: Utils.parseTimeOfDay(
+            (map["building_site_time"] ?? "") as String),
         realSlumping: (map["real_slumping_cm"] ?? 0) as num,
         temperature: (map["temperature_celsius"] ?? 0) as num,
         location: (map["location"] ?? "") as String,

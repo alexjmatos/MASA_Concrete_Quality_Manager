@@ -3,10 +3,10 @@ import 'package:masa_epico_concrete_manager/elements/autocomplete.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
-import 'package:masa_epico_concrete_manager/models/project_site.dart';
+import 'package:masa_epico_concrete_manager/models/building_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
-import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
+import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
@@ -23,9 +23,9 @@ class _ProjectSiteAndResidentFormState
     extends State<ProjectSiteAndResidentForm> {
   final _formKey = GlobalKey<FormState>();
 
-  final BuildingSiteDao projectSiteDao = BuildingSiteDao();
-  final CustomerDao customerDao = CustomerDao();
-  final SiteResidentDao siteResidentDao = SiteResidentDao();
+  final BuildingSiteDAO projectSiteDao = BuildingSiteDAO();
+  final CustomerDAO customerDao = CustomerDAO();
+  final SiteResidentDAO siteResidentDao = SiteResidentDAO();
 
   // Data for General Site Project Info
   final TextEditingController _obraController = TextEditingController();
@@ -94,6 +94,7 @@ class _ProjectSiteAndResidentFormState
                 AutoCompleteElement(
                   fieldName: "Residentes de obra (Busqueda)",
                   options: selectionSiteResidents,
+                  validate: false,
                   onChanged: (p0) {
                     _selectedSiteResident = siteResidents.firstWhere(
                         (element) =>
@@ -185,6 +186,7 @@ class _ProjectSiteAndResidentFormState
         SequentialFormatter.getIdNumberFromConsecutive(
             _customerController.text));
 
+    print(toBeAdded.toMap());
     Future<BuildingSite> future = projectSiteDao.add(toBeAdded);
 
     future.then((value) {
@@ -192,6 +194,7 @@ class _ProjectSiteAndResidentFormState
           "Obra ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.siteName} agregada con exito");
       loadCustomerAndSiteResidentData();
     }).onError((error, stackTrace) {
+      print(stackTrace);
       ComponentUtils.generateErrorMessage(context);
     });
   }

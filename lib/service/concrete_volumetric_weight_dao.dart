@@ -5,11 +5,11 @@ import 'package:sqflite/sqflite.dart';
 import '../constants/constants.dart';
 import '../utils/sequential_counter_generator.dart';
 
-class ConcreteVolumetricWeightDao {
+class ConcreteVolumetricWeightDAO {
   late final Database db;
   final SequentialFormatter sequentialIdGenerator = SequentialFormatter();
 
-  ConcreteVolumetricWeightDao() {
+  ConcreteVolumetricWeightDAO() {
     final injector = Injector.appInstance;
     db = injector.get<Database>();
   }

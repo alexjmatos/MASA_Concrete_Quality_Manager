@@ -16,7 +16,7 @@ class CustomerForm extends StatefulWidget {
 class _CustomerFormState extends State<CustomerForm> {
   final _formKey = GlobalKey<FormState>();
 
-  final CustomerDao customerDao = CustomerDao();
+  final CustomerDAO customerDao = CustomerDAO();
 
   // Data for General Customer Info
   final TextEditingController _clienteController = TextEditingController();

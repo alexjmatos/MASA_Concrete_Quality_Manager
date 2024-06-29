@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:masa_epico_concrete_manager/models/project_site.dart';
+import 'package:masa_epico_concrete_manager/models/building_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 
-import 'concrete_testing_remission.dart';
+import 'concrete_sample.dart';
 import 'concrete_volumetric_weight.dart';
 import 'customer.dart';
 
@@ -18,8 +18,7 @@ class ConcreteTestingOrder {
   Customer customer;
   BuildingSite buildingSite;
   SiteResident siteResident;
-  ConcreteVolumetricWeight? concreteVolumetricWeight;
-  List<ConcreteTestingRemission>? concreteSamples;
+  List<ConcreteSample>? concreteSamples;
 
   ConcreteTestingOrder({
     this.id,
@@ -32,7 +31,6 @@ class ConcreteTestingOrder {
     required this.customer,
     required this.buildingSite,
     required this.siteResident,
-    this.concreteVolumetricWeight,
   });
 
   Map<String, Object?> toMap() {
@@ -47,7 +45,6 @@ class ConcreteTestingOrder {
       "customer_id": customer.id!,
       "building_site_id": buildingSite.id!,
       "site_resident_id": siteResident.id!,
-      "concrete_volumetric_weight_id": concreteVolumetricWeight?.id!
     };
   }
 
@@ -98,13 +95,17 @@ class ConcreteTestingOrder {
         slumping: (source["slumping_cm"] ?? 0) as int,
         volume: (source["volume_m3"] ?? 0) as int,
         tma: (source["tma_mm"] ?? 0) as int,
-        designAge: (source["design_age"] ?? 0) as String,
+        designAge: (source["design_age"] ?? "0") as String,
         testingDate: DateTime.fromMillisecondsSinceEpoch(
             (source["testing_date"] ?? DateTime.now().millisecondsSinceEpoch)
                 as int),
         customer: customer,
         buildingSite: buildingSite,
-        siteResident: siteResident,
-        concreteVolumetricWeight: concreteVolumetricWeight);
+        siteResident: siteResident);
+  }
+
+  @override
+  String toString() {
+    return 'ConcreteTestingOrder{id: $id, designResistance: $designResistance, slumping: $slumping, volume: $volume, tma: $tma, designAge: $designAge, testingDate: $testingDate, customer: $customer, buildingSite: $buildingSite, siteResident: $siteResident, concreteSamples: $concreteSamples}';
   }
 }

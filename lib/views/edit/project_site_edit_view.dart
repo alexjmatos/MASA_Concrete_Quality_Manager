@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/elements/custom_dropdown_form_field.dart';
+import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
-import 'package:masa_epico_concrete_manager/models/project_site.dart';
+import 'package:masa_epico_concrete_manager/models/building_site.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
-import 'package:masa_epico_concrete_manager/service/project_site_dao.dart';
+import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
@@ -29,9 +29,9 @@ class BuildingSiteDetails extends StatefulWidget {
 class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
   final _formKey = GlobalKey<FormState>();
 
-  final BuildingSiteDao projectSiteDao = BuildingSiteDao();
-  final CustomerDao customerDao = CustomerDao();
-  final SiteResidentDao siteResidentDao = SiteResidentDao();
+  final BuildingSiteDAO projectSiteDao = BuildingSiteDAO();
+  final CustomerDAO customerDao = CustomerDAO();
+  final SiteResidentDAO siteResidentDao = SiteResidentDAO();
 
   // Data for General Site Project Info
   final TextEditingController _obraController = TextEditingController();
@@ -48,12 +48,12 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
   static List<SiteResident> siteResidents = [];
   static List<String> selectionSiteResidents = [];
 
-  late BuildingSite selectedProjectSite;
+  late BuildingSite selectedBuildingSite;
   SiteResident? selectedSiteResident;
   Customer? selectedCustomer;
 
-  int selectedCustomerIndex = 0;
-  int selectedSiteResidentIndex = 0;
+  int selectedCustomerIndex = -1;
+  int selectedSiteResidentIndex = -1;
 
   @override
   void initState() {
@@ -95,7 +95,7 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
                     readOnly: widget.readOnly,
                   ),
                 if (!widget.readOnly)
-                  CustomDropdownFormField(
+                  CustomSelectDropdown(
                     labelText: "Cliente",
                     items: selectionCustomers,
                     onChanged: (p0) {
@@ -122,7 +122,7 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
                     readOnly: widget.readOnly,
                   ),
                 if (!widget.readOnly)
-                  CustomDropdownFormField(
+                  CustomSelectDropdown(
                     labelText: "Residentes",
                     items: selectionSiteResidents,
                     onChanged: (p0) {
@@ -178,12 +178,12 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
   }
 
   void updateProjectSite() {
-    selectedProjectSite.id = widget.id;
-    selectedProjectSite.siteName = _obraController.text;
-    selectedProjectSite.customer = selectedCustomer;
-    selectedProjectSite.siteResident = selectedSiteResident;
+    selectedBuildingSite.id = widget.id;
+    selectedBuildingSite.siteName = _obraController.text;
+    selectedBuildingSite.customer = selectedCustomer;
+    selectedBuildingSite.siteResident = selectedSiteResident;
 
-    Future<BuildingSite> future = projectSiteDao.update(selectedProjectSite);
+    Future<BuildingSite> future = projectSiteDao.update(selectedBuildingSite);
 
     future.then((value) {
       ComponentUtils.generateSuccessMessage(context,
@@ -203,13 +203,12 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
   Future<void> loadProjectSiteData() async {
     await projectSiteDao.findById(widget.id).then(
       (value) {
-        selectedProjectSite = value;
-        selectedCustomer = value.customer!;
-        selectedSiteResident = value.siteResident!;
-
-        selectedSiteResident = selectedProjectSite.siteResident;
-        selectedCustomer = selectedProjectSite.customer;
-        _obraController.text = selectedProjectSite.siteName!;
+        selectedBuildingSite = value;
+        selectedCustomer = value.customer;
+        selectedSiteResident = value.siteResident;
+        selectedSiteResident = selectedBuildingSite.siteResident;
+        selectedCustomer = selectedBuildingSite.customer;
+        _obraController.text = selectedBuildingSite.siteName!;
       },
     );
 
@@ -218,7 +217,9 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
     }).then((value) {
       setState(() {
         selectionCustomers = customers
-            .map((customer) => SequentialFormatter.generateSequentialFormatFromCustomer(customer))
+            .map((customer) =>
+                SequentialFormatter.generateSequentialFormatFromCustomer(
+                    customer))
             .toList();
       });
     });
@@ -244,13 +245,16 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
           selectedCustomerIndex = customers.indexOf(customers.firstWhere(
             (element) => element.id == selectedCustomer?.id!,
           ));
-          selectedSiteResidentIndex =
-              siteResidents.indexOf(siteResidents.firstWhere(
-            (element) => element.id == selectedSiteResident?.id!,
-          ));
 
+          if (selectedSiteResident != null) {
+            selectedSiteResidentIndex =
+                siteResidents.indexOf(siteResidents.firstWhere(
+              (element) => element.id == selectedSiteResident?.id!,
+            ));
+            _siteResidentController.text =
+            selectionSiteResidents[selectedSiteResidentIndex];
+          }
           _customerController.text = selectionCustomers[selectedCustomerIndex];
-          _siteResidentController.text = selectionSiteResidents[selectedSiteResidentIndex];
         });
       },
     );
