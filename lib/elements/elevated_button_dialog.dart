@@ -31,7 +31,8 @@ class ElevatedButtonDialog extends StatelessWidget {
           ],
         ),
       ),
-      child: Text(title),
+      style: const ButtonStyle(backgroundColor:  WidgetStatePropertyAll(Colors.blue)),
+      child: Text(title, style: const TextStyle(color: Colors.white),),
     );
   }
 }

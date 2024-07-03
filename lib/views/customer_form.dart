@@ -1,10 +1,19 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
+import 'package:masa_epico_concrete_manager/utils/pdf_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class CustomerForm extends StatefulWidget {
   const CustomerForm({super.key});
@@ -21,6 +30,14 @@ class _CustomerFormState extends State<CustomerForm> {
   // Data for General Customer Info
   final TextEditingController _clienteController = TextEditingController();
   final TextEditingController _razonSocialController = TextEditingController();
+  PdfUtils pdfUtils = PdfUtils();
+  File? _pdfFile;
+
+  @override
+  void initState() {
+    super.initState();
+    _generatePdfAndSave();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +49,12 @@ class _CustomerFormState extends State<CustomerForm> {
           'Datos del cliente',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _generatePdfAndSave, // Regenerate and reload the PDF
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -60,18 +83,21 @@ class _CustomerFormState extends State<CustomerForm> {
                   },
                 ),
                 const SizedBox(height: 20),
-                ElevatedButtonDialog(
-                  title: "Agregar cliente",
-                  description: "Presiona OK para realizar la operacion",
-                  onOkPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      addCustomer();
-                      Navigator.pop(context);
-                      _formKey.currentState!.reset();
-                    } else {
-                      Navigator.pop(context, 'Cancel');
-                    }
-                  },
+                Center(
+                  child: ElevatedButtonDialog(
+                    title: "Agregar cliente",
+                    description: "Presiona OK para realizar la operacion",
+                    onOkPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        // addCustomer();
+                        _openPdf();
+                        Navigator.pop(context);
+                        _formKey.currentState!.reset();
+                      } else {
+                        Navigator.pop(context, 'Cancel');
+                      }
+                    },
+                  ),
                 )
               ],
             ),
@@ -100,5 +126,25 @@ class _CustomerFormState extends State<CustomerForm> {
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
     });
+  }
+
+  Future<void> _generatePdfAndSave() async {
+    // Generate the PDF document
+    Uint8List pdfData = await pdfUtils.buildPdf(PdfPageFormat.a4.landscape);
+
+    // Save the PDF document to a temporary file
+    final output = await getTemporaryDirectory();
+    final file = File("${output.path}/example.pdf");
+    await file.writeAsBytes(pdfData);
+
+    setState(() {
+      _pdfFile = file;
+    });
+  }
+
+  void _openPdf() {
+    if (_pdfFile != null) {
+      OpenFile.open(_pdfFile!.path);
+    }
   }
 }

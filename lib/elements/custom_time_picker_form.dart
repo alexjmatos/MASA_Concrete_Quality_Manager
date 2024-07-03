@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class CustomTimePickerForm extends StatefulWidget {
   final TimeOfDay timeOfDay;
   final String label;
+  final bool readOnly;
   final TextEditingController timeController = TextEditingController();
   final PickerOrientation orientation;
 
@@ -10,6 +11,7 @@ class CustomTimePickerForm extends StatefulWidget {
       {super.key,
       required this.timeOfDay,
       required this.label,
+      required this.readOnly,
       required this.orientation});
 
   @override
@@ -88,13 +90,14 @@ class _CustomTimePickerFormState extends State<CustomTimePickerForm> {
               ),
             ),
             const SizedBox(height: 16),
-            Expanded(
-              flex: 1,
-              child: IconButton(
-                icon: const Icon(Icons.access_time),
-                onPressed: () => _selectTime(context),
+            if (!widget.readOnly)
+              Expanded(
+                flex: 1,
+                child: IconButton(
+                  icon: const Icon(Icons.access_time),
+                  onPressed: () => _selectTime(context),
+                ),
               ),
-            ),
           ],
         );
     }

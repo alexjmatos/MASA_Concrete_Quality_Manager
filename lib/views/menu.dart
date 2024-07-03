@@ -5,7 +5,7 @@ import 'package:masa_epico_concrete_manager/views/record_tables.dart';
 import 'package:masa_epico_concrete_manager/views/concrete_volumetric_weight_form.dart';
 import 'package:masa_epico_concrete_manager/views/customer_form.dart';
 import 'package:masa_epico_concrete_manager/views/home_view.dart';
-import 'package:masa_epico_concrete_manager/views/project_site_form.dart';
+import 'package:masa_epico_concrete_manager/views/building_site_form.dart';
 import 'package:masa_epico_concrete_manager/views/site_resident_form.dart';
 
 import 'concrete_sample_form.dart';

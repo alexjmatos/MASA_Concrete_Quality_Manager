@@ -3,9 +3,18 @@ import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class ComponentUtils {
+  void showPdfMessage(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Documento generado con exito'),
+      ),
+    );
+  }
+
   static void generateSuccessMessage(
       BuildContext context, String successMessage) {
     QuickAlert.show(
+      title: "Exito",
       context: context,
       type: QuickAlertType.success,
       text: successMessage,
@@ -181,7 +190,8 @@ class ComponentUtils {
     );
   }
 
-  static void showSnackbar(BuildContext context, String message, {bool isError = false}) {
+  static void showSnackbar(BuildContext context, String message,
+      {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),

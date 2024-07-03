@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_cylinder_dto.dart';
 import 'package:masa_epico_concrete_manager/dto/concrete_sample_details_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_expansion_tile.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_time_picker_form.dart';
+import 'package:masa_epico_concrete_manager/elements/input_number_field.dart';
+import 'package:masa_epico_concrete_manager/elements/input_text_field.dart';
 import 'package:masa_epico_concrete_manager/elements/input_time_picker_field.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_sample_cylinder.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_volumetric_weight.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 
@@ -312,35 +316,41 @@ class _ConcreteTestingOrderDetailsState
                   children: buildVolumetricWeightInfo(),
                   onExpand: () => updateTotalLoad(),
                 ),
+                const SizedBox(height: 16),
                 if (!widget.readOnly)
-                  ElevatedButtonDialog(
-                    title: "Confirmar cambios",
-                    description: "Presiona OK para realizar la operacion",
-                    onOkPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        updateConcreteQualityOrder();
-                        Navigator.popUntil(context,
-                            ModalRoute.withName(Navigator.defaultRouteName));
-                        _formKey.currentState!.reset();
-                      } else {
-                        Navigator.pop(context, 'Cancel');
-                      }
-                    },
+                  Center(
+                    child: ElevatedButtonDialog(
+                      title: "Confirmar cambios",
+                      description: "Presiona OK para realizar la operacion",
+                      onOkPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          updateConcreteQualityOrder();
+                          Navigator.popUntil(context,
+                              ModalRoute.withName(Navigator.defaultRouteName));
+                          _formKey.currentState!.reset();
+                        } else {
+                          Navigator.pop(context, 'Cancel');
+                        }
+                      },
+                    ),
                   ),
-                ElevatedButton.icon(
-                  onPressed: () => Navigator.popUntil(
-                      context, ModalRoute.withName(Navigator.defaultRouteName)),
-                  icon: const Icon(
-                    Icons.keyboard_return_rounded,
-                    color: Colors.white,
-                  ),
-                  label: const Text(
-                    'Regresar',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lightGreen,
-                    textStyle: const TextStyle(fontSize: 16),
+                const SizedBox(height: 16),
+                Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () => Navigator.popUntil(context,
+                        ModalRoute.withName(Navigator.defaultRouteName)),
+                    icon: const Icon(
+                      Icons.keyboard_return_rounded,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      'Regresar',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.lightGreen,
+                      textStyle: const TextStyle(fontSize: 16),
+                    ),
                   ),
                 )
               ],
@@ -703,38 +713,50 @@ class _ConcreteTestingOrderDetailsState
       widgets.addAll([
         const SizedBox(height: 20),
         CustomTextFormField(
-            controller: details.remissionController,
-            labelText: "Remision",
-            validatorText: ""),
+          controller: details.remissionController,
+          labelText: "Remision",
+          validatorText: "",
+          readOnly: widget.readOnly,
+        ),
         const SizedBox(height: 20),
         CustomNumberFormField(
-            controller: details.volumeController,
-            labelText: "Volumen",
-            validatorText: ""),
+          controller: details.volumeController,
+          labelText: "Volumen",
+          validatorText: "",
+          readOnly: widget.readOnly,
+        ),
         CustomTimePickerForm(
           timeOfDay: sample.plantTime!,
           label: "Hora en planta",
+          readOnly: widget.readOnly,
           orientation: PickerOrientation.horizontal,
         ),
         const SizedBox(height: 20),
         CustomTimePickerForm(
           timeOfDay: sample.buildingSiteTime!,
           label: "Hora en obra",
+          readOnly: widget.readOnly,
           orientation: PickerOrientation.horizontal,
         ),
         const SizedBox(height: 20),
         CustomNumberFormField(
-            controller: details.temperature,
-            labelText: "Temperatura (°C)",
-            validatorText: ""),
+          controller: details.temperature,
+          labelText: "Temperatura (°C)",
+          validatorText: "",
+          readOnly: widget.readOnly,
+        ),
         CustomNumberFormField(
-            controller: details.realSlumpingController,
-            labelText: "Revenimiento real (cm)",
-            validatorText: ""),
+          controller: details.realSlumpingController,
+          labelText: "Revenimiento real (cm)",
+          validatorText: "",
+          readOnly: widget.readOnly,
+        ),
         CustomTextFormField(
-            controller: details.locationController,
-            labelText: "Ubicacion / Elemento",
-            validatorText: ""),
+          controller: details.locationController,
+          labelText: "Ubicacion / Elemento",
+          validatorText: "",
+          readOnly: widget.readOnly,
+        ),
         const SizedBox(height: 20),
       ]);
 
@@ -997,6 +1019,8 @@ class _ConcreteTestingOrderDetailsState
         groupBy(sample.concreteSampleCylinders, (cy) => cy.sampleNumber);
 
     return groupBySampleNumber.values.map((value) {
+      List<ConcreteSampleCylinderDTO> dto = generateDTO(value);
+
       return Column(
         children: [
           Row(
@@ -1042,61 +1066,46 @@ class _ConcreteTestingOrderDetailsState
                             child:
                                 Text('PROMEDIO', textAlign: TextAlign.center))),
                   ],
-                  rows: value
+                  rows: dto
                       .map(
                         (entry) => DataRow(
                           key: ValueKey(entry.id),
                           onLongPress: () {},
                           cells: [
                             DataCell(
-                              Center(
-                                child: Text(
-                                  entry.testingAge.toString(),
-                                ),
+                              Center(child: entry.designAge),
+                            ),
+                            DataCell(
+                              Center(child: entry.testingDate),
+                            ),
+                            DataCell(
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Center(child: entry.totalLoad),
                               ),
                             ),
                             DataCell(
-                              Center(
-                                child: Text(
-                                  Constants.formatter.format(entry.testingDate),
-                                ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Center(child: entry.diameter),
                               ),
                             ),
                             DataCell(
-                              Center(
-                                child: Text(entry.totalLoad == null
-                                    ? ""
-                                    : entry.totalLoad!.toStringAsFixed(1)),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Center(child: entry.resistance),
                               ),
                             ),
                             DataCell(
-                              Center(
-                                child: Text(entry.diameter == null
-                                    ? ""
-                                    : entry.diameter!.toStringAsFixed(1)),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Center(child: entry.percentage),
                               ),
                             ),
                             DataCell(
-                              Center(
-                                child: Text(
-                                  entry.resistance == null
-                                      ? ""
-                                      : entry.resistance!.toStringAsFixed(1),
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              Center(
-                                child: Text(entry.percentage == null
-                                    ? ""
-                                    : entry.percentage!.toStringAsFixed(1)),
-                              ),
-                            ),
-                            DataCell(
-                              Center(
-                                child: Text(entry.median == null
-                                    ? ""
-                                    : entry.median!.toStringAsFixed(1)),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Center(child: entry.median),
                               ),
                             ),
                           ],
@@ -1113,5 +1122,34 @@ class _ConcreteTestingOrderDetailsState
         ],
       );
     }).toList();
+  }
+
+  List<ConcreteSampleCylinderDTO> generateDTO(
+      List<ConcreteSampleCylinder> value) {
+    return value.map(
+      (samp) {
+        InputNumberField designAgeInput = InputNumberField();
+        InputTextField testingDateInput = InputTextField();
+        InputNumberField totalLoadInput = InputNumberField();
+        InputNumberField diameterInput = InputNumberField();
+        InputNumberField resistance = InputNumberField();
+        InputNumberField percentage = InputNumberField();
+        InputNumberField median = InputNumberField();
+
+        designAgeInput.controller.text = samp.testingAge.toString();
+        testingDateInput.controller.text =
+            Constants.formatter.format(samp.testingDate);
+
+        return ConcreteSampleCylinderDTO(
+            samp.id!,
+            designAgeInput,
+            testingDateInput,
+            totalLoadInput,
+            diameterInput,
+            resistance,
+            percentage,
+            median);
+      },
+    ).toList();
   }
 }

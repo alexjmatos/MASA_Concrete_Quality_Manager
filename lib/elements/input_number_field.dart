@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'formatters.dart';
+
 class InputNumberField extends StatelessWidget {
   final bool acceptDecimalPoint;
   final TextEditingController controller = TextEditingController();

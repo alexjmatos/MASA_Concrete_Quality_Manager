@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'formatters.dart';
+
 class InputTextField extends StatelessWidget {
   final int lines;
   final bool readOnly;
@@ -14,6 +16,9 @@ class InputTextField extends StatelessWidget {
       readOnly: readOnly,
       textAlign: TextAlign.center,
       maxLines: lines,
+      inputFormatters: [
+        UppercaseInputFormatter(),
+      ],
       decoration: const InputDecoration(
         isDense: true,
         fillColor: Colors.white,

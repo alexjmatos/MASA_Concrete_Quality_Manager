@@ -64,4 +64,9 @@ class Utils {
     DateFormat dateFormat = DateFormat("dd-MM-yyyy");
     return dateFormat.parse(dateString);
   }
+
+  static String formatDate(DateTime date) {
+    final DateFormat formatter = DateFormat('dd-MM-yyyy');
+    return formatter.format(date);
+  }
 }

@@ -66,18 +66,20 @@ class _SiteResidentFormState extends State<SiteResidentForm> {
                   labelText: "Puesto",
                 ),
                 const SizedBox(height: 20),
-                ElevatedButtonDialog(
-                  title: "Agregar residente de obra",
-                  description: "Presiona OK para realizar la operacion",
-                  onOkPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      addSiteResident();
-                      Navigator.pop(context);
-                      _formKey.currentState!.reset();
-                    } else {
-                      Navigator.pop(context, 'Cancel');
-                    }
-                  },
+                Center(
+                  child: ElevatedButtonDialog(
+                    title: "Agregar residente de obra",
+                    description: "Presiona OK para realizar la operacion",
+                    onOkPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        addSiteResident();
+                        Navigator.pop(context);
+                        _formKey.currentState!.reset();
+                      } else {
+                        Navigator.pop(context, 'Cancel');
+                      }
+                    },
+                  ),
                 ),
               ],
             ),

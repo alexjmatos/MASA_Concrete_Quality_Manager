@@ -129,21 +129,23 @@ class _ProjectSiteAndResidentFormState
                   readOnly: true,
                 ),
                 const SizedBox(height: 20),
-                ElevatedButtonDialog(
-                  title: "Agregar obra",
-                  description: "Presiona OK para realizar la operacion",
-                  onOkPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      addProjectSite();
-                      Navigator.popUntil(
-                        context,
-                        ModalRoute.withName(Navigator.defaultRouteName),
-                      );
-                      _formKey.currentState!.reset();
-                    } else {
-                      Navigator.pop(context, 'Cancel');
-                    }
-                  },
+                Center(
+                  child: ElevatedButtonDialog(
+                    title: "Agregar obra",
+                    description: "Presiona OK para realizar la operacion",
+                    onOkPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        addProjectSite();
+                        Navigator.popUntil(
+                          context,
+                          ModalRoute.withName(Navigator.defaultRouteName),
+                        );
+                        _formKey.currentState!.reset();
+                      } else {
+                        Navigator.pop(context, 'Cancel');
+                      }
+                    },
+                  ),
                 ),
               ],
             ),
