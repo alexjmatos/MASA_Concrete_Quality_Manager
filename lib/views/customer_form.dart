@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/dto/form/customer_form_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
@@ -28,14 +29,16 @@ class _CustomerFormState extends State<CustomerForm> {
   final CustomerDAO customerDao = CustomerDAO();
 
   // Data for General Customer Info
-  final TextEditingController _clienteController = TextEditingController();
-  final TextEditingController _razonSocialController = TextEditingController();
+  late final CustomerFormDTO customerFormDTO;
   PdfUtils pdfUtils = PdfUtils();
   File? _pdfFile;
 
   @override
   void initState() {
     super.initState();
+    customerFormDTO = CustomerFormDTO(
+        identifierController: TextEditingController(),
+        companyNameController: TextEditingController());
     _generatePdfAndSave();
   }
 
@@ -65,14 +68,14 @@ class _CustomerFormState extends State<CustomerForm> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 CustomTextFormField(
-                  controller: _clienteController,
+                  controller: customerFormDTO.identifierController,
                   labelText: "Nombre o Razón Social",
                   validatorText:
                       "El nombre o razon social del cliente no puede quedar vacio",
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField.withValidator(
-                  controller: _razonSocialController,
+                  controller: customerFormDTO.companyNameController,
                   labelText: "RFC (Opcional)",
                   validatorText: "El RFC debe tener 10 caracteres",
                   validator: (p0) {
@@ -89,8 +92,8 @@ class _CustomerFormState extends State<CustomerForm> {
                     description: "Presiona OK para realizar la operacion",
                     onOkPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        // addCustomer();
-                        _openPdf();
+                        addCustomer();
+                        // _openPdf();
                         Navigator.pop(context);
                         _formKey.currentState!.reset();
                       } else {
@@ -108,14 +111,10 @@ class _CustomerFormState extends State<CustomerForm> {
   }
 
   void addCustomer() {
-    // Process data
-    String razonSocial = _clienteController.text.trim();
-    String rfc = _razonSocialController.text.trim();
-
     // Minimal implementation - manager and location empty
     Customer customer = Customer(
-      identifier: razonSocial,
-      companyName: rfc,
+      identifier: customerFormDTO.getIdentifier(),
+      companyName: customerFormDTO.getCompanyName(),
     );
 
     Future<Customer> future = customerDao.add(customer);

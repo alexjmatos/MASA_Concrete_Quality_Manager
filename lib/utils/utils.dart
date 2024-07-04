@@ -30,12 +30,13 @@ class Utils {
   }
 
   static List<Map<String, dynamic>> generateTestingDatesBasedOnDesignDays(
-      DateTime initDateTime, int designAge) {
+      DateTime? initDateTime, int designAge) {
+    initDateTime ??= DateTime.now();
     return Constants.DESIGN_AGES[designAge]!.map(
       (e) {
         return {
           Constants.DESIGN_AGE_KEY: e,
-          Constants.TESTING_DATE_KEY: initDateTime.add(Duration(days: e))
+          Constants.TESTING_DATE_KEY: initDateTime?.add(Duration(days: e))
         };
       },
     ).toList();

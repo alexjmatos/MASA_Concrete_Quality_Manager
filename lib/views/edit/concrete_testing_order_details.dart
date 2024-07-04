@@ -7,7 +7,6 @@ import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart
 import 'package:masa_epico_concrete_manager/elements/custom_time_picker_form.dart';
 import 'package:masa_epico_concrete_manager/elements/input_number_field.dart';
 import 'package:masa_epico_concrete_manager/elements/input_text_field.dart';
-import 'package:masa_epico_concrete_manager/elements/input_time_picker_field.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_sample_cylinder.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_volumetric_weight.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
@@ -149,7 +148,7 @@ class _ConcreteTestingOrderDetailsState
           SequentialFormatter.generateSequentialFormatFromBuildingSite(
               selectedConcreteTestingOrder.buildingSite);
 
-      selectedSiteResident = selectedConcreteTestingOrder.siteResident;
+      selectedSiteResident = selectedConcreteTestingOrder.siteResident!;
       _siteResidentController.text =
           SequentialFormatter.generateSequentialFormatFromSiteResident(
               selectedConcreteTestingOrder.siteResident);

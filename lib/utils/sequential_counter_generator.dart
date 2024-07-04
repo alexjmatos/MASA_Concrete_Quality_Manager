@@ -24,11 +24,16 @@ class SequentialFormatter {
   }
 
   static String generateSequentialFormatFromSiteResident(
-      SiteResident siteResident) {
-    return "${SequentialFormatter.generatePadLeftNumber(siteResident.id!)} - ${siteResident.firstName} ${siteResident.lastName}";
+      SiteResident? siteResident) {
+    if (siteResident != null) {
+      return "${SequentialFormatter.generatePadLeftNumber(siteResident.id!)} - ${siteResident.firstName} ${siteResident.lastName}";
+    } else {
+      return "";
+    }
   }
 
-  static String generateSequentialFormatFromConcreteTestingOrder(ConcreteTestingOrder e) {
+  static String generateSequentialFormatFromConcreteTestingOrder(
+      ConcreteTestingOrder e) {
     return "${SequentialFormatter.generatePadLeftNumber(e.id!)} - ${e.customer.identifier} : ${e.buildingSite.siteName} - (${e.testingDate?.day}/${e.testingDate?.month}/${e.testingDate?.year})";
   }
 }

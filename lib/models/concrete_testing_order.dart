@@ -17,7 +17,7 @@ class ConcreteTestingOrder {
   DateTime? testingDate;
   Customer customer;
   BuildingSite buildingSite;
-  SiteResident siteResident;
+  SiteResident? siteResident;
   List<ConcreteSample>? concreteSamples;
 
   ConcreteTestingOrder({
@@ -44,7 +44,7 @@ class ConcreteTestingOrder {
       "testing_date": testingDate?.millisecondsSinceEpoch,
       "customer_id": customer.id!,
       "building_site_id": buildingSite.id!,
-      "site_resident_id": siteResident.id!,
+      "site_resident_id": siteResident?.id!,
     };
   }
 

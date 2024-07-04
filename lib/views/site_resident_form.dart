@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/dto/form/site_resident_form_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
-import 'package:masa_epico_concrete_manager/models/site_resident.dart';
-import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
-import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
-import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 
 class SiteResidentForm extends StatefulWidget {
   const SiteResidentForm({super.key});
@@ -15,19 +12,15 @@ class SiteResidentForm extends StatefulWidget {
 
 class _SiteResidentFormState extends State<SiteResidentForm> {
   final _formKey = GlobalKey<FormState>();
-
-  final SiteResidentDAO siteResidentDao = SiteResidentDAO();
-
-  // Data for Site Resident
-  final TextEditingController _nombresController = TextEditingController();
-  final TextEditingController _apellidosController = TextEditingController();
-  final TextEditingController _puestoController = TextEditingController();
-
-  SiteResident? _selectedSiteResident;
+  late final SiteResidentFormDTO siteResidentFormDTO;
 
   @override
   void initState() {
     super.initState();
+    siteResidentFormDTO = SiteResidentFormDTO(
+        firstNameController: TextEditingController(),
+        lastNameController: TextEditingController(),
+        jobPositionController: TextEditingController());
   }
 
   @override
@@ -50,19 +43,19 @@ class _SiteResidentFormState extends State<SiteResidentForm> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 CustomTextFormField.withValidator(
-                  controller: _nombresController,
+                  controller: siteResidentFormDTO.firstNameController,
                   labelText: "Nombre",
                   validatorText: 'El campo nombre no puede quedar vacio',
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField.withValidator(
-                  controller: _apellidosController,
+                  controller: siteResidentFormDTO.lastNameController,
                   labelText: "Apellidos",
                   validatorText: 'El campo apellido no puede quedar vacio',
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField.noValidation(
-                  controller: _puestoController,
+                  controller: siteResidentFormDTO.jobPositionController,
                   labelText: "Puesto",
                 ),
                 const SizedBox(height: 20),
@@ -72,7 +65,7 @@ class _SiteResidentFormState extends State<SiteResidentForm> {
                     description: "Presiona OK para realizar la operacion",
                     onOkPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        addSiteResident();
+                        siteResidentFormDTO.addSiteResident(context);
                         Navigator.pop(context);
                         _formKey.currentState!.reset();
                       } else {
@@ -87,30 +80,5 @@ class _SiteResidentFormState extends State<SiteResidentForm> {
         ),
       ),
     );
-  }
-
-  Future<void> addSiteResident() async {
-    String nombreResidente = _nombresController.text.trim();
-    String apellidosResidente = _apellidosController.text.trim();
-    String puestoResidente = _puestoController.text.trim();
-
-    SiteResident siteResident = SiteResident(
-      firstName: nombreResidente,
-      lastName: apellidosResidente,
-      jobPosition: puestoResidente,
-    );
-    var future = siteResidentDao.add(siteResident);
-    future.then((value) {
-      ComponentUtils.generateSuccessMessage(context,
-          "Residente ${SequentialFormatter.generateSequentialFormatFromSiteResident(value)} agregada con exito");
-    }).onError((error, stackTrace) {
-      ComponentUtils.generateErrorMessage(context);
-    });
-  }
-
-  void updateSiteResidentInfo() {
-    _nombresController.text = _selectedSiteResident!.firstName.trim();
-    _apellidosController.text = _selectedSiteResident!.lastName.trim();
-    _puestoController.text = _selectedSiteResident!.jobPosition.trim();
   }
 }
