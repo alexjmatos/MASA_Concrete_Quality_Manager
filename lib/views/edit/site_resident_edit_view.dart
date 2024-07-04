@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/database/app_database.dart';
+import 'package:masa_epico_concrete_manager/dto/site_resident_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
-import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
@@ -9,7 +10,7 @@ import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.d
 class SiteResidentDetails extends StatefulWidget {
   final int id;
   final bool readOnly;
-  final ValueNotifier<List<SiteResident>> siteResidentNotifier;
+  final ValueNotifier<List<SiteResidentDTO>> siteResidentNotifier;
 
   const SiteResidentDetails(
       {super.key,
@@ -31,21 +32,27 @@ class _SiteResidentDetailsState extends State<SiteResidentDetails> {
   final TextEditingController _apellidosController = TextEditingController();
   final TextEditingController _puestoController = TextEditingController();
 
-  late SiteResident selectedSiteResident;
+  late SiteResidentDTO selectedSiteResident;
 
   @override
   void initState() {
     super.initState();
     siteResidentDao.findById(widget.id).then(
       (value) {
-        selectedSiteResident = value;
-        setState(
-          () {
-            _nombresController.text = value.firstName;
-            _apellidosController.text = value.lastName;
-            _puestoController.text = value.jobPosition;
-          },
-        );
+        if (value != null) {
+          selectedSiteResident = SiteResidentDTO(
+              id: value.id,
+              firstName: value.firstName,
+              lastName: value.lastName,
+              jobPosition: value.jobPosition);
+          setState(
+            () {
+              _nombresController.text = value.firstName;
+              _apellidosController.text = value.lastName;
+              _puestoController.text = value.jobPosition;
+            },
+          );
+        }
       },
     );
   }
@@ -130,26 +137,32 @@ class _SiteResidentDetailsState extends State<SiteResidentDetails> {
   }
 
   Future<void> editSiteResident() async {
-    String nombreResidente = _nombresController.text.trim();
-    String apellidosResidente = _apellidosController.text.trim();
-    String puestoResidente = _puestoController.text.trim();
+    String firstName = _nombresController.text.trim();
+    String lastName = _apellidosController.text.trim();
+    String jobPosition = _puestoController.text.trim();
 
-    selectedSiteResident.firstName = nombreResidente;
-    selectedSiteResident.lastName = apellidosResidente;
-    selectedSiteResident.jobPosition = puestoResidente;
+    selectedSiteResident.firstName = firstName;
+    selectedSiteResident.lastName = lastName;
+    selectedSiteResident.jobPosition = jobPosition;
 
-    var future = siteResidentDao.update(selectedSiteResident);
+    var future = siteResidentDao.update(SiteResident(
+        id: selectedSiteResident.id,
+        firstName: selectedSiteResident.firstName ?? "",
+        lastName: selectedSiteResident.lastName ?? "",
+        jobPosition: selectedSiteResident.jobPosition ?? ""));
     future.then((value) {
-      ComponentUtils.generateSuccessMessage(context,
-          "Residente ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.firstName} - ${value.lastName} actualizado con exito");
+      if (value != null) {
+        ComponentUtils.generateSuccessMessage(context,
+            "Residente ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.firstName} - ${value.lastName} actualizado con exito");
+      }
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
     });
   }
 
   void updateSiteResidentInfo() {
-    _nombresController.text = selectedSiteResident.firstName.trim();
-    _apellidosController.text = selectedSiteResident.lastName.trim();
-    _puestoController.text = selectedSiteResident.jobPosition.trim();
+    _nombresController.text = selectedSiteResident.firstName!.trim();
+    _apellidosController.text = selectedSiteResident.lastName!.trim();
+    _puestoController.text = selectedSiteResident.jobPosition!.trim();
   }
 }

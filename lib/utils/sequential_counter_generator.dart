@@ -1,9 +1,10 @@
-import 'package:masa_epico_concrete_manager/models/building_site.dart';
-import 'package:masa_epico_concrete_manager/models/site_resident.dart';
+import 'package:masa_epico_concrete_manager/database/app_database.dart';
+import 'package:masa_epico_concrete_manager/dto/building_site_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_testing_order_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/customer_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/site_resident_dto.dart';
 
 import '../constants/constants.dart';
-import '../models/concrete_testing_order.dart';
-import '../models/customer.dart';
 
 class SequentialFormatter {
   static String generatePadLeftNumber(int? id) {
@@ -14,21 +15,27 @@ class SequentialFormatter {
     return int.parse(consecutive.split("-")[0].trim());
   }
 
-  static String generateSequentialFormatFromCustomer(Customer customer) {
+  static String generateSequentialFormatFromCustomer(CustomerDTO customer) {
     return "${SequentialFormatter.generatePadLeftNumber(customer.id!)} - ${customer.identifier}";
   }
 
   static String generateSequentialFormatFromBuildingSite(
-      BuildingSite building) {
-    return "${SequentialFormatter.generatePadLeftNumber(building.id!)} - ${building.siteName}";
+      BuildingSiteDTO building) {
+    return "${SequentialFormatter.generatePadLeftNumber(building.id)} - ${building.siteName}";
+  }
+
+  static String generateSequentialFormatFromSiteResidentDTO(
+      SiteResidentDTO siteResident) {
+    return "${SequentialFormatter.generatePadLeftNumber(siteResident.id)} - ${siteResident.firstName} ${siteResident.lastName}";
   }
 
   static String generateSequentialFormatFromSiteResident(
       SiteResident siteResident) {
-    return "${SequentialFormatter.generatePadLeftNumber(siteResident.id!)} - ${siteResident.firstName} ${siteResident.lastName}";
+    return "${SequentialFormatter.generatePadLeftNumber(siteResident.id)} - ${siteResident.firstName} ${siteResident.lastName}";
   }
 
-  static String generateSequentialFormatFromConcreteTestingOrder(ConcreteTestingOrder e) {
-    return "${SequentialFormatter.generatePadLeftNumber(e.id!)} - ${e.customer.identifier} : ${e.buildingSite.siteName} - (${e.testingDate?.day}/${e.testingDate?.month}/${e.testingDate?.year})";
+  static String generateSequentialFormatFromConcreteTestingOrder(
+      ConcreteTestingOrderDTO e) {
+    return "${SequentialFormatter.generatePadLeftNumber(e.id!)} - ${e.customer?.identifier} : ${e.buildingSite?.siteName} - (${e.testingDate?.day}/${e.testingDate?.month}/${e.testingDate?.year})";
   }
 }

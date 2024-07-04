@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
-import 'package:masa_epico_concrete_manager/models/customer.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/pdf_utils.dart';
@@ -14,6 +13,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+
+import '../database/app_database.dart';
 
 class CustomerForm extends StatefulWidget {
   const CustomerForm({super.key});
@@ -89,8 +90,7 @@ class _CustomerFormState extends State<CustomerForm> {
                     description: "Presiona OK para realizar la operacion",
                     onOkPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        // addCustomer();
-                        _openPdf();
+                        addCustomer();
                         Navigator.pop(context);
                         _formKey.currentState!.reset();
                       } else {
@@ -112,7 +112,6 @@ class _CustomerFormState extends State<CustomerForm> {
     String razonSocial = _clienteController.text.trim();
     String rfc = _razonSocialController.text.trim();
 
-    // Minimal implementation - manager and location empty
     Customer customer = Customer(
       identifier: razonSocial,
       companyName: rfc,

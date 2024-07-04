@@ -1,37 +1,34 @@
+import 'package:drift/drift.dart';
 import 'package:injector/injector.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_volumetric_weight.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:masa_epico_concrete_manager/database/app_database.dart';
 
-import '../constants/constants.dart';
-import '../utils/sequential_counter_generator.dart';
 
 class ConcreteVolumetricWeightDAO {
-  late final Database db;
-  final SequentialFormatter sequentialIdGenerator = SequentialFormatter();
+  late final AppDatabase db;
 
   ConcreteVolumetricWeightDAO() {
     final injector = Injector.appInstance;
-    db = injector.get<Database>();
+    db = injector.get<AppDatabase>();
   }
 
-  Future<ConcreteVolumetricWeight?> add(
+  Future<ConcreteVolumetricWeight> add(
       ConcreteVolumetricWeight concreteVolumetricWeight) async {
-    int id = await db.insert(
-        Constants.CONCRETE_VOLUMETRIC_WEIGHT, concreteVolumetricWeight.toMap());
-    return findById(id);
+    return await db
+        .into(db.concreteVolumetricWeights)
+        .insertReturning(concreteVolumetricWeight, mode: InsertMode.insert);
   }
 
   Future<ConcreteVolumetricWeight?> findById(int id) async {
-    var list = await db.query(Constants.CONCRETE_VOLUMETRIC_WEIGHT,
-        where: "id = ?", whereArgs: [id], limit: 1);
-    return ConcreteVolumetricWeight.toModel(list.first);
+    return (db.select(db.concreteVolumetricWeights)
+          ..where((tbl) => tbl.id.equals(id)))
+        .getSingleOrNull();
   }
 
   Future<ConcreteVolumetricWeight?> update(
       ConcreteVolumetricWeight concreteVolumetricWeight) async {
-    await db.update(
-        Constants.CONCRETE_VOLUMETRIC_WEIGHT, concreteVolumetricWeight.toMap(),
-        where: "id = ?", whereArgs: [concreteVolumetricWeight.id]);
-    return findById(concreteVolumetricWeight.id!);
+    var result = await db
+        .update(db.concreteVolumetricWeights)
+        .writeReturning(concreteVolumetricWeight);
+    return result.firstOrNull;
   }
 }

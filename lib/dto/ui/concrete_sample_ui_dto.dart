@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/elements/input_text_field.dart';
 import 'package:masa_epico_concrete_manager/elements/input_time_picker_field.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_sample.dart';
 
-import '../elements/input_number_field.dart';
+import '../../database/app_database.dart';
+import '../../elements/input_number_field.dart';
 
 class ConcreteSampleUiDTO {
   String id;

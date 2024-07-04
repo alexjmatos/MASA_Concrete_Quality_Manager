@@ -1,114 +1,164 @@
+import 'package:drift/drift.dart';
 import 'package:injector/injector.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_sample_cylinder.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:masa_epico_concrete_manager/database/app_database.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_cylinder_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_sample_dto.dart';
 
-import '../constants/constants.dart';
-import '../models/concrete_sample.dart';
 import '../utils/sequential_counter_generator.dart';
+import '../utils/utils.dart';
 import 'concrete_cylinder_dao.dart';
 
 class ConcreteSampleDAO {
-  late final Database db;
+  late final AppDatabase db;
   final SequentialFormatter sequentialIdGenerator = SequentialFormatter();
   final ConcreteCylinderDAO concreteCylinderDao = ConcreteCylinderDAO();
 
   ConcreteSampleDAO() {
     final injector = Injector.appInstance;
-    db = injector.get<Database>();
+    db = injector.get<AppDatabase>();
   }
+
+  ConcreteSampleDAO.withDB(this.db);
 
   Future<List<ConcreteSample>> findAll() async {
-    var result = await db.rawQuery("""
-    SELECT
-    sam.id AS id,
-    sam.plant_time,
-    sam.building_site_time,
-    sam.real_slumping_cm,
-    sam.temperature_celsius,
-    sam.location,
-    sam.concrete_testing_order_id,
-    ord.id AS order_id,
-    ord.design_resistance,
-    ord.slumping_cm,
-    ord.volume_m3,
-    ord.tma_mm,
-    ord.design_age,
-    ord.testing_date AS order_testing_date,
-    cust.id AS customer_id,
-    cust.identifier AS customer_identifier,
-    cust.company_name AS customer_company_name,
-    site.id AS building_site_id,
-    site.site_name AS building_site_name,
-    res.id AS site_resident_id,
-    res.first_name AS site_resident_first_name,
-    res.last_name AS site_resident_last_name,
-    res.job_position AS site_resident_job_position
-    FROM
-    concrete_samples sam
-        JOIN
-    concrete_testing_orders ord ON sam.concrete_testing_order_id = ord.id
-        JOIN
-    customers cust ON ord.customer_id = cust.id
-        JOIN
-    building_sites site ON ord.building_site_id = site.id
-        JOIN
-    site_residents res ON ord.site_resident_id = res.id ORDER BY id DESC;
-    """);
-    return result.map((e) => ConcreteSample.toModel(e)).toList();
+    return await db.select(db.concreteSamples).get();
   }
 
-  Future<List<int>> addAll(List<ConcreteSample> samples) async {
-    Batch batch = db.batch();
-    for (var element in samples) {
-      batch.insert(Constants.CONCRETE_TESTING_SAMPLES, element.toMap());
-    }
-    var result = await batch.commit();
-    return result.map((i) => i as int).toList();
+  Future<List<ConcreteSample>> addAll(List<ConcreteSample> samples) async {
+    List<ConcreteSample> inserted = [];
+    await db.transaction(() async {
+      for (var sample in samples) {
+        final result = await db.into(db.concreteSamples).insertReturning(
+              sample,
+              mode: InsertMode.insert,
+            );
+        inserted.add(result);
+      }
+    });
+    return inserted;
   }
 
-  Future<List<int>> addAllCylinders(
-      List<ConcreteSampleCylinder> cylinders) async {
-    Batch batch = db.batch();
-    for (var element in cylinders) {
-      batch.insert(Constants.CONCRETE_TESTING_CYLINDERS, element.toMap());
-    }
-    var result = await batch.commit();
-    return result.map((i) => i as int).toList();
+  Future<List<ConcreteCylinder>> addAllCylinders(
+      List<ConcreteCylinder> cylinders) async {
+    List<ConcreteCylinder> inserted = [];
+    await db.transaction(() async {
+      for (var cylinder in cylinders) {
+        final result = await db.into(db.concreteCylinders).insertReturning(
+              cylinder,
+              mode: InsertMode.insert,
+            );
+        inserted.add(result);
+      }
+    });
+    return inserted;
   }
 
   Future<List<ConcreteSample>> findByOrderId(int? id) async {
-    var result = await db.query(Constants.CONCRETE_TESTING_SAMPLES,
-        where: "concrete_testing_order_id = ?", whereArgs: [id]);
-    return mapToEntities(result);
-  }
-
-  Future<List<ConcreteSample>> mapToEntities(
-      List<Map<String, Object?>> result) async {
-    List<ConcreteSample> finalResult = [];
-    for (var element in result) {
-      ConcreteSample concreteSample = ConcreteSample.toModel(element);
-      concreteSample.concreteSampleCylinders = await concreteCylinderDao
-          .findByConcreteTestingOrder(concreteSample.id);
-      finalResult.add(concreteSample);
-    }
-    return finalResult;
+    var query = db.select(db.concreteSamples)
+      ..where((tbl) => tbl.concreteTestingOrderId.equals(id!));
+    final result = await query.get();
+    return result.toList();
   }
 
   Future<int> findNextCounterByBuildingSite(int id) async {
-    var result = await db.rawQuery("""
-    SELECT
-    bs.id AS building_site_id,
-    COUNT(DISTINCT cc.building_site_sample_number) AS incremental_sample_number
-    FROM
-        building_sites bs
-            JOIN
-        concrete_testing_orders cto ON bs.id = cto.building_site_id
-            JOIN
-        concrete_samples cs ON cto.id = cs.concrete_testing_order_id
-            JOIN
-        concrete_cylinders cc ON cs.id = cc.concrete_sample_id
-    WHERE bs.id = ?;
-    """, [id]);
-    return (result.first["incremental_sample_number"] as int) + 1;
+    // Define table aliases for easier reference
+    final bs = db.buildingSites;
+    final cto = db.concreteTestingOrders;
+    final cs = db.concreteSamples;
+    final cc = db.concreteCylinders;
+
+    // Create a custom select statement
+    final query = db.customSelect(
+      'SELECT '
+      'bs.id AS building_site_id, '
+      'COUNT(DISTINCT cc.building_site_sample_number) AS incremental_sample_number '
+      'FROM building_sites bs '
+      'JOIN concrete_testing_orders cto ON bs.id = cto.building_site_id '
+      'JOIN concrete_samples cs ON cto.id = cs.concrete_testing_order_id '
+      'JOIN concrete_cylinders cc ON cs.id = cc.concrete_sample_id '
+      'WHERE bs.id = ?',
+      variables: [Variable.withInt(id)],
+      readsFrom: {bs, cto, cs, cc},
+    );
+
+    // Execute the query and map the result
+    final result = await query.getSingle();
+    return result.data['building_site_id'] as int;
+  }
+
+  // Define the method to get all concrete samples with their corresponding concrete cylinders by concrete testing order ID
+  Future<List<ConcreteSampleDTO>> getConcreteSamplesByOrderId(
+      int orderId) async {
+    // Define table aliases for easier reference
+    final cs = db.concreteSamples;
+    final cc = db.concreteCylinders;
+
+    // Create a custom select statement
+    final query = db.customSelect(
+      'SELECT '
+      'cs.id AS sample_id, '
+      'cs.remission, '
+      'cs.volume, '
+      'cs.plant_time, '
+      'cs.building_site_time, '
+      'cs.real_slumping_cm, '
+      'cs.temperature_celsius, '
+      'cs.location, '
+      'cc.id AS cylinder_id, '
+      'cc.building_site_sample_number, '
+      'cc.testing_age_days, '
+      'cc.testing_date, '
+      'cc.total_load_kg, '
+      'cc.diameter_cm, '
+      'cc.resistance_kgf_cm2, '
+      'cc.median, '
+      'cc.percentage '
+      'FROM concrete_samples cs '
+      'LEFT JOIN concrete_cylinders cc ON cs.id = cc.concrete_sample_id '
+      'WHERE cs.concrete_testing_order_id = ?',
+      variables: [Variable.withInt(orderId)],
+      readsFrom: {cs, cc},
+    );
+
+    // Execute the query and map the result
+    final result = await query.map((row) {
+      final cylinder = ConcreteCylinderDTO(
+        id: row.read<int>('cylinder_id'),
+        buildingSiteSampleNumber: row.read<int>('building_site_sample_number'),
+        testingAgeDays: row.read<int>('testing_age_days'),
+        testingDate:
+            DateTime.fromMillisecondsSinceEpoch(row.read<int>('testing_date')),
+        totalLoad: row.read<double>('total_load_kg'),
+        diameter: row.read<double>('diameter_cm'),
+        resistance: row.read<double>('resistance_kgf_cm2'),
+        median: row.read<double>('median'),
+        percentage: row.read<double>('percentage'),
+      );
+
+      return ConcreteSampleDTO(
+        id: row.read<int>('sample_id'),
+        remission: row.read<String>('remission'),
+        volume: row.read<double>('volume'),
+        plantTime: Utils.parseTimeOfDay(row.read<String>('plant_time')),
+        buildingSiteTime:
+            Utils.parseTimeOfDay(row.read<String>('building_site_time')),
+        realSlumpingCm: row.read<double>('real_slumping_cm'),
+        temperatureCelsius: row.read<double>('temperature_celsius'),
+        location: row.read<String>('location'),
+        cylinders: [cylinder],
+      );
+    }).get();
+
+    // Group results by sample ID
+    final Map<int, ConcreteSampleDTO> groupedResults = {};
+    for (var item in result) {
+      if (groupedResults.containsKey(item.id)) {
+        groupedResults[item.id]!.cylinders?.addAll(item.cylinders ?? []);
+      } else {
+        groupedResults[item.id ?? 0] = item;
+      }
+    }
+
+    return groupedResults.values.toList();
   }
 }

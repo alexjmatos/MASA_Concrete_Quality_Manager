@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/dto/building_site_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/customer_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/site_resident_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/autocomplete.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
-import 'package:masa_epico_concrete_manager/models/customer.dart';
-import 'package:masa_epico_concrete_manager/models/building_site.dart';
-import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
+
+import '../database/app_database.dart';
 
 class ProjectSiteAndResidentForm extends StatefulWidget {
   const ProjectSiteAndResidentForm({super.key});
@@ -23,28 +25,28 @@ class _ProjectSiteAndResidentFormState
     extends State<ProjectSiteAndResidentForm> {
   final _formKey = GlobalKey<FormState>();
 
-  final BuildingSiteDAO projectSiteDao = BuildingSiteDAO();
+  final BuildingSiteDAO buildingSiteDao = BuildingSiteDAO();
   final CustomerDAO customerDao = CustomerDAO();
   final SiteResidentDAO siteResidentDao = SiteResidentDAO();
 
   // Data for General Site Project Info
-  final TextEditingController _obraController = TextEditingController();
+  final TextEditingController _siteNameController = TextEditingController();
 
   // Data for Customer
   final TextEditingController _customerController = TextEditingController();
   final TextEditingController _siteResidentController = TextEditingController();
 
   // Data for Site Resident
-  final TextEditingController _nombresController = TextEditingController();
-  final TextEditingController _apellidosController = TextEditingController();
-  final TextEditingController _puestoController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _jobPositionController = TextEditingController();
 
-  static List<Customer> customers = [];
+  static List<CustomerDTO> customers = [];
   static List<String> selectionCustomers = [];
-  static List<SiteResident> siteResidents = [];
+  static List<SiteResidentDTO> siteResidents = [];
   static List<String> selectionSiteResidents = [];
 
-  SiteResident? _selectedSiteResident;
+  SiteResidentDTO? _selectedSiteResident;
 
   @override
   void initState() {
@@ -72,7 +74,7 @@ class _ProjectSiteAndResidentFormState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 CustomTextFormField(
-                  controller: _obraController,
+                  controller: _siteNameController,
                   labelText: "Identificador",
                   validatorText:
                       "El identificador de la obra no puede quedar vacio",
@@ -112,19 +114,19 @@ class _ProjectSiteAndResidentFormState
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField.noValidation(
-                  controller: _nombresController,
+                  controller: _firstNameController,
                   labelText: "Nombre",
                   readOnly: true,
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField.noValidation(
-                  controller: _apellidosController,
+                  controller: _lastNameController,
                   labelText: "Apellidos",
                   readOnly: true,
                 ),
                 const SizedBox(height: 20),
                 CustomTextFormField.noValidation(
-                  controller: _puestoController,
+                  controller: _jobPositionController,
                   labelText: "Puesto",
                   readOnly: true,
                 ),
@@ -156,19 +158,19 @@ class _ProjectSiteAndResidentFormState
   }
 
   Future<void> addProjectSite() async {
-    BuildingSite toBeAdded = BuildingSite();
+    String obra = _siteNameController.text.trim();
+    String nombreResidente = _firstNameController.text.trim();
+    String apellidosResidente = _lastNameController.text.trim();
+    String puestoResidente = _jobPositionController.text.trim();
 
-    String obra = _obraController.text.trim();
-    String nombreResidente = _nombresController.text.trim();
-    String apellidosResidente = _apellidosController.text.trim();
-    String puestoResidente = _puestoController.text.trim();
+    BuildingSiteDTO toBeAdded = BuildingSiteDTO(siteName: obra);
 
     if (_selectedSiteResident != null &&
-        _selectedSiteResident!.firstName.toUpperCase() ==
+        _selectedSiteResident!.firstName!.toUpperCase() ==
             nombreResidente.toUpperCase() &&
-        _selectedSiteResident!.lastName.toUpperCase() ==
+        _selectedSiteResident!.lastName!.toUpperCase() ==
             apellidosResidente.toUpperCase() &&
-        _selectedSiteResident!.jobPosition.toUpperCase() ==
+        _selectedSiteResident!.jobPosition!.toUpperCase() ==
             puestoResidente.toUpperCase()) {
       toBeAdded.siteResident = _selectedSiteResident;
     } else if (nombreResidente.isNotEmpty || apellidosResidente.isNotEmpty) {
@@ -179,7 +181,13 @@ class _ProjectSiteAndResidentFormState
       );
       var siteResidentResult = await siteResidentDao.add(siteResident);
 
-      toBeAdded.siteResident = siteResidentResult;
+      if (siteResidentResult != null) {
+        toBeAdded.siteResident = SiteResidentDTO(
+            id: siteResidentResult.id,
+            firstName: siteResidentResult.firstName,
+            lastName: siteResidentResult.lastName,
+            jobPosition: siteResidentResult.jobPosition);
+      }
     }
 
     toBeAdded.siteName = obra;
@@ -188,23 +196,29 @@ class _ProjectSiteAndResidentFormState
         SequentialFormatter.getIdNumberFromConsecutive(
             _customerController.text));
 
-    print(toBeAdded.toMap());
-    Future<BuildingSite> future = projectSiteDao.add(toBeAdded);
+    Future<BuildingSite?> future = buildingSiteDao.add(BuildingSite(
+        id: -1,
+        siteName: toBeAdded.siteName ?? "",
+        customerId: toBeAdded.customer!.id!,
+        siteResidentId: toBeAdded.siteResident?.id));
 
     future.then((value) {
-      ComponentUtils.generateSuccessMessage(context,
-          "Obra ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.siteName} agregada con exito");
-      loadCustomerAndSiteResidentData();
+      if (value != null) {
+        ComponentUtils.generateSuccessMessage(context,
+            "Obra ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.siteName} agregada con exito");
+        loadCustomerAndSiteResidentData();
+      } else {
+        ComponentUtils.generateErrorMessage(context);
+      }
     }).onError((error, stackTrace) {
-      print(stackTrace);
       ComponentUtils.generateErrorMessage(context);
     });
   }
 
   void updateSiteResidentInfo() {
-    _nombresController.text = _selectedSiteResident!.firstName;
-    _apellidosController.text = _selectedSiteResident!.lastName;
-    _puestoController.text = _selectedSiteResident!.jobPosition;
+    _firstNameController.text = _selectedSiteResident!.firstName ?? "";
+    _lastNameController.text = _selectedSiteResident!.lastName ?? "";
+    _jobPositionController.text = _selectedSiteResident!.jobPosition ?? "";
   }
 
   void loadCustomerAndSiteResidentData() {

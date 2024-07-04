@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/dto/customer_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
-import 'package:masa_epico_concrete_manager/models/customer.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 
+import '../../database/app_database.dart';
+
 class CustomerDetails extends StatefulWidget {
   final int id;
   final bool readOnly;
-  final ValueNotifier<List<Customer>> customersNotifier;
+  final ValueNotifier<List<CustomerDTO>> customersNotifier;
 
   const CustomerDetails(
       {super.key,
@@ -24,7 +26,7 @@ class CustomerDetails extends StatefulWidget {
 class _CustomerDetailsState extends State<CustomerDetails> {
   final _formKey = GlobalKey<FormState>();
 
-  late Customer customer;
+  late CustomerDTO customer;
   final CustomerDAO customerDao = CustomerDAO();
 
   // Data for General Customer Info
@@ -37,12 +39,14 @@ class _CustomerDetailsState extends State<CustomerDetails> {
 
     // Retrieve the customer
     customerDao.findById(widget.id).then((value) {
-      customer = value;
+      if (value != null) {
+        customer = value;
 
-      setState(() {
-        _clienteController.text = customer.identifier;
-        _razonSocialController.text = customer.companyName;
-      });
+        setState(() {
+          _clienteController.text = customer.identifier!;
+          _razonSocialController.text = customer.companyName!;
+        });
+      }
     });
   }
 
@@ -136,11 +140,15 @@ class _CustomerDetailsState extends State<CustomerDetails> {
       companyName: rfc,
     );
 
-    Future<Customer> future = customerDao.update(customer);
+    Future<Customer?> future = customerDao.update(customer);
 
     future.then((value) {
-      ComponentUtils.generateSuccessMessage(context,
-          "Cliente ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.identifier} actualizado con exito!");
+      if (value != null) {
+        ComponentUtils.generateSuccessMessage(context,
+            "Cliente ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.identifier} actualizado con exito!");
+      } else {
+        ComponentUtils.generateErrorMessage(context);
+      }
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
     });

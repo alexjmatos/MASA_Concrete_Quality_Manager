@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/dto/site_resident_dto.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 import 'package:masa_epico_concrete_manager/views/edit/site_resident_edit_view.dart';
 
-import '../../models/site_resident.dart';
-
 class SiteResidentData extends DataTableSource {
   final BuildContext context;
-  final ValueNotifier<List<SiteResident>> siteResidentNotifier;
+  final ValueNotifier<List<SiteResidentDTO>> siteResidentNotifier;
 
   SiteResidentData({required this.context, required this.siteResidentNotifier});
 
@@ -41,7 +40,7 @@ class SiteResidentData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              siteResidentNotifier.value[index].firstName,
+              siteResidentNotifier.value[index].firstName ?? "",
               textAlign: TextAlign.center,
             ),
           ),
@@ -49,7 +48,7 @@ class SiteResidentData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              siteResidentNotifier.value[index].lastName,
+              siteResidentNotifier.value[index].lastName ?? "",
               textAlign: TextAlign.center,
             ),
           ),
@@ -57,7 +56,7 @@ class SiteResidentData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              siteResidentNotifier.value[index].jobPosition,
+              siteResidentNotifier.value[index].jobPosition ?? "",
               textAlign: TextAlign.center,
             ),
           ),

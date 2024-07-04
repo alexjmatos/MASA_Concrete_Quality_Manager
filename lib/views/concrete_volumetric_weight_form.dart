@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_testing_order_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
 import 'package:masa_epico_concrete_manager/elements/formatters.dart';
 import 'package:masa_epico_concrete_manager/elements/quantity_form_field.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_volumetric_weight.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_volumetric_weight_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
@@ -12,8 +12,10 @@ import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.d
 import 'package:masa_epico_concrete_manager/utils/utils.dart';
 
 import '../constants/constants.dart';
+import '../database/app_database.dart';
+import '../database/tables.dart';
+import '../dto/concrete_volumetric_weight_dto.dart';
 import '../elements/autocomplete.dart';
-import '../models/concrete_testing_order.dart';
 
 class ConcreteVolumetricWeightForm extends StatefulWidget {
   final int concreteTestingOrderId;
@@ -36,10 +38,10 @@ class _ConcreteVolumetricWeightState
   ConcreteVolumetricWeightDAO concreteVolumetricWeightDao =
       ConcreteVolumetricWeightDAO();
 
-  List<ConcreteTestingOrder> concreteTestingOrders = [];
+  List<ConcreteTestingOrderDTO> concreteTestingOrders = [];
   List<String> selectableConcreteTestingOrders = [];
   int concreteTestingOrderId = 0;
-  late ConcreteTestingOrder selectedConcreteTestingOrder;
+  late ConcreteTestingOrderDTO selectedConcreteTestingOrder;
 
   num volumetricWeight = 0.0;
   num totalLoad = 0.0;
@@ -415,8 +417,10 @@ class _ConcreteVolumetricWeightState
 
   void updateMaterialWeight(String? p0) {
     _materialTareWeightController.text = p0 ?? "0.0";
-    num tareWeight = int.tryParse(_tareWeightController.text) ?? Constants.TARE_WEIGHT;
-    num volumeMaterial = num.tryParse(_tareVolumeController.text) ?? Constants.TARE_VOLUME;
+    num tareWeight =
+        int.tryParse(_tareWeightController.text) ?? Constants.TARE_WEIGHT;
+    num volumeMaterial =
+        num.tryParse(_tareVolumeController.text) ?? Constants.TARE_VOLUME;
     int? weightMaterialPlusTare =
         int.tryParse(_materialTareWeightController.text);
     num weightMaterial = (weightMaterialPlusTare ?? 0) - (tareWeight);
@@ -432,8 +436,9 @@ class _ConcreteVolumetricWeightState
     num fineAggregateQuantity =
         num.tryParse(_fineAggregateController.text) ?? 0.0;
     num waterQuantity = num.tryParse(_waterController.text) ?? 0.0;
-    num additives = rows.isNotEmpty ?
-        Utils.convert(rows).values.reduce((value, element) => value + element) : 0.0;
+    num additives = rows.isNotEmpty
+        ? Utils.convert(rows).values.reduce((value, element) => value + element)
+        : 0.0;
 
     totalLoad = cementQuantity +
         coarseAggregateQuantity +
@@ -455,7 +460,7 @@ class _ConcreteVolumetricWeightState
     num? materialTareWeight = num.tryParse(_materialTareWeightController.text);
     num? materialWeight = num.tryParse(_materialWeightController.text);
     num? tareVolume = num.tryParse(_tareVolumeController.text);
-    num? volumeLoad = selectedConcreteTestingOrder?.volume;
+    num? volumeLoad = selectedConcreteTestingOrder.volumeM3;
     num? cementQuantity = num.tryParse(_cementController.text);
     num? coarseAggregateQuantity =
         num.tryParse(_coarseAggregateController.text);
@@ -464,31 +469,48 @@ class _ConcreteVolumetricWeightState
 
     ConcreteVolumetricWeight concreteVolumetricWeight =
         ConcreteVolumetricWeight(
-            null,
-            tareWeight,
-            materialTareWeight,
-            materialWeight,
-            tareVolume,
-            volumetricWeight,
-            volumeLoad,
-            cementQuantity,
-            coarseAggregateQuantity,
-            fineAggregateQuantity,
-            waterQuantity,
-            Utils.convert(rows),
-            totalLoad,
-            totalLoadVolumetricWeightRelation,
-            percentage);
+            tareWeightGr: tareWeight != null ? tareWeight.toDouble() : 0,
+            materialTareWeightGr:
+                materialTareWeight != null ? materialTareWeight.toDouble() : 0,
+            materialWeightGr:
+                materialWeight != null ? materialWeight.toDouble() : 0,
+            tareVolumeCm3: tareVolume != null ? tareVolume.toDouble() : 0,
+            volumetricWeightGrCm3: volumetricWeight.toDouble(),
+            volumeLoadM3: volumeLoad != null ? volumeLoad.toDouble() : 0,
+            cementQuantityKg:
+                cementQuantity != null ? cementQuantity.toDouble() : 0,
+            coarseAggregateKg: coarseAggregateQuantity != null
+                ? coarseAggregateQuantity.toDouble()
+                : 0,
+            fineAggregateKg: fineAggregateQuantity != null
+                ? fineAggregateQuantity.toDouble()
+                : 0,
+            waterKg: waterQuantity != null ? waterQuantity.toDouble() : 0,
+            additives: Utils.convert(rows).toString(),
+            totalLoadKg: totalLoad.toDouble(),
+            totalLoadVolumetricWeightRelation:
+                totalLoadVolumetricWeightRelation.toDouble(),
+            percentage: percentage.toDouble());
 
     // ADD THE CONCRETE VOLUMETRIC WEIGHT
     await concreteVolumetricWeightDao.add(concreteVolumetricWeight).then(
-        (value) =>
-            selectedConcreteTestingOrder?.concreteSamples?.firstOrNull?.concreteVolumetricWeight = value);
+        (value) => selectedConcreteTestingOrder
+                .concreteSamples?.firstOrNull?.concreteVolumetricWeight =
+            ConcreteVolumetricWeightDTO.fromModel(value));
     // UPDATE THE CONCRETE TESTING ORDER
 
-    await concreteTestingOrderDao
-        .update(selectedConcreteTestingOrder!)
-        .then((value) {
+    ConcreteTestingOrder toUpdate = ConcreteTestingOrder(
+        id: selectedConcreteTestingOrder.id,
+        designResistance: selectedConcreteTestingOrder.designResistance ?? "",
+        slumpingCm: selectedConcreteTestingOrder.slumpingCm ?? 0,
+        totalVolumeM3: selectedConcreteTestingOrder.slumpingCm ?? 0,
+        tmaMm: selectedConcreteTestingOrder.tmaMm ?? 0,
+        designAge: selectedConcreteTestingOrder.designAge ?? "",
+        testingDate: selectedConcreteTestingOrder.testingDate ?? DateTime.now(),
+        customerId: selectedConcreteTestingOrder.slumpingCm ?? 0,
+        buildingSiteId: selectedConcreteTestingOrder.slumpingCm ?? 0);
+
+    await concreteTestingOrderDao.update(toUpdate).then((value) {
       ComponentUtils.generateSuccessMessage(
           context, "Peso volumetrico registrado con exito");
     }).onError((error, stackTrace) {

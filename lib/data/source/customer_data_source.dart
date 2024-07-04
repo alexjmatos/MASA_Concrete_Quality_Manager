@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/dto/customer_dto.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
 import 'package:masa_epico_concrete_manager/views/edit/customer_edit_view.dart';
 
-import '../../models/customer.dart';
-
 class CustomerData extends DataTableSource {
   BuildContext context;
-  final ValueNotifier<List<Customer>> customersNotifier;
+  final ValueNotifier<List<CustomerDTO>> customersNotifier;
 
   CustomerData({required this.context, required this.customersNotifier});
 
@@ -43,7 +42,7 @@ class CustomerData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              customersNotifier.value[index].identifier,
+              customersNotifier.value[index].identifier ?? "",
               textAlign: TextAlign.center,
             ),
           ),
@@ -51,7 +50,7 @@ class CustomerData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              customersNotifier.value[index].companyName,
+              customersNotifier.value[index].companyName ?? "",
               textAlign: TextAlign.center,
             ),
           ),

@@ -1,9 +1,9 @@
-// Interface for filter criteria
-import '../models/building_site.dart';
-import '../models/concrete_sample.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_sample_dto.dart';
+
+import '../database/app_database.dart';
 
 abstract class FilterCriteria {
-  bool matches(ConcreteSample element);
+  bool matches(ConcreteSampleDTO element);
 }
 
 // Concrete implementations for each criterion
@@ -13,10 +13,9 @@ class BuildingSiteCriteria implements FilterCriteria {
   BuildingSiteCriteria(this.selectedBuildingSite);
 
   @override
-  bool matches(ConcreteSample element) {
+  bool matches(ConcreteSampleDTO element) {
     return selectedBuildingSite == null ||
-        element.concreteTestingOrder.buildingSite.id ==
-            selectedBuildingSite?.id;
+        element.testingOrder?.buildingSite?.id == selectedBuildingSite?.id;
   }
 }
 
@@ -26,10 +25,9 @@ class DesignResistanceCriteria implements FilterCriteria {
   DesignResistanceCriteria(this.selectedDesignResistance);
 
   @override
-  bool matches(ConcreteSample element) {
+  bool matches(ConcreteSampleDTO element) {
     return selectedDesignResistance == null ||
-        element.concreteTestingOrder.designResistance ==
-            selectedDesignResistance;
+        element.testingOrder?.designResistance == selectedDesignResistance;
   }
 }
 
@@ -39,8 +37,8 @@ class DesignAgeCriteria implements FilterCriteria {
   DesignAgeCriteria(this.selectedDesignAge);
 
   @override
-  bool matches(ConcreteSample element) {
+  bool matches(ConcreteSampleDTO element) {
     return selectedDesignAge == null ||
-        element.concreteTestingOrder.designAge == selectedDesignAge;
+        element.testingOrder?.designAge == selectedDesignAge;
   }
 }

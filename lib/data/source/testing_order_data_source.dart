@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_testing_order_dto.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 
 import '../../elements/value_notifier_list.dart';
-import '../../models/concrete_testing_order.dart';
 import '../../utils/sequential_counter_generator.dart';
 import '../../views/edit/concrete_testing_order_details.dart';
 
 class ConcreteTestingOrderData extends DataTableSource {
   final BuildContext context;
-  final ValueNotifierList<ConcreteTestingOrder> concreteTestingOrdersNotifier;
+  final ValueNotifierList<ConcreteTestingOrderDTO>
+      concreteTestingOrdersNotifier;
 
   ConcreteTestingOrderData(
       {required this.context, required this.concreteTestingOrdersNotifier});
@@ -46,7 +47,9 @@ class ConcreteTestingOrderData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              DateFormat("dd-MM-yyyy").format(order.testingDate ?? DateTime.now()),
+              order.testingDate != null
+                  ? DateFormat("dd-MM-yyyy").format(order.testingDate!)
+                  : "N/A",
               textAlign: TextAlign.center,
             ),
           ),
@@ -54,7 +57,7 @@ class ConcreteTestingOrderData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              order.buildingSite.siteName ?? 'N/A',
+              order.buildingSite?.siteName ?? 'N/A',
               textAlign: TextAlign.center,
             ),
           ),
@@ -78,7 +81,7 @@ class ConcreteTestingOrderData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              "${order.slumping ?? 'N/A'} cm",
+              "${order.slumpingCm ?? 'N/A'} cm",
               textAlign: TextAlign.center,
             ),
           ),

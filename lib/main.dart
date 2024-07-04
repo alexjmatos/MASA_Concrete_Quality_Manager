@@ -8,6 +8,8 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'database/app_database.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -57,25 +59,7 @@ class MainApp extends StatelessWidget {
   }
 }
 
-Future<Database> initializeDb() async {
-  String path = join(await getDatabasesPath(), dotenv.get("DATABASE_PATH"));
-  await deleteDatabase(path);
-  Database db = await openDatabase(
-    path,
-    version: 1,
-    onCreate: (db, version) async {
-      await _executeSqlScript(db, 'init.sql');
-    },
-  );
-  return db;
-}
-
-Future<void> _executeSqlScript(Database db, String path) async {
-  String script = await rootBundle.loadString(path);
-  List<String> statements = script.split(';');
-  for (String statement in statements) {
-    if (statement.trim().isNotEmpty) {
-      await db.execute(statement);
-    }
-  }
-}
+Future<AppDatabase> initializeDb() async {
+  final database = AppDatabase();
+  return database;
+}nch v

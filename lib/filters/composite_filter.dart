@@ -1,4 +1,5 @@
-import '../models/concrete_sample.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_sample_dto.dart';
+
 import 'filter_criteria.dart';
 
 class CompositeFilter implements FilterCriteria {
@@ -7,7 +8,7 @@ class CompositeFilter implements FilterCriteria {
   CompositeFilter(this.criteria);
 
   @override
-  bool matches(ConcreteSample element) {
+  bool matches(ConcreteSampleDTO element) {
     for (var criterion in criteria) {
       if (!criterion.matches(element)) {
         return false;

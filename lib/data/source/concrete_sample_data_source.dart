@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_sample_dto.dart';
 
 import '../../elements/value_notifier_list.dart';
-import '../../models/concrete_testing_order.dart';
-import '../../models/concrete_sample.dart';
 import '../../utils/sequential_counter_generator.dart';
-import '../../views/edit/concrete_testing_order_details.dart';
 
 class ConcreteSamplesData extends DataTableSource {
   final BuildContext context;
-  final ValueNotifierList<ConcreteSample>
-      concreteTestingSamplesNotifier;
+  final ValueNotifierList<ConcreteSampleDTO> concreteTestingSamplesNotifier;
 
   ConcreteSamplesData(
       {required this.context, required this.concreteTestingSamplesNotifier});
@@ -32,7 +27,7 @@ class ConcreteSamplesData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              concreteSample.concreteTestingOrder.buildingSite.siteName ?? 'N/A',
+              concreteSample.testingOrder?.buildingSite?.siteName ?? 'N/A',
               textAlign: TextAlign.center,
             ),
           ),
@@ -40,7 +35,7 @@ class ConcreteSamplesData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              concreteSample.concreteTestingOrder.designAge ?? 'N/A',
+              concreteSample.testingOrder?.designAge ?? 'N/A',
               textAlign: TextAlign.center,
             ),
           ),
@@ -48,7 +43,7 @@ class ConcreteSamplesData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              concreteSample.concreteTestingOrder.designResistance ?? 'N/A',
+              concreteSample.testingOrder?.designResistance ?? 'N/A',
               textAlign: TextAlign.center,
             ),
           ),
@@ -64,7 +59,7 @@ class ConcreteSamplesData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              "${concreteSample.realSlumping ?? 'N/A'}",
+              "${concreteSample.realSlumpingCm ?? 'N/A'}",
               textAlign: TextAlign.center,
             ),
           ),
@@ -72,7 +67,7 @@ class ConcreteSamplesData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              "${concreteSample.temperature ?? 'N/A'}",
+              "${concreteSample.temperatureCelsius ?? 'N/A'}",
               textAlign: TextAlign.center,
             ),
           ),

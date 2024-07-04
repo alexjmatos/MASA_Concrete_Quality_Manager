@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/dto/customer_dto.dart';
 
-import '../../models/customer.dart';
 import '../source/customer_data_source.dart';
 
 class CustomerDataTable extends StatelessWidget {
-  final ValueNotifier<List<Customer>> customersNotifier;
+  final ValueNotifier<List<CustomerDTO>> customersNotifier;
 
   const CustomerDataTable({super.key, required this.customersNotifier});
 

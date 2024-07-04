@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/data/table/building_site_data_table.dart';
 import 'package:masa_epico_concrete_manager/data/table/site_resident_data_table.dart';
+import 'package:masa_epico_concrete_manager/dto/building_site_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_testing_order_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/customer_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/site_resident_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
 import 'package:masa_epico_concrete_manager/elements/value_notifier_list.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
-import 'package:masa_epico_concrete_manager/models/building_site.dart';
-import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
-import 'package:masa_epico_concrete_manager/views/search/concrete_testing_sample_search.dart';
 
 import '../data/table/customer_data_table.dart';
 import '../data/table/testing_order_data_table.dart';
-import '../models/customer.dart';
+import '../database/app_database.dart';
 
 class ConcreteQualitySearch extends StatefulWidget {
   const ConcreteQualitySearch({super.key});
@@ -33,13 +33,13 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
 
   final TextEditingController selectController = TextEditingController();
 
-  final ValueNotifierList<Customer> _customersNotifier =
+  final ValueNotifierList<CustomerDTO> _customersNotifier =
       ValueNotifierList([]); // Notifier for customers
-  final ValueNotifierList<BuildingSite> _buildingSitesNotifier =
+  final ValueNotifierList<BuildingSiteDTO> _buildingSitesNotifier =
       ValueNotifierList([]); // Notifier for project sites
-  final ValueNotifierList<SiteResident> _siteResidentsNotifier =
+  final ValueNotifierList<SiteResidentDTO> _siteResidentsNotifier =
       ValueNotifierList([]); // Notifier for site residents
-  final ValueNotifierList<ConcreteTestingOrder> _concreteTestingOrderNotifier =
+  final ValueNotifierList<ConcreteTestingOrderDTO> _concreteTestingOrderNotifier =
       ValueNotifierList([]); // Notifier for concrete testing orders
 
   @override
@@ -132,10 +132,6 @@ class _ConcreteQualitySearchState extends State<ConcreteQualitySearch> {
     return ConcreteTestingDataTable(
       concreteTestingOrdersNotifier: _concreteTestingOrderNotifier,
     );
-  }
-
-  ConcreteTestingSampleSearch generateConcreteTestingRemissionSearchView() {
-    return const ConcreteTestingSampleSearch();
   }
 
   // Method to load data for all tables

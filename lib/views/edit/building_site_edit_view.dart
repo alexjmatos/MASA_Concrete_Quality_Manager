@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/database/app_database.dart';
+import 'package:masa_epico_concrete_manager/dto/building_site_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/customer_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/site_resident_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
-import 'package:masa_epico_concrete_manager/models/customer.dart';
-import 'package:masa_epico_concrete_manager/models/building_site.dart';
-import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
@@ -14,7 +15,7 @@ import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.d
 class BuildingSiteDetails extends StatefulWidget {
   final int id;
   final bool readOnly;
-  final ValueNotifier<List<BuildingSite>> projectSitesNotifier;
+  final ValueNotifier<List<BuildingSiteDTO>> projectSitesNotifier;
 
   const BuildingSiteDetails(
       {super.key,
@@ -43,14 +44,14 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
   final TextEditingController _apellidosController = TextEditingController();
   final TextEditingController _puestoController = TextEditingController();
 
-  static List<Customer> customers = [];
+  static List<CustomerDTO> customers = [];
   static List<String> selectionCustomers = [];
-  static List<SiteResident> siteResidents = [];
+  static List<SiteResidentDTO> siteResidents = [];
   static List<String> selectionSiteResidents = [];
 
-  late BuildingSite selectedBuildingSite;
-  SiteResident? selectedSiteResident;
-  Customer? selectedCustomer;
+  late BuildingSiteDTO selectedBuildingSite;
+  SiteResidentDTO? selectedSiteResident;
+  CustomerDTO? selectedCustomer;
 
   int selectedCustomerIndex = -1;
   int selectedSiteResidentIndex = -1;
@@ -183,27 +184,35 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
     selectedBuildingSite.customer = selectedCustomer;
     selectedBuildingSite.siteResident = selectedSiteResident;
 
-    Future<BuildingSite> future = projectSiteDao.update(selectedBuildingSite);
+    Future<BuildingSite?> future = projectSiteDao.update(BuildingSite(
+        id: selectedBuildingSite.id,
+        siteName: selectedBuildingSite.siteName ?? "",
+        customerId: selectedBuildingSite.customer!.id!,
+        siteResidentId: selectedBuildingSite.siteResident?.id));
 
     future.then((value) {
-      ComponentUtils.generateSuccessMessage(context,
-          "Obra ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.siteName} actualizada con exito");
-      loadProjectSiteData();
+      if (value != null) {
+        ComponentUtils.generateSuccessMessage(context,
+            "Obra ${SequentialFormatter.generatePadLeftNumber(value.id!)} - ${value.siteName} actualizada con exito");
+        loadProjectSiteData();
+      } else {
+        ComponentUtils.generateErrorMessage(context);
+      }
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
     });
   }
 
   void updateSiteResidentInfo() {
-    _nombresController.text = selectedSiteResident!.firstName;
-    _apellidosController.text = selectedSiteResident!.lastName;
-    _puestoController.text = selectedSiteResident!.jobPosition;
+    _nombresController.text = selectedSiteResident!.firstName!;
+    _apellidosController.text = selectedSiteResident!.lastName!;
+    _puestoController.text = selectedSiteResident!.jobPosition!;
   }
 
   Future<void> loadProjectSiteData() async {
     await projectSiteDao.findById(widget.id).then(
       (value) {
-        selectedBuildingSite = value;
+        selectedBuildingSite = BuildingSiteDTO(id: value.id);
         selectedCustomer = value.customer;
         selectedSiteResident = value.siteResident;
         selectedSiteResident = selectedBuildingSite.siteResident;
@@ -252,7 +261,7 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
               (element) => element.id == selectedSiteResident?.id!,
             ));
             _siteResidentController.text =
-            selectionSiteResidents[selectedSiteResidentIndex];
+                selectionSiteResidents[selectedSiteResidentIndex];
           }
           _customerController.text = selectionCustomers[selectedCustomerIndex];
         });

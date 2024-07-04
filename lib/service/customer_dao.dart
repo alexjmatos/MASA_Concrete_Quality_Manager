@@ -1,39 +1,49 @@
+import 'package:drift/drift.dart';
 import 'package:injector/injector.dart';
-import 'package:masa_epico_concrete_manager/constants/constants.dart';
-import 'package:masa_epico_concrete_manager/models/customer.dart';
+import 'package:masa_epico_concrete_manager/dto/customer_dto.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
-import 'package:sqflite/sqflite.dart';
+
+import '../database/app_database.dart';
 
 class CustomerDAO {
-  late final Database db;
+  late final AppDatabase db;
   final SequentialFormatter sequentialIdGenerator = SequentialFormatter();
 
   CustomerDAO() {
     final injector = Injector.appInstance;
-    db = injector.get<Database>();
+    db = injector.get<AppDatabase>();
   }
 
   Future<Customer> add(Customer customer) async {
-    int id = await db.insert(Constants.CUSTOMERS, customer.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
-    return findById(id);
+    return await db
+        .into(db.customers)
+        .insertReturning(customer, mode: InsertMode.insert);
   }
 
-  Future<List<Customer>> findAll() async {
-    List<Map<String, Object?>> records =
-        await db.query(Constants.CUSTOMERS, limit: 100);
-    return records.map((e) => Customer.toModel(e)).toList();
+  Future<List<CustomerDTO>> findAll() async {
+    return db.select(db.customers).get().then(
+      (value) {
+        return value
+            .map((e) => CustomerDTO(
+                id: e.id!,
+                identifier: e.identifier,
+                companyName: e.companyName))
+            .toList();
+      },
+    );
   }
 
-  Future<Customer> findById(int id) async {
-    List<Map<String, Object?>> records =
-        await db.query(Constants.CUSTOMERS, where: "id = ?", whereArgs: [id]);
-    return records.map((e) => Customer.toModel(e)).first;
+  Future<CustomerDTO?> findById(int id) async {
+    return (db.select(db.customers)..where((tbl) => tbl.id.equals(id))).map(
+      (p0) {
+        return CustomerDTO(
+            id: p0.id, identifier: p0.identifier, companyName: p0.companyName);
+      },
+    ).getSingleOrNull();
   }
 
-  Future<Customer> update(Customer customer) async {
-    await db.update(Constants.CUSTOMERS, customer.toMap(),
-        where: "id = ?", whereArgs: [customer.id]);
-    return findById(customer.id!);
+  Future<Customer?> update(Customer customer) async {
+    var result = await db.update(db.customers).writeReturning(customer);
+    return result.firstOrNull;
   }
 }

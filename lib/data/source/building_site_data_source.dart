@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/models/building_site.dart';
+import 'package:masa_epico_concrete_manager/dto/building_site_dto.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
-import 'package:masa_epico_concrete_manager/views/edit/project_site_edit_view.dart';
+import 'package:masa_epico_concrete_manager/views/edit/building_site_edit_view.dart';
 
 class BuildingSiteData extends DataTableSource {
   final BuildContext context;
-  final ValueNotifier<List<BuildingSite>> buildingSiteNotifier;
+  final ValueNotifier<List<BuildingSiteDTO>> buildingSiteNotifier;
 
   BuildingSiteData({required this.context, required this.buildingSiteNotifier});
 
@@ -18,7 +18,7 @@ class BuildingSiteData extends DataTableSource {
           Center(
             child: Text(
               SequentialFormatter.generatePadLeftNumber(
-                  buildingSiteNotifier.value[index].id!),
+                  buildingSiteNotifier.value[index].id),
             ),
           ),
           onLongPress: () {
@@ -38,7 +38,7 @@ class BuildingSiteData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              buildingSiteNotifier.value[index].siteName!,
+              buildingSiteNotifier.value[index].siteName ?? "",
               textAlign: TextAlign.center,
             ),
           ),
@@ -46,7 +46,7 @@ class BuildingSiteData extends DataTableSource {
         DataCell(
           Center(
             child: Text(
-              buildingSiteNotifier.value[index].customer!.identifier,
+              buildingSiteNotifier.value[index].customer!.identifier!,
               textAlign: TextAlign.center,
             ),
           ),

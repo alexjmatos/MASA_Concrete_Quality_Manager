@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/data/source/site_resident_data_source.dart';
-
-import '../../models/site_resident.dart';
+import 'package:masa_epico_concrete_manager/dto/site_resident_dto.dart';
 
 class SiteResidentDataTable extends StatelessWidget {
-  final ValueNotifier<List<SiteResident>> siteResidentNotifier;
+  final ValueNotifier<List<SiteResidentDTO>> siteResidentNotifier;
 
   const SiteResidentDataTable({super.key, required this.siteResidentNotifier});
 

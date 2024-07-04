@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_sample.dart';
+import 'package:masa_epico_concrete_manager/database/app_database.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_sample_dto.dart';
 
-class ConcreteSampleDetailsDTO {
+import '../../utils/utils.dart';
+
+class ConcreteSampleInputDTO {
   TextEditingController remissionController;
   TextEditingController volumeController;
   TimeOfDay plantTime;
@@ -10,7 +13,7 @@ class ConcreteSampleDetailsDTO {
   TextEditingController realSlumpingController;
   TextEditingController locationController;
 
-  ConcreteSampleDetailsDTO(
+  ConcreteSampleInputDTO(
       this.remissionController,
       this.volumeController,
       this.plantTime,
@@ -19,22 +22,22 @@ class ConcreteSampleDetailsDTO {
       this.realSlumpingController,
       this.locationController);
 
-  static ConcreteSampleDetailsDTO fromModel(ConcreteSample model) {
+  static ConcreteSampleInputDTO fromModel(ConcreteSampleDTO dto) {
     TextEditingController remissionController = TextEditingController();
     TextEditingController volumeController = TextEditingController();
     TextEditingController temperature = TextEditingController();
     TextEditingController realSlumpingController = TextEditingController();
     TextEditingController locationController = TextEditingController();
-    TimeOfDay plantTime = model.plantTime ?? TimeOfDay.now();
-    TimeOfDay buildingSiteTime = model.buildingSiteTime ?? TimeOfDay.now();
+    TimeOfDay plantTime = dto.plantTime ?? TimeOfDay.now();
+    TimeOfDay buildingSiteTime = dto.buildingSiteTime ?? TimeOfDay.now();
 
-    remissionController.text = model.remission ?? "";
-    volumeController.text = model.volume.toString();
-    temperature.text = model.temperature.toString();
-    realSlumpingController.text = model.realSlumping.toString();
-    locationController.text = model.location.toString();
+    remissionController.text = dto.remission ?? "";
+    volumeController.text = dto.volume.toString();
+    temperature.text = dto.temperatureCelsius.toString();
+    realSlumpingController.text = dto.realSlumpingCm.toString();
+    locationController.text = dto.location.toString();
 
-    return ConcreteSampleDetailsDTO(
+    return ConcreteSampleInputDTO(
         remissionController,
         volumeController,
         plantTime,

@@ -1,9 +1,11 @@
 import 'dart:typed_data';
 
-import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
-import 'package:masa_epico_concrete_manager/utils/utils.dart';
+import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+
+import '../dto/concrete_cylinder_dto.dart';
+import '../dto/concrete_sample_dto.dart';
 
 class PdfUtils {
   Future<Uint8List> buildPdf(PdfPageFormat format) async {
@@ -26,12 +28,52 @@ class PdfUtils {
 
   final List<ConcreteSampleDTO> products = [
     ConcreteSampleDTO(
-        "REM-001", "12:30", "13:30", "18", "38", "MURO CIMENTACION", [
-      ConcreteCylinderDTO(1, 3, DateTime.now(), 20970, 118, 120, 47),
-      ConcreteCylinderDTO(2, 7, DateTime.now(), 20970, 118, 120, 47),
-      ConcreteCylinderDTO(3, 14, DateTime.now(), 20970, 118, 120, 47),
-      ConcreteCylinderDTO(4, 14, DateTime.now(), 20970, 118, 120, 47)
-    ])
+        remission: "REM-001",
+        plantTime: TimeOfDay.now(),
+        buildingSiteTime: TimeOfDay.now(),
+        realSlumpingCm: 18,
+        temperatureCelsius: 38.5,
+        location: "MURO CIMENTACION",
+        id: 1,
+        cylinders: [
+          ConcreteCylinderDTO(
+              id: 4,
+              designAge: 14,
+              testingDate: DateTime.now(),
+              totalLoad: 20970,
+              resistance: 118,
+              median: 120,
+              percentage: 47,
+              buildingSiteSampleNumber: 1),
+          ConcreteCylinderDTO(
+              id: 4,
+              designAge: 14,
+              testingDate: DateTime.now(),
+              totalLoad: 20970,
+              resistance: 118,
+              median: 120,
+              percentage: 47,
+              buildingSiteSampleNumber: 2),
+          ConcreteCylinderDTO(
+              id: 4,
+              designAge: 14,
+              testingDate: DateTime.now(),
+              totalLoad: 20970,
+              resistance: 118,
+              median: 120,
+              percentage: 47,
+              buildingSiteSampleNumber: 3),
+          ConcreteCylinderDTO(
+              id: 4,
+              designAge: 14,
+              testingDate: DateTime.now(),
+              totalLoad: 20970,
+              resistance: 118,
+              median: 120,
+              percentage: 47,
+              buildingSiteSampleNumber: 5)
+        ],
+        volume: 40),
   ];
 
   pw.Widget _contentTable(pw.Context context) {
@@ -105,83 +147,5 @@ class PdfUtils {
         ),
       ),
     ));
-  }
-}
-
-class ConcreteCylinderDTO {
-  int id;
-  int designAge;
-  DateTime testingDate;
-  num? totalLoad;
-  num? resistance;
-  num? median;
-  num? percentage;
-
-  ConcreteCylinderDTO(this.id, this.designAge, this.testingDate, this.totalLoad,
-      this.resistance, this.median, this.percentage);
-}
-
-class ConcreteSampleDTO {
-  String remission;
-  String timePlant;
-  String timeBuildingSite;
-  String slumping;
-  String temperature;
-  String location;
-  List<ConcreteCylinderDTO> cylinders;
-
-  ConcreteSampleDTO(this.remission, this.timePlant, this.timeBuildingSite,
-      this.slumping, this.temperature, this.location, this.cylinders);
-
-  pw.Widget getIndex(int index) {
-    switch (index) {
-      case 0:
-        return pw.Expanded(child: pw.Text(remission));
-      case 1:
-        return pw.Expanded(child: pw.Text(timePlant));
-      case 2:
-        return pw.Expanded(child: pw.Text(timeBuildingSite));
-      case 3:
-        return pw.Expanded(child: pw.Text(slumping));
-      case 4:
-        return pw.Expanded(child: pw.Text(temperature));
-      case 5:
-        return pw.Expanded(child: pw.Text(location));
-      case 6:
-        return pw.Column(
-            children: cylinders
-                .map((e) =>
-                    pw.Text(SequentialFormatter.generatePadLeftNumber(e.id)))
-                .toList());
-      case 7:
-        return pw.Column(
-            children:
-                cylinders.map((e) => pw.Text(e.designAge.toString())).toList());
-      case 8:
-        return pw.Column(
-            children: cylinders
-                .map((e) => pw.Text(Utils.formatDate(e.testingDate)))
-                .toList());
-      case 9:
-        return pw.Column(
-            children:
-                cylinders.map((e) => pw.Text(e.totalLoad.toString())).toList());
-      case 10:
-        return pw.Column(
-            children: cylinders
-                .map((e) => pw.Text(e.resistance.toString()))
-                .toList());
-      case 11:
-        return pw.Column(
-            children:
-                cylinders.map((e) => pw.Text(e.median.toString())).toList());
-      case 12:
-        return pw.Column(
-            children: cylinders
-                .map((e) => pw.Text(e.percentage.toString()))
-                .toList());
-      default:
-        return pw.Text("");
-    }
   }
 }

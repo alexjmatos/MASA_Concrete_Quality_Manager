@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/database/app_database.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
-import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
@@ -99,10 +99,15 @@ class _SiteResidentFormState extends State<SiteResidentForm> {
       lastName: apellidosResidente,
       jobPosition: puestoResidente,
     );
+
     var future = siteResidentDao.add(siteResident);
     future.then((value) {
-      ComponentUtils.generateSuccessMessage(context,
-          "Residente ${SequentialFormatter.generateSequentialFormatFromSiteResident(value)} agregada con exito");
+      if (value != null) {
+        ComponentUtils.generateSuccessMessage(context,
+            "Residente ${SequentialFormatter.generateSequentialFormatFromSiteResident(value)} agregada con exito");
+      } else {
+        ComponentUtils.generateErrorMessage(context);
+      }
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
     });
