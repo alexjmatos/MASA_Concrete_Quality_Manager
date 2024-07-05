@@ -1,4 +1,4 @@
-class ConcreteSampleCylinder {
+class ConcreteCylinder {
   int? id;
   int? sampleNumber;
   int testingAge;
@@ -10,7 +10,7 @@ class ConcreteSampleCylinder {
   num? percentage;
   int? concreteSampleId;
 
-  ConcreteSampleCylinder(
+  ConcreteCylinder(
       {this.id,
       this.sampleNumber,
       required this.testingAge,
@@ -37,8 +37,8 @@ class ConcreteSampleCylinder {
     };
   }
 
-  static ConcreteSampleCylinder toModel(Map<String, Object?> map) {
-    return ConcreteSampleCylinder(
+  static ConcreteCylinder toModel(Map<String, Object?> map) {
+    return ConcreteCylinder(
         id: map["id"] as int,
         sampleNumber: map["building_site_sample_number"] as int?,
         testingAge: map["testing_age_days"] as int,

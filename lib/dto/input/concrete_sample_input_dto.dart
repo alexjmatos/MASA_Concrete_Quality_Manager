@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_sample.dart';
 
-class ConcreteSampleDetailsDTO {
+class ConcreteSampleInputDTO {
   TextEditingController remissionController;
   TextEditingController volumeController;
   TimeOfDay plantTime;
@@ -10,7 +10,7 @@ class ConcreteSampleDetailsDTO {
   TextEditingController realSlumpingController;
   TextEditingController locationController;
 
-  ConcreteSampleDetailsDTO(
+  ConcreteSampleInputDTO(
       this.remissionController,
       this.volumeController,
       this.plantTime,
@@ -19,7 +19,7 @@ class ConcreteSampleDetailsDTO {
       this.realSlumpingController,
       this.locationController);
 
-  static ConcreteSampleDetailsDTO fromModel(ConcreteSample model) {
+  static ConcreteSampleInputDTO fromModel(ConcreteSample model) {
     TextEditingController remissionController = TextEditingController();
     TextEditingController volumeController = TextEditingController();
     TextEditingController temperature = TextEditingController();
@@ -34,7 +34,7 @@ class ConcreteSampleDetailsDTO {
     realSlumpingController.text = model.realSlumping.toString();
     locationController.text = model.location.toString();
 
-    return ConcreteSampleDetailsDTO(
+    return ConcreteSampleInputDTO(
         remissionController,
         volumeController,
         plantTime,

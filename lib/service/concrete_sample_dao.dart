@@ -67,7 +67,7 @@ class ConcreteSampleDAO {
   }
 
   Future<List<int>> addAllCylinders(
-      List<ConcreteSampleCylinder> cylinders) async {
+      List<ConcreteCylinder> cylinders) async {
     Batch batch = db.batch();
     for (var element in cylinders) {
       batch.insert(Constants.CONCRETE_TESTING_CYLINDERS, element.toMap());
@@ -87,7 +87,7 @@ class ConcreteSampleDAO {
     List<ConcreteSample> finalResult = [];
     for (var element in result) {
       ConcreteSample concreteSample = ConcreteSample.toModel(element);
-      concreteSample.concreteSampleCylinders = await concreteCylinderDao
+      concreteSample.concreteCylinders = await concreteCylinderDao
           .findByConcreteTestingOrder(concreteSample.id);
       finalResult.add(concreteSample);
     }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:masa_epico_concrete_manager/dto/concrete_cylinder_dto.dart';
-import 'package:masa_epico_concrete_manager/dto/concrete_sample_details_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/input/concrete_sample_input_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_expansion_tile.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_time_picker_form.dart';
@@ -12,6 +11,7 @@ import 'package:masa_epico_concrete_manager/models/concrete_volumetric_weight.da
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 
 import '../../constants/constants.dart';
+import '../../dto/input/concrete_cylinder_input_dto.dart';
 import '../../elements/autocomplete.dart';
 import '../../elements/custom_number_form_field.dart';
 import '../../elements/custom_text_form_field.dart';
@@ -706,8 +706,7 @@ class _ConcreteTestingOrderDetailsState
 
   List<Widget> buildConcreteSamplesInfo() {
     return samples.map<Widget>((ConcreteSample sample) {
-      ConcreteSampleDetailsDTO details =
-          ConcreteSampleDetailsDTO.fromModel(sample);
+      ConcreteSampleInputDTO details = ConcreteSampleInputDTO.fromModel(sample);
       List<Widget> widgets = [];
       widgets.addAll([
         const SizedBox(height: 20),
@@ -1015,10 +1014,10 @@ class _ConcreteTestingOrderDetailsState
 
   List<Widget> generateDataTable(ConcreteSample sample) {
     var groupBySampleNumber =
-        groupBy(sample.concreteSampleCylinders, (cy) => cy.sampleNumber);
+        groupBy(sample.concreteCylinders, (cy) => cy.sampleNumber);
 
     return groupBySampleNumber.values.map((value) {
-      List<ConcreteSampleCylinderDTO> dto = generateDTO(value);
+      List<ConcreteCylinderInputDTO> dto = generateDTO(value);
 
       return Column(
         children: [
@@ -1123,8 +1122,7 @@ class _ConcreteTestingOrderDetailsState
     }).toList();
   }
 
-  List<ConcreteSampleCylinderDTO> generateDTO(
-      List<ConcreteSampleCylinder> value) {
+  List<ConcreteCylinderInputDTO> generateDTO(List<ConcreteCylinder> value) {
     return value.map(
       (samp) {
         InputNumberField designAgeInput = InputNumberField();
@@ -1139,7 +1137,7 @@ class _ConcreteTestingOrderDetailsState
         testingDateInput.controller.text =
             Constants.formatter.format(samp.testingDate);
 
-        return ConcreteSampleCylinderDTO(
+        return ConcreteCylinderInputDTO(
             samp.id!,
             designAgeInput,
             testingDateInput,

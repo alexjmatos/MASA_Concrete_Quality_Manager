@@ -14,10 +14,10 @@ class ConcreteCylinderDAO {
     db = injector.get<Database>();
   }
 
-  Future<List<ConcreteSampleCylinder>> findByConcreteTestingOrder(
+  Future<List<ConcreteCylinder>> findByConcreteTestingOrder(
       int? id) async {
     var result = await db.query(Constants.CONCRETE_TESTING_CYLINDERS,
         where: "concrete_sample_id = ?", whereArgs: [id]);
-    return result.map((e) => ConcreteSampleCylinder.toModel(e)).toList();
+    return result.map((e) => ConcreteCylinder.toModel(e)).toList();
   }
 }

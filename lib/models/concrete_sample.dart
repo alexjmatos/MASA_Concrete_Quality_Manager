@@ -19,7 +19,7 @@ class ConcreteSample {
   String? location;
   ConcreteTestingOrder concreteTestingOrder;
   ConcreteVolumetricWeight? concreteVolumetricWeight;
-  List<ConcreteSampleCylinder> concreteSampleCylinders;
+  List<ConcreteCylinder> concreteCylinders;
 
   ConcreteSample(
       {this.id,
@@ -31,7 +31,7 @@ class ConcreteSample {
       this.temperature,
       this.location,
       required this.concreteTestingOrder,
-      required this.concreteSampleCylinders});
+      required this.concreteCylinders});
 
   Map<String, Object?> toMap() {
     return {
@@ -48,7 +48,7 @@ class ConcreteSample {
   }
 
   static ConcreteSample toModel(Map<String, Object?> map) {
-    List<ConcreteSampleCylinder> concreteSamples = [];
+    List<ConcreteCylinder> concreteSamples = [];
     Customer customer = Customer(
       id: (map["customer_id"] ?? 0) as int,
       identifier: (map["customer_identifier"] ?? "") as String,
@@ -92,6 +92,6 @@ class ConcreteSample {
         temperature: (map["temperature_celsius"] ?? 0) as num,
         location: (map["location"] ?? "") as String,
         concreteTestingOrder: concreteTestingOrder,
-        concreteSampleCylinders: concreteSamples);
+        concreteCylinders: concreteSamples);
   }
 }

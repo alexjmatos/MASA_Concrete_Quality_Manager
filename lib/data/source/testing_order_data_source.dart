@@ -5,7 +5,7 @@ import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import '../../elements/value_notifier_list.dart';
 import '../../models/concrete_testing_order.dart';
 import '../../utils/sequential_counter_generator.dart';
-import '../../views/edit/concrete_testing_order_details.dart';
+import '../../views/details/concrete_testing_order_details.dart';
 
 class ConcreteTestingOrderData extends DataTableSource {
   final BuildContext context;

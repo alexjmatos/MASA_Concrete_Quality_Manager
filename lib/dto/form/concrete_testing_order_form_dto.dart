@@ -94,7 +94,7 @@ class ConcreteTestingOrderFormDTO {
           realSlumping: num.tryParse(sample.realSlumping.controller.text),
           temperature: num.tryParse(sample.temperature.controller.text),
           location: sample.location.controller.text,
-          concreteSampleCylinders: []);
+          concreteCylinders: []);
     }).toList();
 
     var list = await concreteSampleDAO.addAll(concreteSamples);
@@ -116,7 +116,7 @@ class ConcreteTestingOrderFormDTO {
             int.tryParse(dto.designAges.elementAt(j).controller.text) ?? 0;
         var testingDate = Utils.convertToDateTime(
             dto.testingDates.elementAt(j).controller.text);
-        return ConcreteSampleCylinder(
+        return ConcreteCylinder(
             sampleNumber: sampleNumber,
             testingAge: testingAge,
             testingDate: testingDate,

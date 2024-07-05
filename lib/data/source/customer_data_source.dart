@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
-import 'package:masa_epico_concrete_manager/views/edit/customer_edit_view.dart';
 
 import '../../models/customer.dart';
+import '../../views/details/customer_edit_view.dart';
 
 class CustomerData extends DataTableSource {
   BuildContext context;

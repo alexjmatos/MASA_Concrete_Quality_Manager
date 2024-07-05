@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
-import 'package:masa_epico_concrete_manager/views/edit/site_resident_edit_view.dart';
 
 import '../../models/site_resident.dart';
+import '../../views/details/site_resident_edit_view.dart';
 
 class SiteResidentData extends DataTableSource {
   final BuildContext context;

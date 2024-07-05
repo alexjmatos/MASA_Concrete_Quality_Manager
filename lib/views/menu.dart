@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:masa_epico_concrete_manager/views/concrete_testing_order_form.dart';
-import 'package:masa_epico_concrete_manager/views/search/concrete_testing_sample_search.dart';
 import 'package:masa_epico_concrete_manager/views/record_tables.dart';
-import 'package:masa_epico_concrete_manager/views/concrete_volumetric_weight_form.dart';
-import 'package:masa_epico_concrete_manager/views/customer_form.dart';
 import 'package:masa_epico_concrete_manager/views/home_view.dart';
-import 'package:masa_epico_concrete_manager/views/building_site_form.dart';
-import 'package:masa_epico_concrete_manager/views/site_resident_form.dart';
+import 'package:masa_epico_concrete_manager/views/form/building_site_form.dart';
+import 'package:masa_epico_concrete_manager/views/form/site_resident_form.dart';
 
-import 'concrete_sample_form.dart';
+import 'form/concrete_sample_form.dart';
+import 'form/concrete_testing_order_form.dart';
+import 'form/customer_form.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key, required this.title, required this.isTablet});

@@ -14,10 +14,10 @@ import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
 
-import '../elements/elevated_button_dialog.dart';
-import '../elements/input_number_field.dart';
-import '../utils/sequential_counter_generator.dart';
-import '../utils/utils.dart';
+import '../../elements/elevated_button_dialog.dart';
+import '../../elements/input_number_field.dart';
+import '../../utils/sequential_counter_generator.dart';
+import '../../utils/utils.dart';
 
 class ConcreteTestingOrderForm extends StatefulWidget {
   const ConcreteTestingOrderForm({super.key});
@@ -529,7 +529,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
     }
   }
 
-  List<ConcreteSampleCylinder> generateConcreteSampleCylinders(
+  List<ConcreteCylinder> generateConcreteSampleCylinders(
       ConcreteSampleFormDTO dto) {
     return Iterable.generate(dto.designAges.length, (index) => index).map((i) {
       int? testingAge =
@@ -538,7 +538,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
           DateTime.tryParse(dto.testingDates.elementAt(i).controller.text) ??
               DateTime.now();
 
-      return ConcreteSampleCylinder(
+      return ConcreteCylinder(
           testingAge: testingAge, testingDate: testingDate);
     }).toList();
   }

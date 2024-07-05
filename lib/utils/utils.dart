@@ -50,15 +50,19 @@ class Utils {
     return TimeOfDay(hour: hour, minute: minute);
   }
 
-  static String formatTimeOfDay(TimeOfDay time) {
-    final int hour = time.hour;
-    final int minute = time.minute;
+  static String formatTimeOfDay(TimeOfDay? time) {
+    if (time != null) {
+      final int hour = time.hour;
+      final int minute = time.minute;
 
-    // Ensuring two-digit formatting for hour and minute
-    final String hourString = hour.toString().padLeft(2, '0');
-    final String minuteString = minute.toString().padLeft(2, '0');
+      // Ensuring two-digit formatting for hour and minute
+      final String hourString = hour.toString().padLeft(2, '0');
+      final String minuteString = minute.toString().padLeft(2, '0');
 
-    return '$hourString:$minuteString';
+      return '$hourString:$minuteString';
+    } else {
+      return "";
+    }
   }
 
   static DateTime convertToDateTime(String dateString) {

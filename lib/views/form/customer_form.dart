@@ -5,16 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/dto/form/customer_form_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
+import 'package:masa_epico_concrete_manager/reports/report_generator.dart';
+import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
-import 'package:masa_epico_concrete_manager/utils/pdf_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'dart:typed_data';
 
 class CustomerForm extends StatefulWidget {
   const CustomerForm({super.key});
@@ -26,12 +32,16 @@ class CustomerForm extends StatefulWidget {
 class _CustomerFormState extends State<CustomerForm> {
   final _formKey = GlobalKey<FormState>();
 
+  // DAOs
   final CustomerDAO customerDao = CustomerDAO();
+  final ConcreteTestingOrderDAO concreteTestingOrderDAO =
+      ConcreteTestingOrderDAO();
 
-  // Data for General Customer Info
+  // DTOs
   late final CustomerFormDTO customerFormDTO;
-  PdfUtils pdfUtils = PdfUtils();
+
   File? _pdfFile;
+  final ReportGenerator reportGenerator = ReportGenerator();
 
   @override
   void initState() {
@@ -92,8 +102,8 @@ class _CustomerFormState extends State<CustomerForm> {
                     description: "Presiona OK para realizar la operacion",
                     onOkPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        addCustomer();
-                        // _openPdf();
+                        // addCustomer();
+                        _openPdf();
                         Navigator.pop(context);
                         _formKey.currentState!.reset();
                       } else {
@@ -128,8 +138,11 @@ class _CustomerFormState extends State<CustomerForm> {
   }
 
   Future<void> _generatePdfAndSave() async {
+    ConcreteTestingOrder order = await concreteTestingOrderDAO.findById(1);
+
     // Generate the PDF document
-    Uint8List pdfData = await pdfUtils.buildPdf(PdfPageFormat.a4.landscape);
+    Uint8List pdfData =
+        await reportGenerator.buildReport(PdfPageFormat.a4.landscape, order);
 
     // Save the PDF document to a temporary file
     final output = await getTemporaryDirectory();
