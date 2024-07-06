@@ -68,7 +68,7 @@ class _ConcreteTestingOrderDetailsState
 
   late ConcreteTestingOrder selectedConcreteTestingOrder;
   Customer selectedCustomer = Customer(identifier: "", companyName: "");
-  BuildingSite selectedBuildingSite = BuildingSite();
+  BuildingSite selectedBuildingSite = BuildingSite(siteName: "");
   SiteResident selectedSiteResident =
       SiteResident(firstName: "", lastName: "", jobPosition: "");
   ConcreteVolumetricWeight? selectedConcreteVolumetricWeight;

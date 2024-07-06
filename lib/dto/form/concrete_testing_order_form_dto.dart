@@ -63,7 +63,7 @@ class ConcreteTestingOrderFormDTO {
         designAge: designAgeController.text,
         testingDate: selectedDate,
         customer: selectedCustomer ?? Customer(identifier: "", companyName: ""),
-        buildingSite: selectedBuildingSite ?? BuildingSite(),
+        buildingSite: selectedBuildingSite ?? BuildingSite(siteName: ""),
         siteResident: selectedSiteResident);
 
     concreteTestingOrderDAO.add(concreteTestingOrder).then((value) {

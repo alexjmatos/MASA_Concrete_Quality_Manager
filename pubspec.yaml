@@ -37,7 +37,8 @@ flutter:
   - family: Heebo
     fonts:
       - asset: fonts/Heebo-Regular.ttf
-  assets: 
-    - images/masa-control.svg
+  assets:
+    - assets/masacontrol.png
+    - assets/masacontrol.svg
     - dev.env
     - init.sql

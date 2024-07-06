@@ -77,7 +77,7 @@ class BuildingSiteFormDTO {
 
   Future<void> addProjectSite(BuildContext context,
       BuildingSiteDAO buildingSiteDAO, SiteResidentDAO siteResidentDAO) async {
-    BuildingSite toBeAdded = BuildingSite();
+    BuildingSite toBeAdded = BuildingSite(siteName: "");
 
     String siteName = getSiteName();
     String firstName = getFirstName();

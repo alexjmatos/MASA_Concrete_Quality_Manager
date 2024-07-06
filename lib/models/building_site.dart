@@ -4,7 +4,7 @@ import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 
 class BuildingSite {
   int? id;
-  String? siteName;
+  String siteName;
 
   // ONE TO MANY
   SiteResident? siteResident;
@@ -12,7 +12,7 @@ class BuildingSite {
   // ONE TO MANY
   Customer? customer;
 
-  BuildingSite({this.id, this.siteName, this.customer, this.siteResident});
+  BuildingSite({this.id, required this.siteName, this.customer, this.siteResident});
 
   Map<String, Object?> toMap() {
     return {
