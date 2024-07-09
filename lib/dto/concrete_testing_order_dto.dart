@@ -10,6 +10,7 @@ class ConcreteTestingOrderDTO {
   String tma;
   String designAge;
   String date;
+  String provider;
 
   ConcreteTestingOrderDTO(
       this.id,
@@ -22,5 +23,6 @@ class ConcreteTestingOrderDTO {
       this.totalVolume,
       this.tma,
       this.designAge,
-      this.date);
+      this.date,
+      this.provider);
 }

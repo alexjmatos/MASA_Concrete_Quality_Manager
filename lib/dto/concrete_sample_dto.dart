@@ -1,3 +1,4 @@
+import '../constants/constants.dart';
 import '../utils/sequential_counter_generator.dart';
 import '../utils/utils.dart';
 import 'concrete_cylinder.dart';
@@ -24,7 +25,8 @@ class ConcreteSampleDTO {
       this.cylinders);
 
   pw.TextStyle getStyle() {
-    return pw.TextStyle(font: pw.Font.times(), fontSize: 8);
+    return pw.TextStyle(
+        font: pw.Font.times(), fontSize: Constants.TABLE_FONT_SIZE);
   }
 
   pw.Widget getIndex(int index) {
@@ -65,25 +67,44 @@ class ConcreteSampleDTO {
       case 10:
         return pw.Column(
             children: cylinders
-                .map((e) => pw.Text(e.totalLoad.toString(), style: getStyle()))
+                .map((e) => pw.Text(
+                    e.totalLoad != null
+                        ? e.totalLoad!.toStringAsPrecision(1)
+                        : "",
+                    style: getStyle()))
                 .toList());
       case 11:
         return pw.Column(
             children: cylinders
-                .map((e) => pw.Text(e.resistance.toString(), style: getStyle()))
+                .map((e) => pw.Text(
+                    e.resistance != null
+                        ? e.resistance!.toStringAsPrecision(1)
+                        : "",
+                    style: getStyle()))
                 .toList());
       case 12:
         return pw.Column(
             children: cylinders
-                .map((e) => pw.Text(e.median.toString(), style: getStyle()))
+                .map((e) => pw.Text(
+                    e.median != null ? e.median!.toStringAsPrecision(1) : "",
+                    style: getStyle()))
                 .toList());
       case 13:
         return pw.Column(
             children: cylinders
-                .map((e) => pw.Text(e.percentage.toString(), style: getStyle()))
+                .map((e) => pw.Text(
+                    e.percentage != null
+                        ? e.percentage!.toStringAsPrecision(1)
+                        : "",
+                    style: getStyle()))
                 .toList());
       default:
         return pw.Text("");
     }
+  }
+
+  @override
+  String toString() {
+    return 'ConcreteSampleDTO{remission: $remission, timePlant: $timePlant, timeBuildingSite: $timeBuildingSite, sampleNumber: $sampleNumber, slumping: $slumping, temperature: $temperature, location: $location, cylinders: $cylinders}';
   }
 }

@@ -54,6 +54,6 @@ class ConcreteCylinder {
 
   @override
   String toString() {
-    return 'ConcreteTestingSampleCylinder{id: $id, testingAge: $testingAge, testingDate: $testingDate, totalLoad: $totalLoad, designResistance: $resistance, median: $median, percentage: $percentage}';
+    return 'ConcreteCylinder{id: $id, sampleNumber: $sampleNumber, testingAge: $testingAge, testingDate: $testingDate, totalLoad: $totalLoad, diameter: $diameter, resistance: $resistance, median: $median, percentage: $percentage, concreteSampleId: $concreteSampleId}';
   }
 }

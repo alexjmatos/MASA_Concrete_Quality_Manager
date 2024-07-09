@@ -5,22 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/dto/form/customer_form_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/elevated_button_dialog.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 import 'package:masa_epico_concrete_manager/models/customer.dart';
 import 'package:masa_epico_concrete_manager/reports/report_generator.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/utils/component_utils.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
 
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
-import 'dart:typed_data';
 
 class CustomerForm extends StatefulWidget {
   const CustomerForm({super.key});
@@ -40,7 +31,7 @@ class _CustomerFormState extends State<CustomerForm> {
   // DTOs
   late final CustomerFormDTO customerFormDTO;
 
-  File? _pdfFile;
+
   final ReportGenerator reportGenerator = ReportGenerator();
 
   @override
@@ -49,7 +40,7 @@ class _CustomerFormState extends State<CustomerForm> {
     customerFormDTO = CustomerFormDTO(
         identifierController: TextEditingController(),
         companyNameController: TextEditingController());
-    _generatePdfAndSave();
+
   }
 
   @override
@@ -62,12 +53,6 @@ class _CustomerFormState extends State<CustomerForm> {
           'Datos del cliente',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _generatePdfAndSave, // Regenerate and reload the PDF
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -102,8 +87,7 @@ class _CustomerFormState extends State<CustomerForm> {
                     description: "Presiona OK para realizar la operacion",
                     onOkPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        // addCustomer();
-                        _openPdf();
+                        addCustomer();
                         Navigator.pop(context);
                         _formKey.currentState!.reset();
                       } else {
@@ -135,28 +119,5 @@ class _CustomerFormState extends State<CustomerForm> {
     }).onError((error, stackTrace) {
       ComponentUtils.generateErrorMessage(context);
     });
-  }
-
-  Future<void> _generatePdfAndSave() async {
-    ConcreteTestingOrder order = await concreteTestingOrderDAO.findById(1);
-
-    // Generate the PDF document
-    Uint8List pdfData =
-        await reportGenerator.buildReport(PdfPageFormat.a4.landscape, order);
-
-    // Save the PDF document to a temporary file
-    final output = await getTemporaryDirectory();
-    final file = File("${output.path}/example.pdf");
-    await file.writeAsBytes(pdfData);
-
-    setState(() {
-      _pdfFile = file;
-    });
-  }
-
-  void _openPdf() {
-    if (_pdfFile != null) {
-      OpenFile.open(_pdfFile!.path);
-    }
   }
 }

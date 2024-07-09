@@ -11,8 +11,6 @@ import '../../models/concrete_testing_order.dart';
 import '../../models/customer.dart';
 import '../../models/site_resident.dart';
 import '../../service/concrete_sample_dao.dart';
-import '../../utils/component_utils.dart';
-import '../../utils/sequential_counter_generator.dart';
 import '../../utils/utils.dart';
 
 class ConcreteTestingOrderFormDTO {
@@ -54,7 +52,8 @@ class ConcreteTestingOrderFormDTO {
       this.selectedSiteResident,
       required this.selectedDate});
 
-  void addConcreteTestingOrder(BuildContext context) {
+  Future<ConcreteTestingOrder> addConcreteTestingOrder(
+      BuildContext context) async {
     ConcreteTestingOrder concreteTestingOrder = ConcreteTestingOrder(
         designResistance: designResistanceController.text,
         slumping: int.tryParse(slumpingController.text),
@@ -66,19 +65,7 @@ class ConcreteTestingOrderFormDTO {
         buildingSite: selectedBuildingSite ?? BuildingSite(siteName: ""),
         siteResident: selectedSiteResident);
 
-    concreteTestingOrderDAO.add(concreteTestingOrder).then((value) {
-      return addConcreteTestingSamples(value);
-    }).then(
-      (value) {
-        return addConcreteTestingCylinders(value);
-      },
-    ).then(
-      (value) {
-        int id = value["CONCRETE_TESTING_ORDER_ID"] as int;
-        ComponentUtils.generateSuccessMessage(context,
-            "Orden de muestreo ${SequentialFormatter.generatePadLeftNumber(id)} agregada con exito");
-      },
-    );
+    return await concreteTestingOrderDAO.add(concreteTestingOrder);
   }
 
   Future<Map<String, Object?>> addConcreteTestingSamples(
@@ -104,10 +91,14 @@ class ConcreteTestingOrderFormDTO {
   Future<Map<String, Object?>> addConcreteTestingCylinders(
       Map<String, Object?> previousResult) async {
     List<int> identifiers = previousResult["CONCRETE_SAMPLES"] as List<int>;
-    for (var i in Iterable.generate(samples.length, (index) => index)) {
+    int id = previousResult["CONCRETE_TESTING_ORDER_ID"] as int;
+    List<ConcreteCylinder> cylinders = [];
+
+    for (var i in Iterable.generate(identifiers.length, (index) => index)) {
       int sampleNumber = await concreteSampleDAO
           .findNextCounterByBuildingSite(selectedBuildingSite?.id ?? 0);
-      var cylinders = Iterable.generate(
+
+      cylinders.addAll(Iterable.generate(
         samples[i].designAges.length,
         (index) => index,
       ).map((j) {
@@ -121,20 +112,23 @@ class ConcreteTestingOrderFormDTO {
             testingAge: testingAge,
             testingDate: testingDate,
             concreteSampleId: identifiers.elementAt(i));
-      }).toList();
-      var result = await concreteSampleDAO.addAllCylinders(cylinders);
-      previousResult.putIfAbsent(
-        "CONCRETE_CYLINDERS",
-        () => result,
-      );
-      return previousResult;
+      }).toList());
     }
+
+    var result = await concreteSampleDAO.addAllCylinders(cylinders);
+    var order = await concreteTestingOrderDAO.findById(id);
+    previousResult.putIfAbsent(
+      "CONCRETE_CYLINDERS",
+      () => result,
+    );
+    previousResult.putIfAbsent(
+      "CONCRETE_TESTING_ORDER",
+      () => order,
+    );
     return previousResult;
   }
 
   String getTestingDateString() {
-    return Constants
-        .formatter
-        .format(selectedDate);
+    return Constants.formatter.format(selectedDate);
   }
 }

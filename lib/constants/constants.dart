@@ -1,5 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
+import 'dart:core';
+
 import 'package:intl/intl.dart';
 
 class Constants {
@@ -61,7 +63,15 @@ class Constants {
     "500"
   ];
 
-  static const List<String> CONCRETE_DESIGN_AGES = ["3", "7", "14", "28"];
+  static const List<String> CONCRETE_DESIGN_AGES = [
+    "3",
+    "3 RR",
+    "7",
+    "7 RR",
+    "14",
+    "14 RR",
+    "28"
+  ];
 
   static DateFormat formatter = DateFormat('dd-MM-yyyy');
 
@@ -69,10 +79,17 @@ class Constants {
   static const double DATA_TABLE_COLUMN_SPACING = 56;
   static const String DESIGN_AGE_KEY = "DESIGN_AGE_DAYS";
   static const String TESTING_DATE_KEY = "TESTING_DATE";
-  static const Map<int, List<int>> DESIGN_AGES = {
-    3: [1, 2, 3, 3],
-    7: [1, 3, 7, 7],
-    14: [3, 7, 14, 14],
-    28: [7, 14, 28, 28]
+  static const Map<String, List<int>> DESIGN_AGES = {
+    "3": [1, 2, 3, 3],
+    "3 RR": [1, 2, 3, 3],
+    "7 RR": [1, 3, 7, 7],
+    "7": [1, 3, 7, 7],
+    "14": [3, 7, 14, 14],
+    "14 RR": [3, 7, 14, 14],
+    "28": [7, 14, 28, 28],
   };
+
+  static const double TITLE_FONT_SIZE = 12.0;
+  static const double INFO_FONT_SIZE = 10.0;
+  static const double TABLE_FONT_SIZE = 8.0;
 }

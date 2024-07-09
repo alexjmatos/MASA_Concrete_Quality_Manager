@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/constants/constants.dart';
 import 'package:masa_epico_concrete_manager/dto/form/concrete_sample_form_dto.dart';
@@ -10,12 +12,22 @@ import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart
 import 'package:masa_epico_concrete_manager/elements/input_text_field.dart';
 import 'package:masa_epico_concrete_manager/elements/input_time_picker_field.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_sample_cylinder.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
+import 'package:masa_epico_concrete_manager/reports/report_generator.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/src/widgets/document.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
-import '../../elements/elevated_button_dialog.dart';
+import 'dart:typed_data' as ty;
 import '../../elements/input_number_field.dart';
+import '../../utils/component_utils.dart';
 import '../../utils/sequential_counter_generator.dart';
 import '../../utils/utils.dart';
 
@@ -35,12 +47,18 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   final BuildingSiteDAO buildingSiteDao = BuildingSiteDAO();
   final SiteResidentDAO siteResidentDao = SiteResidentDAO();
 
+  // REPORT
+  final ReportGenerator reportGenerator = ReportGenerator();
+
   // DTOs
   late final ConcreteTestingOrderFormDTO concreteTestingOrderFormDTO;
 
   // SELECTION
   List<String> availableClients = [];
   List<String> availableProjectSites = [];
+
+  // PDF FILE
+  File? _pdfFile;
 
   @override
   void initState() {
@@ -216,9 +234,8 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                               designAgeAndTesting:
                                   Utils.generateTestingDatesBasedOnDesignDays(
                                       concreteTestingOrderFormDTO.selectedDate,
-                                      int.tryParse(concreteTestingOrderFormDTO
-                                              .designAgeController.text) ??
-                                          28));
+                                      concreteTestingOrderFormDTO
+                                              .designAgeController.text));
                           setState(() {
                             concreteTestingOrderFormDTO.samples.add(value);
                           });
@@ -326,19 +343,40 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                 ),
                 const SizedBox(height: 16),
                 Center(
-                  child: ElevatedButtonDialog(
-                    title: "Agregar orden de muestreo",
-                    description: "Presiona OK para realizar la operacion",
-                    onOkPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        concreteTestingOrderFormDTO
-                            .addConcreteTestingOrder(context);
-                        Navigator.popUntil(context,
-                            ModalRoute.withName(Navigator.defaultRouteName));
-                      } else {
-                        Navigator.pop(context, 'Cancelar');
-                      }
+                  child: ElevatedButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Selecciona una opcion:'),
+                            actions: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  save(true);
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Guardar y generar reporte'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  save(false);
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Guardar'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Cancelar'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
+                    child: const Text("Registrar orden de muestreo"),
                   ),
                 ),
               ],
@@ -346,6 +384,59 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
           ),
         ),
       ),
+    );
+  }
+
+  void save(bool generateReport) {
+    ConcreteTestingOrder? order;
+    concreteTestingOrderFormDTO.addConcreteTestingOrder(context).then(
+      (order) {
+        // ORDER STEP
+        return concreteTestingOrderFormDTO.addConcreteTestingSamples(order);
+      },
+    ).then(
+      (map) {
+        return concreteTestingOrderFormDTO.addConcreteTestingCylinders(map);
+      },
+    ).then(
+      (result) {
+        order = result["CONCRETE_TESTING_ORDER"] as ConcreteTestingOrder;
+
+        if (generateReport) {
+          QuickAlert.show(
+            title: "Exito",
+            context: context,
+            type: QuickAlertType.success,
+            text:
+                "Orden de muestreo ${SequentialFormatter.generatePadLeftNumber(order?.id)} agregada con exito",
+            autoCloseDuration: const Duration(seconds: 30),
+            showConfirmBtn: true,
+            confirmBtnText: "Ver reporte",
+            onConfirmBtnTap: () {
+              savePdf(order!).then(
+                (value) {
+                  if (value != null) {
+                    _openPdfPath(value);
+                  }
+                  Navigator.popUntil(
+                      context, ModalRoute.withName(Navigator.defaultRouteName));
+                },
+              );
+            },
+          );
+        } else {
+          QuickAlert.show(
+            title: "Exito",
+            context: context,
+            type: QuickAlertType.success,
+            text:
+                "Orden de muestreo ${SequentialFormatter.generatePadLeftNumber(order?.id)} agregada con exito",
+            autoCloseDuration: const Duration(seconds: 10),
+            showConfirmBtn: true,
+            confirmBtnText: "Ok",
+          );
+        }
+      },
     );
   }
 
@@ -493,10 +584,9 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                 .map(
               (j) {
                 concreteTestingOrderFormDTO.samples[i].designAges[j].controller
-                    .text = Constants.DESIGN_AGES[int.tryParse(
+                    .text = Constants.DESIGN_AGES[
                             concreteTestingOrderFormDTO
-                                .designAgeController.text) ??
-                        0]!
+                                .designAgeController.text]!
                     .elementAt(j)
                     .toString();
                 return concreteTestingOrderFormDTO.samples[i].designAges[j];
@@ -538,8 +628,56 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
           DateTime.tryParse(dto.testingDates.elementAt(i).controller.text) ??
               DateTime.now();
 
-      return ConcreteCylinder(
-          testingAge: testingAge, testingDate: testingDate);
+      return ConcreteCylinder(testingAge: testingAge, testingDate: testingDate);
     }).toList();
+  }
+
+  void _openPdfPath(String path) {
+    OpenFile.open(path);
+  }
+
+  Future<String?> savePdf(ConcreteTestingOrder order) async {
+    // Generate the PDF document
+    Document pdf =
+        await reportGenerator.buildReport(PdfPageFormat.a4.landscape, order);
+
+    try {
+      // Request storage permissions
+      if (await _requestPermissions()) {
+        // Get the Downloads directory
+        final downloadsDir = await getDownloadsDirectory();
+        final file = File(
+            "${downloadsDir?.path}/MASA_CONCRETOS_${SequentialFormatter.generatePadLeftNumber(order.id)}.pdf");
+
+        // Save the PDF
+        await file.writeAsBytes(await pdf.save());
+        print("PDF saved to ${file.path}");
+        return file.path;
+      } else {
+        print("Storage permissions are denied.");
+      }
+    } catch (e) {
+      print("Error saving PDF: $e");
+      print(e);
+    }
+    return null;
+  }
+
+  Future<bool> _requestPermissions() async {
+    if (Platform.isAndroid) {
+      return await Permission.manageExternalStorage.request().isGranted;
+    }
+    return true;
+  }
+
+  Future<Directory?> getDownloadsDirectory() async {
+    if (Platform.isAndroid) {
+      if (await Permission.manageExternalStorage.request().isGranted) {
+        return Directory('/storage/emulated/0/Download');
+      }
+      return await getExternalStorageDirectory();
+    } else {
+      return await getApplicationDocumentsDirectory(); // For iOS
+    }
   }
 }
