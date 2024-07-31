@@ -75,9 +75,9 @@ class ConcreteTestingOrderFormDTO {
           concreteTestingOrder: order,
           remission: sample.remission.controller.text,
           volume: num.tryParse(sample.volume.controller.text),
-          plantTime: Utils.parseTimeOfDay(sample.timePlant.timeController.text),
+          plantTime: Utils.convertStringToTimeOfDay(sample.timePlant.timeController.text),
           buildingSiteTime:
-              Utils.parseTimeOfDay(sample.timeBuildingSite.timeController.text),
+              Utils.convertStringToTimeOfDay(sample.timeBuildingSite.timeController.text),
           realSlumping: num.tryParse(sample.realSlumping.controller.text),
           temperature: num.tryParse(sample.temperature.controller.text),
           location: sample.location.controller.text,

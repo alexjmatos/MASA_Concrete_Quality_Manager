@@ -29,5 +29,14 @@ class ValueNotifierList<T> extends ValueNotifier<List<T>> {
     value = newList;
   }
 
-
+  void update(T valueToUpdate) {
+    int index = value.indexOf(valueToUpdate);
+    if (index >= 0 && index < value.length) {
+      value[index] = valueToUpdate;
+      notifyListeners(); // Notify listeners after updating the value
+    } else {
+      throw RangeError(
+          'Index $index is out of bounds for List of length ${value.length}');
+    }
+  }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_testing_order_details_dto.dart';
+import 'package:masa_epico_concrete_manager/dto/concrete_volumetric_weight_dto.dart';
 import 'package:masa_epico_concrete_manager/dto/input/concrete_sample_input_dto.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_expansion_tile.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart';
@@ -24,6 +26,7 @@ import '../../models/concrete_sample.dart';
 import '../../models/customer.dart';
 import '../../models/building_site.dart';
 import '../../models/site_resident.dart';
+import '../../service/concrete_sample_dao.dart';
 import '../../service/concrete_volumetric_weight_dao.dart';
 import '../../service/customer_dao.dart';
 import '../../service/building_site_dao.dart';
@@ -32,6 +35,7 @@ import '../../utils/component_utils.dart';
 import '../../utils/sequential_counter_generator.dart';
 import '../../utils/utils.dart';
 import 'package:collection/collection.dart';
+import 'dart:math' as math;
 
 class ConcreteTestingOrderDetails extends StatefulWidget {
   final int id;
@@ -59,6 +63,15 @@ class _ConcreteTestingOrderDetailsState
       ConcreteTestingOrderDAO();
   final ConcreteVolumetricWeightDAO concreteVolumetricWeightDao =
       ConcreteVolumetricWeightDAO();
+  final ConcreteSampleDAO concreteSampleDAO = ConcreteSampleDAO();
+
+  // DTOs
+  late final ConcreteTestingOrderDetailsDTO dto =
+      ConcreteTestingOrderDetailsDTO(
+    concreteVolumetricWeightDTO: ConcreteVolumetricWeightDTO(),
+    samples: [],
+    cylinders: [],
+  );
 
   static List<Customer> clients = [];
   static List<String> availableClients = [];
@@ -73,17 +86,6 @@ class _ConcreteTestingOrderDetailsState
       SiteResident(firstName: "", lastName: "", jobPosition: "");
   ConcreteVolumetricWeight? selectedConcreteVolumetricWeight;
 
-  final TextEditingController _customerController = TextEditingController();
-  final TextEditingController _buildingSiteController = TextEditingController();
-  final TextEditingController _siteResidentController = TextEditingController();
-  final TextEditingController _designResistanceController =
-      TextEditingController();
-  final TextEditingController _slumpingController = TextEditingController();
-  final TextEditingController _volumeController = TextEditingController();
-  final TextEditingController _tmaController = TextEditingController();
-  final TextEditingController _designAgeController = TextEditingController();
-  final TextEditingController _testingDateController = TextEditingController();
-
   DateTime selectedDate = DateTime.now();
   int designResistanceIndex = 0;
   int designAgeIndex = 0;
@@ -96,30 +98,6 @@ class _ConcreteTestingOrderDetailsState
   num totalLoad = 0.0;
   num totalLoadVolumetricWeightRelation = 0.0;
   num percentage = 0.0;
-
-  final TextEditingController _concreteTestingOrderController =
-      TextEditingController();
-  final TextEditingController _tareWeightController = TextEditingController();
-  final TextEditingController _materialTareWeightController =
-      TextEditingController();
-  final TextEditingController _materialWeightController =
-      TextEditingController();
-  final TextEditingController _tareVolumeController = TextEditingController();
-  final TextEditingController _volumetricWeightController =
-      TextEditingController();
-  final TextEditingController _cementController = TextEditingController();
-  final TextEditingController _coarseAggregateController =
-      TextEditingController();
-  final TextEditingController _fineAggregateController =
-      TextEditingController();
-  final TextEditingController _waterController = TextEditingController();
-  final TextEditingController _additiveTypeController = TextEditingController();
-  final TextEditingController _quantityController = TextEditingController();
-  final TextEditingController _totalLoadController = TextEditingController();
-
-  final TextEditingController _totalLoadVolumetricWeightController =
-      TextEditingController();
-  final TextEditingController _percentageController = TextEditingController();
 
   bool setTareWeight = true;
   bool setTareVolume = true;
@@ -137,119 +115,128 @@ class _ConcreteTestingOrderDetailsState
     selectedConcreteTestingOrder =
         await concreteTestingOrderDao.findById(widget.id);
 
-    setState(() {
-      selectedCustomer = selectedConcreteTestingOrder.customer;
-      _customerController.text =
-          SequentialFormatter.generateSequentialFormatFromCustomer(
-              selectedConcreteTestingOrder.customer);
+    setState(
+      () {
+        // SET CUSTOMER
+        selectedCustomer = selectedConcreteTestingOrder.customer;
+        dto.customerController.text =
+            SequentialFormatter.generateSequentialFormatFromCustomer(
+                selectedConcreteTestingOrder.customer);
 
-      selectedBuildingSite = selectedConcreteTestingOrder.buildingSite;
-      _buildingSiteController.text =
-          SequentialFormatter.generateSequentialFormatFromBuildingSite(
-              selectedConcreteTestingOrder.buildingSite);
+        // SET BUILDING SITE
+        selectedBuildingSite = selectedConcreteTestingOrder.buildingSite;
+        dto.buildingSiteController.text =
+            SequentialFormatter.generateSequentialFormatFromBuildingSite(
+                selectedConcreteTestingOrder.buildingSite);
 
-      selectedSiteResident = selectedConcreteTestingOrder.siteResident!;
-      _siteResidentController.text =
-          SequentialFormatter.generateSequentialFormatFromSiteResident(
-              selectedConcreteTestingOrder.siteResident);
+        // SET SITE RESIDENT
+        selectedSiteResident = selectedConcreteTestingOrder.siteResident!;
+        dto.siteResidentController.text =
+            SequentialFormatter.generateSequentialFormatFromSiteResident(
+                selectedConcreteTestingOrder.siteResident);
 
-      _designResistanceController.text =
-          selectedConcreteTestingOrder.designResistance!;
+        // SET DESIGN RESISTANCE
+        dto.designResistanceController.text =
+            selectedConcreteTestingOrder.designResistance!;
 
-      designResistanceIndex = Constants.CONCRETE_COMPRESSION_RESISTANCES
-          .indexOf(selectedConcreteTestingOrder.designResistance!);
+        designResistanceIndex = Constants.CONCRETE_COMPRESSION_RESISTANCES
+            .indexOf(selectedConcreteTestingOrder.designResistance!);
 
-      _slumpingController.text =
-          selectedConcreteTestingOrder.slumping.toString();
+        dto.slumpingController.text =
+            selectedConcreteTestingOrder.slumping.toString();
 
-      _volumeController.text = selectedConcreteTestingOrder.volume.toString();
+        dto.volumeController.text =
+            selectedConcreteTestingOrder.volume.toString();
 
-      _tmaController.text = selectedConcreteTestingOrder.tma.toString();
+        dto.tmaController.text = selectedConcreteTestingOrder.tma.toString();
 
-      _designAgeController.text = selectedConcreteTestingOrder.designAge!;
+        dto.designAgeController.text = selectedConcreteTestingOrder.designAge!;
 
-      designAgeIndex = Constants.CONCRETE_DESIGN_AGES
-          .indexOf(selectedConcreteTestingOrder.designAge!);
+        designAgeIndex = Constants.CONCRETE_DESIGN_AGES
+            .indexOf(selectedConcreteTestingOrder.designAge!);
 
-      selectedDate = selectedConcreteTestingOrder.testingDate!;
+        selectedDate = selectedConcreteTestingOrder.testingDate!;
 
-      _testingDateController.text =
-          Constants.formatter.format(selectedConcreteTestingOrder.testingDate!);
+        dto.testingDateController.text = Constants.formatter
+            .format(selectedConcreteTestingOrder.testingDate!);
 
-      final selectedConcreteVolumetricWeight = selectedConcreteTestingOrder
-          .concreteSamples?.first.concreteVolumetricWeight;
+        // final selectedConcreteVolumetricWeight = selectedConcreteTestingOrder
+        //     .concreteSamples?.first.concreteVolumetricWeight;
 
-      samples = selectedConcreteTestingOrder.concreteSamples!;
+        samples = selectedConcreteTestingOrder.concreteSamples!;
 
-      if (selectedConcreteVolumetricWeight != null) {
-        _concreteTestingOrderController.text = SequentialFormatter
-            .generateSequentialFormatFromConcreteTestingOrder(
-                selectedConcreteTestingOrder);
-        _tareWeightController.text =
-            (selectedConcreteVolumetricWeight.tareWeight ?? 0.0)
-                .toStringAsFixed(1);
-        _materialTareWeightController.text =
-            (selectedConcreteVolumetricWeight.materialTareWeight ?? 0.0)
-                .toStringAsFixed(1);
-        _materialWeightController.text =
-            (selectedConcreteVolumetricWeight.materialWeight ?? 0.0)
-                .toStringAsFixed(1);
-        _tareVolumeController.text =
-            (selectedConcreteVolumetricWeight.tareVolume ?? 0.0)
-                .toStringAsFixed(3);
-        _volumetricWeightController.text =
-            (selectedConcreteVolumetricWeight.volumetricWeight ?? 0.0)
-                .toStringAsFixed(1);
-        _cementController.text =
-            (selectedConcreteVolumetricWeight.cementQuantity ?? 0.0)
-                .toStringAsFixed(1);
-        _coarseAggregateController.text =
-            (selectedConcreteVolumetricWeight.coarseAggregateQuantity ?? 0.0)
-                .toStringAsFixed(1);
-        _fineAggregateController.text =
-            (selectedConcreteVolumetricWeight.fineAggregateQuantity ?? 0.0)
-                .toStringAsFixed(1);
-        _waterController.text =
-            (selectedConcreteVolumetricWeight.waterQuantity ?? 0.0)
-                .toStringAsFixed(1);
-
-        additivesRows = selectedConcreteVolumetricWeight.additives.entries.map(
-          (e) {
-            Map<String, String> temp = {};
-            temp.putIfAbsent(
-              "Aditivo",
-              () => e.key,
-            );
-            temp.putIfAbsent(
-              "Cantidad (lt)",
-              () => e.value.toStringAsFixed(2),
-            );
-            return temp;
-          },
-        ).toList();
-
-        _totalLoadController.text =
-            (selectedConcreteVolumetricWeight.totalLoad ?? 0.0)
-                .toStringAsFixed(1);
-        _totalLoadVolumetricWeightController.text =
-            (selectedConcreteVolumetricWeight
-                        .totalLoadVolumetricWeightRelation ??
-                    0.0)
-                .toStringAsFixed(1);
-        _percentageController.text =
-            (selectedConcreteVolumetricWeight.percentage ?? 0.0)
-                .toStringAsFixed(1);
-
-        // SET GLOBAL VARIABLES
-        volumetricWeight =
-            selectedConcreteVolumetricWeight.volumetricWeight ?? 0.0;
-        totalLoad = selectedConcreteVolumetricWeight.totalLoad ?? 0.0;
-        totalLoadVolumetricWeightRelation = selectedConcreteVolumetricWeight
-                .totalLoadVolumetricWeightRelation ??
-            0.0;
-        percentage = selectedConcreteVolumetricWeight.percentage ?? 0.0;
-      }
-    });
+        // if (selectedConcreteVolumetricWeight != null) {
+        //   dto.concreteVolumetricWeightDTO.concreteTestingOrderController.text =
+        //       SequentialFormatter
+        //           .generateSequentialFormatFromConcreteTestingOrder(
+        //               selectedConcreteTestingOrder);
+        //   dto.concreteVolumetricWeightDTO.tareWeightController.text =
+        //       (selectedConcreteVolumetricWeight.tareWeight ?? 0.0)
+        //           .toStringAsFixed(1);
+        //   dto.concreteVolumetricWeightDTO.materialTareWeightController.text =
+        //       (selectedConcreteVolumetricWeight.materialTareWeight ?? 0.0)
+        //           .toStringAsFixed(1);
+        //   dto.concreteVolumetricWeightDTO.materialWeightController.text =
+        //       (selectedConcreteVolumetricWeight.materialWeight ?? 0.0)
+        //           .toStringAsFixed(1);
+        //   dto.concreteVolumetricWeightDTO.tareVolumeController.text =
+        //       (selectedConcreteVolumetricWeight.tareVolume ?? 0.0)
+        //           .toStringAsFixed(3);
+        //   dto.concreteVolumetricWeightDTO.volumetricWeightController.text =
+        //       (selectedConcreteVolumetricWeight.volumetricWeight ?? 0.0)
+        //           .toStringAsFixed(1);
+        //   dto.concreteVolumetricWeightDTO.cementController.text =
+        //       (selectedConcreteVolumetricWeight.cementQuantity ?? 0.0)
+        //           .toStringAsFixed(1);
+        //   dto.concreteVolumetricWeightDTO.coarseAggregateController.text =
+        //       (selectedConcreteVolumetricWeight.coarseAggregateQuantity ?? 0.0)
+        //           .toStringAsFixed(1);
+        //   dto.concreteVolumetricWeightDTO.fineAggregateController.text =
+        //       (selectedConcreteVolumetricWeight.fineAggregateQuantity ?? 0.0)
+        //           .toStringAsFixed(1);
+        //   dto.concreteVolumetricWeightDTO.waterController.text =
+        //       (selectedConcreteVolumetricWeight.waterQuantity ?? 0.0)
+        //           .toStringAsFixed(1);
+        //
+        //   additivesRows =
+        //       selectedConcreteVolumetricWeight.additives.entries.map(
+        //     (e) {
+        //       Map<String, String> temp = {};
+        //       temp.putIfAbsent(
+        //         "Aditivo",
+        //         () => e.key,
+        //       );
+        //       temp.putIfAbsent(
+        //         "Cantidad (lt)",
+        //         () => e.value.toStringAsFixed(2),
+        //       );
+        //       return temp;
+        //     },
+        //   ).toList();
+        //
+        //   dto.concreteVolumetricWeightDTO.totalLoadController.text =
+        //       (selectedConcreteVolumetricWeight.totalLoad ?? 0.0)
+        //           .toStringAsFixed(1);
+        //   dto.concreteVolumetricWeightDTO.totalLoadVolumetricWeightController
+        //       .text = (selectedConcreteVolumetricWeight
+        //               .totalLoadVolumetricWeightRelation ??
+        //           0.0)
+        //       .toStringAsFixed(1);
+        //   dto.concreteVolumetricWeightDTO.percentageController.text =
+        //       (selectedConcreteVolumetricWeight.percentage ?? 0.0)
+        //           .toStringAsFixed(1);
+        //
+        //   // SET GLOBAL VARIABLES
+        //   volumetricWeight =
+        //       selectedConcreteVolumetricWeight.volumetricWeight ?? 0.0;
+        //   totalLoad = selectedConcreteVolumetricWeight.totalLoad ?? 0.0;
+        //   totalLoadVolumetricWeightRelation = selectedConcreteVolumetricWeight
+        //           .totalLoadVolumetricWeightRelation ??
+        //       0.0;
+        //   percentage = selectedConcreteVolumetricWeight.percentage ?? 0.0;
+        // }
+      },
+    );
   }
 
   Future<void> _loadData() async {
@@ -258,9 +245,11 @@ class _ConcreteTestingOrderDetailsState
     }).whenComplete(() {
       setState(() {
         availableClients = clients
-            .map((customer) =>
-                SequentialFormatter.generateSequentialFormatFromCustomer(
-                    customer))
+            .map(
+              (customer) =>
+                  SequentialFormatter.generateSequentialFormatFromCustomer(
+                      customer),
+            )
             .toList();
       });
     });
@@ -272,9 +261,10 @@ class _ConcreteTestingOrderDetailsState
         buildingSites = value;
         setState(() {
           availableBuildingSites = buildingSites
-              .map((e) =>
-                  SequentialFormatter.generateSequentialFormatFromBuildingSite(
-                      e))
+              .map(
+                (e) => SequentialFormatter
+                    .generateSequentialFormatFromBuildingSite(e),
+              )
               .toList();
         });
       },
@@ -310,11 +300,11 @@ class _ConcreteTestingOrderDetailsState
                   children: buildConcreteSamplesInfo(),
                   onExpand: () => updateConcreteSamples(),
                 ),
-                CustomExpansionTile(
-                  title: "Pesos volumetricos",
-                  children: buildVolumetricWeightInfo(),
-                  onExpand: () => updateTotalLoad(),
-                ),
+                // CustomExpansionTile(
+                //   title: "Pesos volumetricos",
+                //   children: buildVolumetricWeightInfo(),
+                //   onExpand: () => updateTotalLoad(),
+                // ),
                 const SizedBox(height: 16),
                 if (!widget.readOnly)
                   Center(
@@ -324,6 +314,12 @@ class _ConcreteTestingOrderDetailsState
                       onOkPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           updateConcreteQualityOrder();
+                          concreteTestingOrderDao.findAll().then(
+                            (value) {
+                              widget.concreteTestingOrdersNotifier.value =
+                                  value;
+                            },
+                          );
                           Navigator.popUntil(context,
                               ModalRoute.withName(Navigator.defaultRouteName));
                           _formKey.currentState!.reset();
@@ -367,7 +363,7 @@ class _ConcreteTestingOrderDetailsState
         fieldName: "Cliente",
         options: availableClients,
         onChanged: (p0) => setSelectedCustomer(p0),
-        controller: _customerController,
+        controller: dto.customerController,
         readOnly: widget.readOnly,
       ),
       const SizedBox(height: 20),
@@ -375,18 +371,18 @@ class _ConcreteTestingOrderDetailsState
         fieldName: "Obra",
         options: availableBuildingSites,
         onChanged: (p0) => setSelectedProjectSite(p0),
-        controller: _buildingSiteController,
+        controller: dto.buildingSiteController,
         readOnly: widget.readOnly,
       ),
       const SizedBox(height: 20),
       CustomTextFormField.noValidation(
-        controller: _siteResidentController,
+        controller: dto.siteResidentController,
         labelText: "Residente",
         readOnly: true,
       ),
       const SizedBox(height: 20),
       const Text(
-        'Informacion de la muestra',
+        'Informacion de la orden de muestreo',
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
       const Divider(),
@@ -395,32 +391,33 @@ class _ConcreteTestingOrderDetailsState
         CustomSelectDropdown(
           labelText: "F'C (kg/cm2)",
           items: Constants.CONCRETE_COMPRESSION_RESISTANCES,
-          onChanged: (p0) => _designResistanceController.text = p0,
+          onChanged: (p0) => dto.designResistanceController.text = p0,
           defaultValueIndex: designResistanceIndex,
         ),
       if (widget.readOnly)
         CustomTextFormField(
-          controller: _designResistanceController,
+          controller: dto.designResistanceController,
           labelText: "F'C (kg/cm2)",
           validatorText: "",
+          readOnly: widget.readOnly,
         ),
       const SizedBox(height: 20),
       CustomNumberFormField(
         labelText: "Revenimiento (cm)",
-        controller: _slumpingController,
+        controller: dto.slumpingController,
         validatorText: "",
         readOnly: widget.readOnly,
         maxLength: 2,
       ),
       CustomNumberFormField(
-        controller: _volumeController,
+        controller: dto.volumeController,
         labelText: "Volumen (m3)",
         validatorText: "",
         readOnly: widget.readOnly,
         maxLength: 3,
       ),
       CustomNumberFormField(
-        controller: _tmaController,
+        controller: dto.tmaController,
         labelText: "Tamaño máximo del agregado (mm)",
         validatorText: "",
         readOnly: widget.readOnly,
@@ -430,16 +427,18 @@ class _ConcreteTestingOrderDetailsState
         CustomSelectDropdown(
             labelText: "Edad de diseño",
             items: Constants.CONCRETE_DESIGN_AGES,
-            onChanged: (p0) => _designAgeController.text = p0,
+            onChanged: (p0) => dto.designAgeController.text = p0,
             defaultValueIndex: designAgeIndex),
       if (widget.readOnly)
         CustomTextFormField(
-            controller: _designAgeController,
-            labelText: "Edad de diseño",
-            validatorText: ""),
+          controller: dto.designAgeController,
+          labelText: "Edad de diseño",
+          validatorText: "",
+          readOnly: widget.readOnly,
+        ),
       const SizedBox(height: 20),
       CustomTextFormField.noValidation(
-        controller: _testingDateController,
+        controller: dto.testingDateController,
         labelText: "Fecha de muestreo",
         readOnly: true,
       ),
@@ -456,7 +455,7 @@ class _ConcreteTestingOrderDetailsState
               setState(
                 () {
                   selectedDate = dateTime;
-                  _testingDateController.text =
+                  dto.testingDateController.text =
                       Constants.formatter.format(selectedDate);
                 },
               );
@@ -472,7 +471,8 @@ class _ConcreteTestingOrderDetailsState
     return [
       const SizedBox(height: 20),
       CustomTextFormField(
-        controller: _concreteTestingOrderController,
+        controller:
+            dto.concreteVolumetricWeightDTO.concreteTestingOrderController,
         labelText: "Orden de muestreo",
         validatorText: "",
         readOnly: true,
@@ -483,7 +483,7 @@ class _ConcreteTestingOrderDetailsState
           Expanded(
             child: QuantityFormField(
               labelText: "Peso de la tara (gr)",
-              controller: _tareWeightController,
+              controller: dto.concreteVolumetricWeightDTO.tareWeightController,
               readOnly: setTareWeight,
             ),
           ),
@@ -507,14 +507,15 @@ class _ConcreteTestingOrderDetailsState
       const SizedBox(height: 20),
       QuantityFormField(
         labelText: "Peso del material + tara (gr)",
-        controller: _materialTareWeightController,
+        controller:
+            dto.concreteVolumetricWeightDTO.materialTareWeightController,
         onChanged: (p0) => updateMaterialWeight(p0),
         readOnly: widget.readOnly,
       ),
       const SizedBox(height: 20),
       QuantityFormField(
         labelText: "Peso del material (gr)",
-        controller: _materialWeightController,
+        controller: dto.concreteVolumetricWeightDTO.materialWeightController,
         readOnly: true,
       ),
       const SizedBox(height: 20),
@@ -523,7 +524,7 @@ class _ConcreteTestingOrderDetailsState
           Expanded(
             child: QuantityFormField(
               labelText: "Volumen de la tara (cm³)",
-              controller: _tareVolumeController,
+              controller: dto.concreteVolumetricWeightDTO.tareVolumeController,
               readOnly: setTareVolume,
             ),
           ),
@@ -547,7 +548,7 @@ class _ConcreteTestingOrderDetailsState
       const SizedBox(height: 20),
       QuantityFormField(
         labelText: "Peso volumetrico (gr/cm³)",
-        controller: _volumetricWeightController,
+        controller: dto.concreteVolumetricWeightDTO.volumetricWeightController,
         readOnly: true,
       ),
       const SizedBox(height: 20),
@@ -559,25 +560,25 @@ class _ConcreteTestingOrderDetailsState
       const SizedBox(height: 20),
       QuantityFormField(
         labelText: "Cemento (kg)",
-        controller: _cementController,
+        controller: dto.concreteVolumetricWeightDTO.cementController,
         onChanged: (p0) => updateTotalLoad(),
       ),
       const SizedBox(height: 20),
       QuantityFormField(
         labelText: "Grava (kg)",
-        controller: _coarseAggregateController,
+        controller: dto.concreteVolumetricWeightDTO.coarseAggregateController,
         onChanged: (p0) => updateTotalLoad(),
       ),
       const SizedBox(height: 20),
       QuantityFormField(
         labelText: "Arena (kg)",
-        controller: _fineAggregateController,
+        controller: dto.concreteVolumetricWeightDTO.fineAggregateController,
         onChanged: (p0) => updateTotalLoad(),
       ),
       const SizedBox(height: 20),
       QuantityFormField(
         labelText: "Agua (kg)",
-        controller: _waterController,
+        controller: dto.concreteVolumetricWeightDTO.waterController,
         onChanged: (p0) => updateTotalLoad(),
       ),
       const SizedBox(height: 16),
@@ -586,7 +587,8 @@ class _ConcreteTestingOrderDetailsState
           children: [
             Expanded(
               child: TextField(
-                controller: _additiveTypeController,
+                controller:
+                    dto.concreteVolumetricWeightDTO.additiveTypeController,
                 decoration: const InputDecoration(
                   labelText: "Tipo de aditivo",
                   border: OutlineInputBorder(),
@@ -597,7 +599,7 @@ class _ConcreteTestingOrderDetailsState
             const SizedBox(width: 16),
             Expanded(
               child: TextField(
-                controller: _quantityController,
+                controller: dto.concreteVolumetricWeightDTO.quantityController,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
@@ -681,7 +683,7 @@ class _ConcreteTestingOrderDetailsState
       const SizedBox(height: 20),
       QuantityFormField(
         labelText: "Carga total",
-        controller: _totalLoadController,
+        controller: dto.concreteVolumetricWeightDTO.totalLoadController,
         onChanged: (p0) => updateTotalLoad(),
         readOnly: true,
       ),
@@ -690,191 +692,245 @@ class _ConcreteTestingOrderDetailsState
       const SizedBox(height: 20),
       QuantityFormField(
         labelText: "Relación carga total y peso volumetrico",
-        controller: _totalLoadVolumetricWeightController,
+        controller:
+            dto.concreteVolumetricWeightDTO.totalLoadVolumetricWeightController,
         onChanged: (p0) => updateTotalLoad(),
         readOnly: true,
       ),
       const SizedBox(height: 20),
       QuantityFormField(
         labelText: "Porcentaje",
-        controller: _percentageController,
+        controller: dto.concreteVolumetricWeightDTO.percentageController,
         onChanged: (p0) => updateTotalLoad(),
         readOnly: true,
       ),
     ];
   }
 
-  List<Widget> buildConcreteSamplesInfo() {
-    return samples.map<Widget>((ConcreteSample sample) {
-      ConcreteSampleInputDTO details = ConcreteSampleInputDTO.fromModel(sample);
+  List<ExpansionTile> buildConcreteSamplesInfo() {
+    dto.samples = samples.map((ConcreteSample sample) {
+      return ConcreteSampleInputDTO.fromModel(sample);
+    }).toList();
+
+    return Iterable.generate(samples.length).map((i) {
       List<Widget> widgets = [];
       widgets.addAll([
         const SizedBox(height: 20),
         CustomTextFormField(
-          controller: details.remissionController,
+          controller: dto.samples[i].remissionController,
           labelText: "Remision",
           validatorText: "",
           readOnly: widget.readOnly,
         ),
         const SizedBox(height: 20),
         CustomNumberFormField(
-          controller: details.volumeController,
+          controller: dto.samples[i].volumeController,
           labelText: "Volumen",
           validatorText: "",
           readOnly: widget.readOnly,
         ),
         CustomTimePickerForm(
-          timeOfDay: sample.plantTime!,
+          timeController: dto.samples[i].plantTime,
+          timeOfDay: dto.samples[i].plantTimeOfDay,
           label: "Hora en planta",
           readOnly: widget.readOnly,
           orientation: PickerOrientation.horizontal,
         ),
         const SizedBox(height: 20),
         CustomTimePickerForm(
-          timeOfDay: sample.buildingSiteTime!,
+          timeController: dto.samples[i].buildingSiteTime,
+          timeOfDay: dto.samples[i].buildingTimeOfDay,
           label: "Hora en obra",
           readOnly: widget.readOnly,
           orientation: PickerOrientation.horizontal,
         ),
         const SizedBox(height: 20),
         CustomNumberFormField(
-          controller: details.temperature,
+          controller: dto.samples[i].temperature,
           labelText: "Temperatura (°C)",
           validatorText: "",
           readOnly: widget.readOnly,
         ),
         CustomNumberFormField(
-          controller: details.realSlumpingController,
+          controller: dto.samples[i].realSlumpingController,
           labelText: "Revenimiento real (cm)",
           validatorText: "",
           readOnly: widget.readOnly,
         ),
         CustomTextFormField(
-          controller: details.locationController,
+          controller: dto.samples[i].locationController,
           labelText: "Ubicacion / Elemento",
           validatorText: "",
           readOnly: widget.readOnly,
         ),
         const SizedBox(height: 20),
       ]);
-
-      widgets.addAll(generateDataTable(sample));
+      widgets.addAll(generateDataTable(samples[i]));
 
       return ExpansionTile(
           title: Text(
-              "${SequentialFormatter.generatePadLeftNumber(sample.id)} - ${sample.remission}"),
+              "${SequentialFormatter.generatePadLeftNumber(samples[i].id)} - ${samples[i].remission}"),
           children: widgets);
     }).toList();
   }
 
   Future<void> updateConcreteQualityOrder() async {
+    // UPDATE GENERAL INFO
     selectedConcreteTestingOrder.slumping =
-        int.tryParse(_slumpingController.text);
-    selectedConcreteTestingOrder.volume = int.tryParse(_volumeController.text);
-    selectedConcreteTestingOrder.tma = int.tryParse(_tmaController.text);
+        int.tryParse(dto.slumpingController.text);
+    selectedConcreteTestingOrder.volume =
+        int.tryParse(dto.volumeController.text);
+    selectedConcreteTestingOrder.tma = int.tryParse(dto.tmaController.text);
     selectedConcreteTestingOrder.designResistance =
-        _designResistanceController.text;
-    selectedConcreteTestingOrder.designAge = _designAgeController.text;
+        dto.designResistanceController.text;
+    selectedConcreteTestingOrder.designAge = dto.designAgeController.text;
     selectedConcreteTestingOrder.testingDate = selectedDate;
     selectedConcreteTestingOrder.customer = selectedCustomer;
     selectedConcreteTestingOrder.buildingSite = selectedBuildingSite;
     selectedConcreteTestingOrder.siteResident = selectedSiteResident;
 
-    final ConcreteVolumetricWeight? concreteVolumetricWeight =
-        selectedConcreteTestingOrder
-            .concreteSamples?.first.concreteVolumetricWeight;
-    int volume = int.tryParse(_volumeController.text) ?? 7;
-    num? tareWeight = num.tryParse(_tareWeightController.text);
-    num? materialTareWeight = num.tryParse(_materialTareWeightController.text);
-    num? materialWeight = num.tryParse(_materialWeightController.text);
-    num? tareVolume = num.tryParse(_tareVolumeController.text);
-    num? volumeLoad = selectedConcreteTestingOrder.volume;
-    num volumetricWeight =
-        num.tryParse(_volumetricWeightController.text) ?? 1.0;
-    num cementQuantity = num.tryParse(_cementController.text) ?? 0.0;
-    num coarseAggregateQuantity =
-        num.tryParse(_coarseAggregateController.text) ?? 0.0;
-    num fineAggregateQuantity =
-        num.tryParse(_fineAggregateController.text) ?? 0.0;
-    num waterQuantity = num.tryParse(_waterController.text) ?? 0.0;
-    Map<String, num> additives = Utils.convert(additivesRows);
-    num additivesTotal = additivesRows.isNotEmpty
-        ? Utils.convert(additivesRows)
-            .values
-            .reduce((value, element) => value + element)
-        : 0.0;
+    concreteTestingOrderDao.update(selectedConcreteTestingOrder);
 
-    totalLoad = cementQuantity +
-        coarseAggregateQuantity +
-        fineAggregateQuantity +
-        waterQuantity +
-        additivesTotal;
+    // UPDATE CONCRETE SAMPLES
+    for (var samp in samples) {
+      // RETRIEVE THE INPUT ELEMENT
+      var input =
+          dto.samples.firstWhereOrNull((element) => element.id == samp.id);
 
-    totalLoadVolumetricWeightRelation = totalLoad / volumetricWeight;
-    percentage = (totalLoadVolumetricWeightRelation / volume) * 100;
-
-    ConcreteVolumetricWeight? result;
-
-    // If concrete volumetric weight exists, then simply updated
-    if (concreteVolumetricWeight != null) {
-      concreteVolumetricWeight.tareWeight = tareWeight;
-      concreteVolumetricWeight.materialTareWeight = materialTareWeight;
-      concreteVolumetricWeight.materialWeight = materialWeight;
-      concreteVolumetricWeight.tareVolume = tareVolume;
-      concreteVolumetricWeight.volumeLoad = volumeLoad;
-      concreteVolumetricWeight.cementQuantity = cementQuantity;
-      concreteVolumetricWeight.coarseAggregateQuantity =
-          coarseAggregateQuantity;
-      concreteVolumetricWeight.fineAggregateQuantity = fineAggregateQuantity;
-      concreteVolumetricWeight.waterQuantity = waterQuantity;
-      concreteVolumetricWeight.additives = additives;
-
-      result =
-          await concreteVolumetricWeightDao.update(concreteVolumetricWeight);
-    }
-    // Otherwise, add it to the table and also update the concrete testing order
-    else {
-      ConcreteVolumetricWeight concreteVolumetricWeight =
-          ConcreteVolumetricWeight(
-              null,
-              tareWeight,
-              materialTareWeight,
-              materialWeight,
-              tareVolume,
-              volumetricWeight,
-              volumeLoad,
-              cementQuantity,
-              coarseAggregateQuantity,
-              fineAggregateQuantity,
-              waterQuantity,
-              additives,
-              totalLoad,
-              totalLoadVolumetricWeightRelation,
-              percentage);
-      result = await concreteVolumetricWeightDao.add(concreteVolumetricWeight);
+      // UPDATE THE SAMPLE
+      if (input != null) {
+        samp.remission = input.remissionController.text.trim();
+        samp.volume = num.tryParse(input.volumeController.text.trim());
+        samp.plantTime = Utils.convertStringToTimeOfDay(input.plantTime.text);
+        samp.buildingSiteTime =
+            Utils.convertStringToTimeOfDay(input.buildingSiteTime.text);
+        samp.temperature = num.tryParse(input.temperature.text.trim());
+        samp.realSlumping =
+            num.tryParse(input.realSlumpingController.text.trim());
+        samp.location = input.locationController.text.trim();
+      }
     }
 
-    if (result != null) {
-      selectedConcreteTestingOrder
-          .concreteSamples?.firstOrNull?.concreteVolumetricWeight = result;
-    }
+    concreteSampleDAO.updateAllConcreteSamples(samples);
 
-    return concreteTestingOrderDao
-        .update(selectedConcreteTestingOrder)
-        .then((value) {
-      ComponentUtils.generateSuccessMessage(
-          context, "Orden de muestreo actualizado con exito");
-      int index = widget.concreteTestingOrdersNotifier.value.indexWhere(
-        (element) => element.id == value.id,
-      );
-      widget.concreteTestingOrdersNotifier.updateAtIndex(index, value);
-    }).onError((error, stackTrace) {
-      ComponentUtils.generateErrorMessage(context);
-    });
+    // UPDATE CONCRETE CYLINDERS
+
+    //
+    // final ConcreteVolumetricWeight? concreteVolumetricWeight =
+    //     selectedConcreteTestingOrder
+    //         .concreteSamples?.first.concreteVolumetricWeight;
+    // int volume = int.tryParse(_volumeController.text) ?? 7;
+    // num? tareWeight = num.tryParse(_tareWeightController.text);
+    // num? materialTareWeight = num.tryParse(_materialTareWeightController.text);
+    // num? materialWeight = num.tryParse(_materialWeightController.text);
+    // num? tareVolume = num.tryParse(_tareVolumeController.text);
+    // num? volumeLoad = selectedConcreteTestingOrder.volume;
+    // num volumetricWeight =
+    //     num.tryParse(_volumetricWeightController.text) ?? 1.0;
+    // num cementQuantity = num.tryParse(_cementController.text) ?? 0.0;
+    // num coarseAggregateQuantity =
+    //     num.tryParse(_coarseAggregateController.text) ?? 0.0;
+    // num fineAggregateQuantity =
+    //     num.tryParse(_fineAggregateController.text) ?? 0.0;
+    // num waterQuantity = num.tryParse(_waterController.text) ?? 0.0;
+    // Map<String, num> additives = Utils.convert(additivesRows);
+    // num additivesTotal = additivesRows.isNotEmpty
+    //     ? Utils.convert(additivesRows)
+    //         .values
+    //         .reduce((value, element) => value + element)
+    //     : 0.0;
+    //
+    // totalLoad = cementQuantity +
+    //     coarseAggregateQuantity +
+    //     fineAggregateQuantity +
+    //     waterQuantity +
+    //     additivesTotal;
+    //
+    // totalLoadVolumetricWeightRelation = totalLoad / volumetricWeight;
+    // percentage = (totalLoadVolumetricWeightRelation / volume) * 100;
+    //
+    // ConcreteVolumetricWeight? result;
+    //
+    // // If concrete volumetric weight exists, then simply updated
+    // if (concreteVolumetricWeight != null) {
+    //   concreteVolumetricWeight.tareWeight = tareWeight;
+    //   concreteVolumetricWeight.materialTareWeight = materialTareWeight;
+    //   concreteVolumetricWeight.materialWeight = materialWeight;
+    //   concreteVolumetricWeight.tareVolume = tareVolume;
+    //   concreteVolumetricWeight.volumeLoad = volumeLoad;
+    //   concreteVolumetricWeight.cementQuantity = cementQuantity;
+    //   concreteVolumetricWeight.coarseAggregateQuantity =
+    //       coarseAggregateQuantity;
+    //   concreteVolumetricWeight.fineAggregateQuantity = fineAggregateQuantity;
+    //   concreteVolumetricWeight.waterQuantity = waterQuantity;
+    //   concreteVolumetricWeight.additives = additives;
+    //
+    //   result =
+    //       await concreteVolumetricWeightDao.update(concreteVolumetricWeight);
+    // }
+    // // Otherwise, add it to the table and also update the concrete testing order
+    // else {
+    //   ConcreteVolumetricWeight concreteVolumetricWeight =
+    //       ConcreteVolumetricWeight(
+    //           null,
+    //           tareWeight,
+    //           materialTareWeight,
+    //           materialWeight,
+    //           tareVolume,
+    //           volumetricWeight,
+    //           volumeLoad,
+    //           cementQuantity,
+    //           coarseAggregateQuantity,
+    //           fineAggregateQuantity,
+    //           waterQuantity,
+    //           additives,
+    //           totalLoad,
+    //           totalLoadVolumetricWeightRelation,
+    //           percentage);
+    //   result = await concreteVolumetricWeightDao.add(concreteVolumetricWeight);
+    // }
+    //
+    // if (result != null) {
+    //   selectedConcreteTestingOrder
+    //       .concreteSamples?.firstOrNull?.concreteVolumetricWeight = result;
+    // }
+
+    // UPDATE THE CONCRETE TESTING ORDER AND SAMPLES
+
+    // return concreteTestingOrderDao
+    //     .update(selectedConcreteTestingOrder)
+    //     .then((value) {
+    //   ComponentUtils.generateSuccessMessage(
+    //       context, "Orden de muestreo actualizado con exito");
+    //   int index = widget.concreteTestingOrdersNotifier.value.indexWhere(
+    //     (element) => element.id == value.id,
+    //   );
+    //   widget.concreteTestingOrdersNotifier.updateAtIndex(index, value);
+    // }).onError((error, stackTrace) {
+    //   ComponentUtils.generateErrorMessage(context);
+    // });
+
+    // // SET THE CONCRETE SAMPLES
+    // if (selectedConcreteTestingOrder.concreteSamples != null) {
+    //   // UPDATE CONCRETE SAMPLES
+    //   concreteSampleDAO.updateAllConcreteSamples(
+    //       selectedConcreteTestingOrder.concreteSamples!);
+    //
+    //   // UPDATE CYLINDERS
+    //   var cylinders = dto.cylinders.expand((element) => element).map(
+    //     (cy) {
+    //       return ConcreteCylinder(
+    //           id: cy.id,
+    //           testingAge: int.tryParse(cy.designAge.controller.text) ?? 0,
+    //           testingDate:
+    //               Utils.convertToDateTime(cy.testingDate.controller.text));
+    //     },
+    //   ).toList();
+    // }
   }
 
   void setSelectedCustomer(String selected) async {
-    _customerController.text = selected;
+    dto.customerController.text = selected;
     selectedCustomer = await customerDao.findById(
         SequentialFormatter.getIdNumberFromConsecutive(selected.split("-")[0]));
 
@@ -890,7 +946,7 @@ class _ConcreteTestingOrderDetailsState
   }
 
   void setSelectedProjectSite(String selected) {
-    _buildingSiteController.text = selected;
+    dto.buildingSiteController.text = selected;
     selectedBuildingSite = buildingSites.firstWhere((element) =>
         element.id ==
         SequentialFormatter.getIdNumberFromConsecutive(
@@ -901,7 +957,7 @@ class _ConcreteTestingOrderDetailsState
         selectedSiteResident = value.first;
         setState(
           () {
-            _siteResidentController.text =
+            dto.siteResidentController.text =
                 SequentialFormatter.generateSequentialFormatFromSiteResident(
                     selectedSiteResident);
           },
@@ -911,14 +967,16 @@ class _ConcreteTestingOrderDetailsState
   }
 
   void _addRow() {
-    String type = _additiveTypeController.text.trim();
-    String quantity = _quantityController.text.trim();
+    String type =
+        dto.concreteVolumetricWeightDTO.additiveTypeController.text.trim();
+    String quantity =
+        dto.concreteVolumetricWeightDTO.quantityController.text.trim();
     if (type.isNotEmpty && quantity.isNotEmpty) {
       setState(() {
         additivesRows.add({"Aditivo": type, "Cantidad (lt)": quantity});
       });
-      _additiveTypeController.clear();
-      _quantityController.clear();
+      dto.concreteVolumetricWeightDTO.additiveTypeController.clear();
+      dto.concreteVolumetricWeightDTO.quantityController.clear();
       updateTotalLoad();
     } else {
       ComponentUtils.showSnackbar(
@@ -953,42 +1011,55 @@ class _ConcreteTestingOrderDetailsState
         if (concreteTestingOrderId != 0) {
           selectedConcreteTestingOrder = concreteTestingOrders
               .firstWhere((element) => element.id == concreteTestingOrderId);
-          _concreteTestingOrderController.text = SequentialFormatter
-              .generateSequentialFormatFromConcreteTestingOrder(
-                  selectedConcreteTestingOrder);
+          dto.concreteVolumetricWeightDTO.concreteTestingOrderController.text =
+              SequentialFormatter
+                  .generateSequentialFormatFromConcreteTestingOrder(
+                      selectedConcreteTestingOrder);
         }
       });
     });
   }
 
   void setSelectedConcreteTestingOrder(String selected) {
-    _concreteTestingOrderController.text = selected;
+    dto.concreteVolumetricWeightDTO.concreteTestingOrderController.text =
+        selected;
     selectedConcreteTestingOrder = concreteTestingOrders.firstWhere((element) =>
         element.id == SequentialFormatter.getIdNumberFromConsecutive(selected));
   }
 
   void updateMaterialWeight(String? p0) {
-    _materialTareWeightController.text = p0 ?? "0.0";
-    num tareWeight =
-        int.tryParse(_tareWeightController.text) ?? Constants.TARE_WEIGHT;
-    num volumeMaterial =
-        num.tryParse(_tareVolumeController.text) ?? Constants.TARE_VOLUME;
-    num? weightMaterialPlusTare =
-        num.tryParse(_materialTareWeightController.text);
+    dto.concreteVolumetricWeightDTO.materialTareWeightController.text =
+        p0 ?? "0.0";
+    num tareWeight = int.tryParse(
+            dto.concreteVolumetricWeightDTO.tareWeightController.text) ??
+        Constants.TARE_WEIGHT;
+    num volumeMaterial = num.tryParse(
+            dto.concreteVolumetricWeightDTO.tareVolumeController.text) ??
+        Constants.TARE_VOLUME;
+    num? weightMaterialPlusTare = num.tryParse(
+        dto.concreteVolumetricWeightDTO.materialTareWeightController.text);
     num weightMaterial = (weightMaterialPlusTare ?? 0) - (tareWeight);
     volumetricWeight = (weightMaterial / volumeMaterial).floor();
-    _materialWeightController.text = weightMaterial.toString();
-    _volumetricWeightController.text = volumetricWeight.toString();
+    dto.concreteVolumetricWeightDTO.materialWeightController.text =
+        weightMaterial.toString();
+    dto.concreteVolumetricWeightDTO.volumetricWeightController.text =
+        volumetricWeight.toString();
   }
 
   void updateTotalLoad() {
-    int? volume = int.tryParse(_volumeController.text) ?? 7;
-    num cementQuantity = num.tryParse(_cementController.text) ?? 0.0;
-    num coarseAggregateQuantity =
-        num.tryParse(_coarseAggregateController.text) ?? 0.0;
-    num fineAggregateQuantity =
-        num.tryParse(_fineAggregateController.text) ?? 0.0;
-    num waterQuantity = num.tryParse(_waterController.text) ?? 0.0;
+    int? volume = int.tryParse(dto.volumeController.text) ?? 7;
+    num cementQuantity =
+        num.tryParse(dto.concreteVolumetricWeightDTO.cementController.text) ??
+            0.0;
+    num coarseAggregateQuantity = num.tryParse(
+            dto.concreteVolumetricWeightDTO.coarseAggregateController.text) ??
+        0.0;
+    num fineAggregateQuantity = num.tryParse(
+            dto.concreteVolumetricWeightDTO.fineAggregateController.text) ??
+        0.0;
+    num waterQuantity =
+        num.tryParse(dto.concreteVolumetricWeightDTO.waterController.text) ??
+            0.0;
     num additives = additivesRows.isNotEmpty
         ? Utils.convert(additivesRows)
             .values
@@ -1004,10 +1075,12 @@ class _ConcreteTestingOrderDetailsState
     totalLoadVolumetricWeightRelation = totalLoad / volumetricWeight;
     percentage = (totalLoadVolumetricWeightRelation / volume) * 100;
 
-    _totalLoadController.text = totalLoad.floor().toString();
-    _totalLoadVolumetricWeightController.text =
+    dto.concreteVolumetricWeightDTO.totalLoadController.text =
+        totalLoad.floor().toString();
+    dto.concreteVolumetricWeightDTO.totalLoadVolumetricWeightController.text =
         totalLoadVolumetricWeightRelation.toStringAsFixed(2).toString();
-    _percentageController.text = percentage.toStringAsFixed(2).toString();
+    dto.concreteVolumetricWeightDTO.percentageController.text =
+        percentage.toStringAsFixed(2).toString();
   }
 
   void updateConcreteSamples() {}
@@ -1016,9 +1089,14 @@ class _ConcreteTestingOrderDetailsState
     var groupBySampleNumber =
         groupBy(sample.concreteCylinders, (cy) => cy.sampleNumber);
 
-    return groupBySampleNumber.values.map((value) {
-      List<ConcreteCylinderInputDTO> dto = generateDTO(value);
+    var cylinders = groupBySampleNumber.values.map((value) {
+      return generateDTO(value);
+    }).toList();
 
+    // SAVE THE CYLINDERS FOR REFERENCE
+    dto.cylinders.addAll(cylinders);
+
+    return cylinders.map((dto) {
       return Column(
         children: [
           Row(
@@ -1124,21 +1202,103 @@ class _ConcreteTestingOrderDetailsState
 
   List<ConcreteCylinderInputDTO> generateDTO(List<ConcreteCylinder> value) {
     return value.map(
-      (samp) {
-        InputNumberField designAgeInput = InputNumberField();
-        InputTextField testingDateInput = InputTextField();
-        InputNumberField totalLoadInput = InputNumberField();
-        InputNumberField diameterInput = InputNumberField();
-        InputNumberField resistance = InputNumberField();
-        InputNumberField percentage = InputNumberField();
-        InputNumberField median = InputNumberField();
-
-        designAgeInput.controller.text = samp.testingAge.toString();
+      (cylinder) {
+        // NON EDITABLE FIELD - ONLY CHANGES BASED ON THE CONCRETE TESTING DATE
+        InputTextField testingDateInput = InputTextField(
+          onChange: (p0) {},
+          readOnly: true,
+        );
         testingDateInput.controller.text =
-            Constants.formatter.format(samp.testingDate);
+            Constants.formatter.format(cylinder.testingDate);
+
+        // EDITABLE FIELD - CHANGES THE TESTING DESIGN DATE
+        InputNumberField designAgeInput = InputNumberField(
+          acceptDecimalPoint: false,
+          onChange: (p0) {
+            int? days = int.tryParse(p0);
+            if (days != null) {
+              testingDateInput.controller.text = Constants.formatter.format(
+                  selectedConcreteTestingOrder.testingDate!
+                      .add(Duration(days: days)));
+            }
+          },
+          controller: TextEditingController(),
+        );
+        designAgeInput.controller.text = cylinder.testingAge.toString();
+
+        // CONTROLLERS
+        TextEditingController percentageController = TextEditingController();
+        TextEditingController resistanceController = TextEditingController();
+        TextEditingController totalLoadController = TextEditingController();
+        TextEditingController diameterController = TextEditingController();
+
+        // RESISTANCE - NON EDITABLE FIELD - CHANGES BASED ON THE TOTAL LOAD AND DEFAULT VALUE
+        InputNumberField resistance = InputNumberField(
+          controller: resistanceController,
+          onChange: (p0) {},
+          readOnly: true,
+        );
+
+        // EDITABLE FIELD - TOTAL LOAD
+        InputNumberField totalLoadInput = InputNumberField(
+          onChange: (p0) {
+            // CALCULATE AREA
+            num? diameter = num.tryParse(diameterController.text);
+            num? totalLoad = num.tryParse(p0);
+
+            if (diameter != null && totalLoad != null) {
+              // CALCULATE RESISTANCE
+              num area = (math.pi * math.pow(diameter, 2)) / 4;
+              num resistance = totalLoad / area;
+
+              // SET THE FIELD
+              resistanceController.text = resistance.toStringAsPrecision(1);
+            }
+          },
+          controller: totalLoadController,
+        );
+
+        // EDITABLE FIELD - DEFAULT VALUE 15 CM
+        InputNumberField diameterInput = InputNumberField(
+          onChange: (p0) {
+            // CALCULATE AREA
+            num? diameter = num.tryParse(p0);
+            num? totalLoad = num.tryParse(totalLoadController.text);
+            num? designResistance = num.tryParse(
+                selectedConcreteTestingOrder.designResistance ?? "");
+
+            if (diameter != null && totalLoad != null) {
+              // CALCULATE RESISTANCE
+              num area = (math.pi * math.pow(diameter, 2)) / 4;
+              num resistance = totalLoad / area;
+
+              // SET THE FIELDS RESISTANCE AND PERCENTAGE
+              resistanceController.text = resistance.toStringAsFixed(1);
+              if (designResistance != null) {
+                num percentage = (resistance / designResistance) * 100;
+                percentageController.text = percentage.toStringAsFixed(1);
+              }
+            }
+          },
+          controller: diameterController,
+        );
+
+        // PERCENTAGE - NON EDITABLE
+        InputNumberField percentage = InputNumberField(
+          onChange: (p0) {},
+          controller: percentageController,
+          readOnly: true,
+        );
+
+        // MEDIAN - NON EDITABLE
+        InputNumberField median = InputNumberField(
+          onChange: (p0) {},
+          controller: TextEditingController(),
+          readOnly: true,
+        );
 
         return ConcreteCylinderInputDTO(
-            samp.id!,
+            cylinder.id!,
             designAgeInput,
             testingDateInput,
             totalLoadInput,

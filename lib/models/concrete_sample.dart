@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:masa_epico_concrete_manager/dto/input/concrete_cylinder_input_dto.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_volumetric_weight.dart';
 import 'package:masa_epico_concrete_manager/models/site_resident.dart';
@@ -68,7 +69,7 @@ class ConcreteSample {
         siteResident: siteResident);
 
     ConcreteTestingOrder concreteTestingOrder = ConcreteTestingOrder(
-        id: (map["order_id"] ?? 0) as int,
+        id: (map["concrete_testing_order_id"] ?? 0) as int,
         designResistance: (map["design_resistance"] ?? "") as String,
         slumping: (map["slumping_cm"] ?? 0) as int,
         volume: (map["volume_m3"] ?? 0) as int,
@@ -85,13 +86,18 @@ class ConcreteSample {
         id: map["id"] as int,
         remission: map["remission"] as String?,
         volume: map["volume"] as num?,
-        plantTime: Utils.parseTimeOfDay((map["plant_time"] ?? "") as String),
-        buildingSiteTime: Utils.parseTimeOfDay(
+        plantTime: Utils.convertStringToTimeOfDay((map["plant_time"] ?? "") as String),
+        buildingSiteTime: Utils.convertStringToTimeOfDay(
             (map["building_site_time"] ?? "") as String),
         realSlumping: (map["real_slumping_cm"] ?? 0) as num,
         temperature: (map["temperature_celsius"] ?? 0) as num,
         location: (map["location"] ?? "") as String,
         concreteTestingOrder: concreteTestingOrder,
         concreteCylinders: concreteSamples);
+  }
+
+  @override
+  String toString() {
+    return 'ConcreteSample{id: $id, remission: $remission, volume: $volume, plantTime: $plantTime, buildingSiteTime: $buildingSiteTime, realSlumping: $realSlumping, temperature: $temperature, location: $location, concreteTestingOrder: $concreteTestingOrder, concreteVolumetricWeight: $concreteVolumetricWeight, concreteCylinders: $concreteCylinders}';
   }
 }

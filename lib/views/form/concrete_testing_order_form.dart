@@ -235,7 +235,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                                   Utils.generateTestingDatesBasedOnDesignDays(
                                       concreteTestingOrderFormDTO.selectedDate,
                                       concreteTestingOrderFormDTO
-                                              .designAgeController.text));
+                                          .designAgeController.text));
                           setState(() {
                             concreteTestingOrderFormDTO.samples.add(value);
                           });
@@ -501,12 +501,18 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
 
   ConcreteSampleFormDTO _buildConcreteSampleDTO(
       {required List<Map<String, dynamic>> designAgeAndTesting}) {
-    InputNumberField volumeInput = InputNumberField();
+    InputNumberField volumeInput = InputNumberField(
+      onChange: (p0) {},
+      controller: TextEditingController(),
+    );
     volumeInput.controller.text = "7";
 
     return ConcreteSampleFormDTO(
         id: Utils.generateUniqueId(),
-        remission: InputTextField(lines: 3),
+        remission: InputTextField(
+          lines: 3,
+          onChange: (p0) {},
+        ),
         volume: volumeInput,
         timePlant: InputTimePicker(
           timeOfDay: TimeOfDay.now(),
@@ -514,19 +520,36 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
         timeBuildingSite: InputTimePicker(
           timeOfDay: TimeOfDay.now(),
         ),
-        temperature: InputNumberField(),
-        realSlumping: InputNumberField(acceptDecimalPoint: true),
-        location: InputTextField(lines: 3),
+        temperature: InputNumberField(
+          onChange: (p0) {},
+          controller: TextEditingController(),
+        ),
+        realSlumping: InputNumberField(
+          acceptDecimalPoint: true,
+          onChange: (p0) {},
+          controller: TextEditingController(),
+        ),
+        location: InputTextField(
+          lines: 3,
+          onChange: (p0) {},
+        ),
         designAges: designAgeAndTesting.map(
           (e) {
-            InputNumberField designAge = InputNumberField(readOnly: true);
+            InputNumberField designAge = InputNumberField(
+              readOnly: true,
+              onChange: (p0) {},
+              controller: TextEditingController(),
+            );
             designAge.controller.text = e[Constants.DESIGN_AGE_KEY].toString();
             return designAge;
           },
         ).toList(),
         testingDates: designAgeAndTesting.map(
           (e) {
-            InputTextField testingDate = InputTextField(readOnly: true);
+            InputTextField testingDate = InputTextField(
+              readOnly: true,
+              onChange: (p0) {},
+            );
             DateTime temp = e[Constants.TESTING_DATE_KEY] as DateTime;
             testingDate.controller.text = Constants.formatter.format(temp);
             return testingDate;
@@ -585,8 +608,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
               (j) {
                 concreteTestingOrderFormDTO.samples[i].designAges[j].controller
                     .text = Constants.DESIGN_AGES[
-                            concreteTestingOrderFormDTO
-                                .designAgeController.text]!
+                        concreteTestingOrderFormDTO.designAgeController.text]!
                     .elementAt(j)
                     .toString();
                 return concreteTestingOrderFormDTO.samples[i].designAges[j];

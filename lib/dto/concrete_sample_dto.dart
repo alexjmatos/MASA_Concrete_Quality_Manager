@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 import '../constants/constants.dart';
 import '../utils/sequential_counter_generator.dart';
 import '../utils/utils.dart';
@@ -5,24 +7,36 @@ import 'concrete_cylinder.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class ConcreteSampleDTO {
-  String remission;
-  String timePlant;
-  String timeBuildingSite;
-  String sampleNumber;
-  String slumping;
-  String temperature;
-  String location;
+  TextEditingController remission = TextEditingController();
+  TextEditingController volume = TextEditingController();
+  TextEditingController timePlant = TextEditingController();
+  TextEditingController timeBuildingSite = TextEditingController();
+  TextEditingController sampleNumber = TextEditingController();
+  TextEditingController slumping = TextEditingController();
+  TextEditingController temperature = TextEditingController();
+  TextEditingController location = TextEditingController();
   List<ConcreteCylinderDTO> cylinders;
 
   ConcreteSampleDTO(
-      this.remission,
-      this.timePlant,
-      this.timeBuildingSite,
-      this.sampleNumber,
-      this.slumping,
-      this.temperature,
-      this.location,
-      this.cylinders);
+      String remission,
+      String volume,
+      String timePlant,
+      String timeBuildingSite,
+      String sampleNumber,
+      String slumping,
+      String temperature,
+      String location,
+      this.cylinders) {
+    this.remission.text = remission;
+    this.volume.text = volume;
+    this.timePlant.text = timePlant;
+    this.timeBuildingSite.text = timeBuildingSite;
+    this.sampleNumber.text = sampleNumber;
+    this.slumping.text = slumping;
+    this.temperature.text = temperature;
+    this.location.text = location;
+    cylinders = cylinders;
+  }
 
   pw.TextStyle getStyle() {
     return pw.TextStyle(
@@ -32,19 +46,21 @@ class ConcreteSampleDTO {
   pw.Widget getIndex(int index) {
     switch (index) {
       case 0:
-        return pw.Expanded(child: pw.Text(remission, style: getStyle()));
+        return pw.Expanded(child: pw.Text(remission.text, style: getStyle()));
       case 1:
-        return pw.Expanded(child: pw.Text(timePlant, style: getStyle()));
+        return pw.Expanded(child: pw.Text(timePlant.text, style: getStyle()));
       case 2:
-        return pw.Expanded(child: pw.Text(timeBuildingSite, style: getStyle()));
+        return pw.Expanded(
+            child: pw.Text(timeBuildingSite.text, style: getStyle()));
       case 3:
-        return pw.Expanded(child: pw.Text(sampleNumber, style: getStyle()));
+        return pw.Expanded(
+            child: pw.Text(sampleNumber.text, style: getStyle()));
       case 4:
-        return pw.Expanded(child: pw.Text(slumping, style: getStyle()));
+        return pw.Expanded(child: pw.Text(slumping.text, style: getStyle()));
       case 5:
-        return pw.Expanded(child: pw.Text(temperature, style: getStyle()));
+        return pw.Expanded(child: pw.Text(temperature.text, style: getStyle()));
       case 6:
-        return pw.Expanded(child: pw.Text(location, style: getStyle()));
+        return pw.Expanded(child: pw.Text(location.text, style: getStyle()));
       case 7:
         return pw.Column(
             children: cylinders

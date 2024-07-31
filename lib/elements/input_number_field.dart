@@ -3,20 +3,31 @@ import 'package:flutter/services.dart';
 
 import 'formatters.dart';
 
-class InputNumberField extends StatelessWidget {
+class InputNumberField extends StatefulWidget {
   final bool acceptDecimalPoint;
-  final TextEditingController controller = TextEditingController();
   final bool readOnly;
+  final Function(String) onChange;
+  final TextEditingController controller;
 
-  InputNumberField(
-      {super.key, this.acceptDecimalPoint = true, this.readOnly = false});
+  const InputNumberField(
+      {super.key,
+      this.acceptDecimalPoint = true,
+      this.readOnly = false,
+      required this.onChange,
+      required this.controller});
 
+  @override
+  State<InputNumberField> createState() => _InputNumberFieldState();
+}
+
+class _InputNumberFieldState extends State<InputNumberField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: controller,
+      controller: widget.controller,
       textAlign: TextAlign.center,
-      readOnly: readOnly,
+      readOnly: widget.readOnly,
+      onChanged: widget.onChange,
       decoration: const InputDecoration(
         isDense: true,
         fillColor: Colors.white,
@@ -38,11 +49,19 @@ class InputNumberField extends StatelessWidget {
         ),
       ),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: acceptDecimalPoint
+      inputFormatters: widget.acceptDecimalPoint
           ? <TextInputFormatter>[
               FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
             ]
           : <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
     );
+  }
+
+  String getValue() {
+    return widget.controller.text;
+  }
+
+  void setValue(String value) {
+    widget.controller.text = value;
   }
 }

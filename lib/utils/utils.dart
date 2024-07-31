@@ -42,27 +42,29 @@ class Utils {
     ).toList();
   }
 
-  static TimeOfDay parseTimeOfDay(String timeString) {
-    final parts = timeString.split(':');
-    final hour = int.parse(parts[0]);
-    final minute = int.parse(parts[1]);
+  static TimeOfDay convertStringToTimeOfDay(String timeString) {
+    String result = timeString.replaceAll(RegExp(r'\s'), '\u202F');
 
-    return TimeOfDay(hour: hour, minute: minute);
+    // Define the format of your time string
+    final format = DateFormat.jm(); // jm stands for 'hh:mm a'
+
+    // Parse the string to a DateTime object
+    DateTime dateTime = format.parse(result);
+
+    // Convert the DateTime object to TimeOfDay
+    return TimeOfDay.fromDateTime(dateTime);
   }
 
-  static String formatTimeOfDay(TimeOfDay? time) {
-    if (time != null) {
-      final int hour = time.hour;
-      final int minute = time.minute;
+  static String formatTimeOfDay(TimeOfDay timeOfDay) {
+    // Convert TimeOfDay to DateTime
+    final now = DateTime.now();
+    final dateTime = DateTime(now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
 
-      // Ensuring two-digit formatting for hour and minute
-      final String hourString = hour.toString().padLeft(2, '0');
-      final String minuteString = minute.toString().padLeft(2, '0');
+    // Define the format
+    final format = DateFormat.jm(); // 'jm' means 'h:mm a'
 
-      return '$hourString:$minuteString';
-    } else {
-      return "";
-    }
+    // Format the DateTime object to the desired string format
+    return format.format(dateTime);
   }
 
   static DateTime convertToDateTime(String dateString) {

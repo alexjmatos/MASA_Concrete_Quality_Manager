@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../utils/utils.dart';
+
 class CustomTimePickerForm extends StatefulWidget {
   final TimeOfDay timeOfDay;
   final String label;
   final bool readOnly;
-  final TextEditingController timeController = TextEditingController();
+  final TextEditingController timeController;
   final PickerOrientation orientation;
 
   CustomTimePickerForm(
@@ -12,7 +14,10 @@ class CustomTimePickerForm extends StatefulWidget {
       required this.timeOfDay,
       required this.label,
       required this.readOnly,
-      required this.orientation});
+      required this.orientation,
+      required this.timeController}) {
+    timeController.text = Utils.formatTimeOfDay(timeOfDay);
+  }
 
   @override
   State<CustomTimePickerForm> createState() => _CustomTimePickerFormState();
@@ -39,10 +44,12 @@ class _CustomTimePickerFormState extends State<CustomTimePickerForm> {
       initialTime: selectedTime ?? TimeOfDay.now(),
     );
     if (picked != null && picked != selectedTime) {
-      setState(() {
-        selectedTime = picked;
-        widget.timeController.text = picked.format(context);
-      });
+      setState(
+        () {
+          selectedTime = picked;
+          widget.timeController.text = picked.format(context);
+        },
+      );
     }
   }
 

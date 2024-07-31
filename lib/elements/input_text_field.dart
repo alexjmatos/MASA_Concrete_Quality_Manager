@@ -5,9 +5,14 @@ import 'formatters.dart';
 class InputTextField extends StatelessWidget {
   final int lines;
   final bool readOnly;
+  final Function(String) onChange;
   final TextEditingController controller = TextEditingController();
 
-  InputTextField({super.key, this.lines = 1, this.readOnly = false});
+  InputTextField(
+      {super.key,
+      this.lines = 1,
+      this.readOnly = false,
+      required this.onChange});
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +21,7 @@ class InputTextField extends StatelessWidget {
       readOnly: readOnly,
       textAlign: TextAlign.center,
       maxLines: lines,
+      onChanged: onChange,
       inputFormatters: [
         UppercaseInputFormatter(),
       ],

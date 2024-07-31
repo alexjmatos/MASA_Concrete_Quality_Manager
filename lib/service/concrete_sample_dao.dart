@@ -66,8 +66,7 @@ class ConcreteSampleDAO {
     return result.map((i) => i as int).toList();
   }
 
-  Future<List<int>> addAllCylinders(
-      List<ConcreteCylinder> cylinders) async {
+  Future<List<int>> addAllCylinders(List<ConcreteCylinder> cylinders) async {
     Batch batch = db.batch();
     for (var element in cylinders) {
       batch.insert(Constants.CONCRETE_TESTING_CYLINDERS, element.toMap());
@@ -80,6 +79,17 @@ class ConcreteSampleDAO {
     var result = await db.query(Constants.CONCRETE_TESTING_SAMPLES,
         where: "concrete_testing_order_id = ?", whereArgs: [id]);
     return mapToEntities(result);
+  }
+
+  Future<void> updateAllConcreteSamples(List<ConcreteSample> samples) async {
+    var batch = db.batch();
+    for (var element in samples) {
+      batch.update(Constants.CONCRETE_TESTING_SAMPLES, element.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+          where: "id = ?",
+          whereArgs: [element.id]);
+    }
+    await batch.commit(noResult: true);
   }
 
   Future<List<ConcreteSample>> mapToEntities(

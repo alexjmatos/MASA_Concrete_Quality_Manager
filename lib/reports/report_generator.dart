@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
@@ -247,10 +248,9 @@ class ReportGenerator {
 
   pw.Widget _generateContentTable(
       pw.Context context, List<ConcreteSampleDTO> samples, int flex) {
-    for (var element in samples){
+    for (var element in samples) {
       print(element);
     }
-
 
     const tableHeaders = [
       "REMISION",
@@ -332,8 +332,9 @@ class ReportGenerator {
       return samples.map((e) {
         return ConcreteSampleDTO(
             e.remission ?? "",
-            Utils.formatTimeOfDay(e.plantTime),
-            Utils.formatTimeOfDay(e.buildingSiteTime),
+            e.volume != null ? e.volume!.toStringAsFixed(1) : "",
+            Utils.formatTimeOfDay(e.plantTime ?? TimeOfDay.now()),
+            Utils.formatTimeOfDay(e.buildingSiteTime ?? TimeOfDay.now()),
             (e.concreteCylinders.first.sampleNumber ?? 0).toString(),
             e.realSlumping != null ? e.realSlumping!.toStringAsFixed(1) : "",
             e.temperature != null ? e.temperature!.toStringAsFixed(1) : "",

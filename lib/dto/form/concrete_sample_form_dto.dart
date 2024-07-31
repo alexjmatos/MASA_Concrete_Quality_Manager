@@ -17,27 +17,55 @@ class ConcreteSampleFormDTO {
   List<InputNumberField> designAges = [];
   List<InputTextField> testingDates = [];
 
-  ConcreteSampleFormDTO({required this.id,
-    required this.remission,
-    required this.volume,
-    required this.timePlant,
-    required this.timeBuildingSite,
-    required this.temperature,
-    required this.realSlumping,
-    required this.location,
-    required this.designAges,
-    required this.testingDates});
+  ConcreteSampleFormDTO(
+      {required this.id,
+      required this.remission,
+      required this.volume,
+      required this.timePlant,
+      required this.timeBuildingSite,
+      required this.temperature,
+      required this.realSlumping,
+      required this.location,
+      required this.designAges,
+      required this.testingDates});
 
   static ConcreteSampleFormDTO fromModel(ConcreteSample model) {
-    return ConcreteSampleFormDTO(id: model.id.toString(),
-        remission: InputTextField(),
-        volume: InputNumberField(),
-        timePlant: InputTimePicker(timeOfDay: TimeOfDay.now(),),
-        timeBuildingSite: InputTimePicker(timeOfDay: TimeOfDay.now(),),
-        temperature: InputNumberField(),
-        realSlumping: InputNumberField(),
-        location: InputTextField(),
-        designAges: [InputNumberField()],
-        testingDates: [InputTextField()]);
+    return ConcreteSampleFormDTO(
+        id: model.id.toString(),
+        remission: InputTextField(
+          onChange: (p0) {},
+        ),
+        volume: InputNumberField(
+          onChange: (p0) {},
+          controller: TextEditingController(),
+        ),
+        timePlant: InputTimePicker(
+          timeOfDay: TimeOfDay.now(),
+        ),
+        timeBuildingSite: InputTimePicker(
+          timeOfDay: TimeOfDay.now(),
+        ),
+        temperature: InputNumberField(
+          onChange: (p0) {},
+          controller: TextEditingController(),
+        ),
+        realSlumping: InputNumberField(
+          onChange: (p0) {},
+          controller: TextEditingController(),
+        ),
+        location: InputTextField(
+          onChange: (p0) {},
+        ),
+        designAges: [
+          InputNumberField(
+            onChange: (p0) {},
+            controller: TextEditingController(),
+          )
+        ],
+        testingDates: [
+          InputTextField(
+            onChange: (p0) {},
+          )
+        ]);
   }
 }
