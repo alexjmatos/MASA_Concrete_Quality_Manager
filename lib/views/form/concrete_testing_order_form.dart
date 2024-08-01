@@ -11,7 +11,7 @@ import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart
 import 'package:masa_epico_concrete_manager/elements/custom_text_form_field.dart';
 import 'package:masa_epico_concrete_manager/elements/input_text_field.dart';
 import 'package:masa_epico_concrete_manager/elements/input_time_picker_field.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_sample_cylinder.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_cylinder.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 import 'package:masa_epico_concrete_manager/reports/report_generator.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';

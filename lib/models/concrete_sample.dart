@@ -6,7 +6,7 @@ import 'package:masa_epico_concrete_manager/models/site_resident.dart';
 
 import '../utils/utils.dart';
 import 'building_site.dart';
-import 'concrete_sample_cylinder.dart';
+import 'concrete_cylinder.dart';
 import 'customer.dart';
 
 class ConcreteSample {

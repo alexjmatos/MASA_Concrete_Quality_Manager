@@ -8,7 +8,7 @@ import 'package:masa_epico_concrete_manager/elements/custom_select_dropdown.dart
 import 'package:masa_epico_concrete_manager/elements/custom_time_picker_form.dart';
 import 'package:masa_epico_concrete_manager/elements/input_number_field.dart';
 import 'package:masa_epico_concrete_manager/elements/input_text_field.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_sample_cylinder.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_cylinder.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_volumetric_weight.dart';
 import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
 
@@ -104,6 +104,7 @@ class _ConcreteTestingOrderDetailsState
 
   List<Map<String, String>> additivesRows = [];
   List<ConcreteSample> samples = [];
+  List<ConcreteCylinder> cylinders = [];
 
   @override
   void initState() {
@@ -163,7 +164,13 @@ class _ConcreteTestingOrderDetailsState
         // final selectedConcreteVolumetricWeight = selectedConcreteTestingOrder
         //     .concreteSamples?.first.concreteVolumetricWeight;
 
-        samples = selectedConcreteTestingOrder.concreteSamples!;
+        if (selectedConcreteTestingOrder.concreteSamples != null) {
+          samples = selectedConcreteTestingOrder.concreteSamples!;
+          cylinders = selectedConcreteTestingOrder.concreteSamples!
+              .map((e) => e.concreteCylinders)
+              .expand((element) => element)
+              .toList();
+        }
 
         // if (selectedConcreteVolumetricWeight != null) {
         //   dto.concreteVolumetricWeightDTO.concreteTestingOrderController.text =
@@ -814,6 +821,33 @@ class _ConcreteTestingOrderDetailsState
     concreteSampleDAO.updateAllConcreteSamples(samples);
 
     // UPDATE CONCRETE CYLINDERS
+    for (var cylinder in cylinders) {
+      var cylinderDTO = dto.cylinders
+          .expand((element) => element)
+          .firstWhereOrNull((element) => element.id == cylinder.id);
+
+      if (cylinderDTO != null) {
+        // UPDATE THE FIELDS
+        cylinder.testingAge =
+            int.tryParse(cylinderDTO.designAge.controller.text) ?? 0;
+        cylinder.testingDate =
+            Utils.convertToDateTime(cylinderDTO.testingDate.controller.text);
+        cylinder.totalLoad =
+            num.tryParse(cylinderDTO.totalLoad.controller.text.trim());
+        cylinder.diameter =
+            num.tryParse(cylinderDTO.diameter.controller.text.trim());
+        cylinder.resistance =
+            num.tryParse(cylinderDTO.resistance.controller.text.trim());
+        print(
+            "------------------------------------------------------------------------");
+        print(cylinderDTO);
+        print(cylinder);
+        print(
+            "------------------------------------------------------------------------");
+      }
+    }
+
+    concreteSampleDAO.updateAllConcreteCylinders(cylinders);
 
     //
     // final ConcreteVolumetricWeight? concreteVolumetricWeight =
@@ -1232,6 +1266,14 @@ class _ConcreteTestingOrderDetailsState
         TextEditingController totalLoadController = TextEditingController();
         TextEditingController diameterController = TextEditingController();
 
+        // SET INITIAL VALUES
+        totalLoadController.text = cylinder.totalLoad?.toStringAsFixed(1) ?? "";
+        diameterController.text = cylinder.diameter?.toStringAsFixed(1) ?? "";
+        resistanceController.text =
+            cylinder.resistance?.toStringAsFixed(1) ?? "";
+        percentageController.text =
+            cylinder.percentage?.toStringAsFixed(1) ?? "";
+
         // RESISTANCE - NON EDITABLE FIELD - CHANGES BASED ON THE TOTAL LOAD AND DEFAULT VALUE
         InputNumberField resistance = InputNumberField(
           controller: resistanceController,
@@ -1250,9 +1292,15 @@ class _ConcreteTestingOrderDetailsState
               // CALCULATE RESISTANCE
               num area = (math.pi * math.pow(diameter, 2)) / 4;
               num resistance = totalLoad / area;
+              num? designResistance = num.tryParse(
+                  selectedConcreteTestingOrder.designResistance ?? "");
 
               // SET THE FIELD
-              resistanceController.text = resistance.toStringAsPrecision(1);
+              resistanceController.text = resistance.toStringAsFixed(1);
+              if (designResistance != null) {
+                num percentage = (resistance / designResistance) * 100;
+                percentageController.text = percentage.toStringAsFixed(1);
+              }
             }
           },
           controller: totalLoadController,

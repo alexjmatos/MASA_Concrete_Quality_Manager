@@ -1,5 +1,5 @@
 import 'package:injector/injector.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_sample_cylinder.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_cylinder.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../constants/constants.dart';

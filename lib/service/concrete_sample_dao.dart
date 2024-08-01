@@ -1,5 +1,5 @@
 import 'package:injector/injector.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_sample_cylinder.dart';
+import 'package:masa_epico_concrete_manager/models/concrete_cylinder.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../constants/constants.dart';
@@ -120,5 +120,16 @@ class ConcreteSampleDAO {
     WHERE bs.id = ?;
     """, [id]);
     return (result.first["incremental_sample_number"] as int) + 1;
+  }
+
+  Future<void> updateAllConcreteCylinders(List<ConcreteCylinder> cylinders) async {
+    var batch = db.batch();
+    for (var element in cylinders) {
+      batch.update(Constants.CONCRETE_TESTING_CYLINDERS, element.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+          where: "id = ?",
+          whereArgs: [element.id]);
+    }
+    await batch.commit(noResult: true);
   }
 }

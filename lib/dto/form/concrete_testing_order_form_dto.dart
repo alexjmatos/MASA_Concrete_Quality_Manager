@@ -6,7 +6,7 @@ import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.d
 import '../../constants/constants.dart';
 import '../../models/building_site.dart';
 import '../../models/concrete_sample.dart';
-import '../../models/concrete_sample_cylinder.dart';
+import '../../models/concrete_cylinder.dart';
 import '../../models/concrete_testing_order.dart';
 import '../../models/customer.dart';
 import '../../models/site_resident.dart';
