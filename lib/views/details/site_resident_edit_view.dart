@@ -104,6 +104,10 @@ class _SiteResidentDetailsState extends State<SiteResidentDetails> {
                         Navigator.pop(context, 'Cancel');
                       }
                     },
+                    textColor: Colors.white,
+                    icon: Icons.save,
+                    iconColor: Colors.white,
+                    buttonColor: Colors.blue,
                   ),
                 ElevatedButton.icon(
                   onPressed: () => Navigator.popUntil(

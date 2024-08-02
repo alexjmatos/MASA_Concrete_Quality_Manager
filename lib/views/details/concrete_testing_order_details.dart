@@ -9,8 +9,9 @@ import 'package:masa_epico_concrete_manager/elements/custom_time_picker_form.dar
 import 'package:masa_epico_concrete_manager/elements/input_number_field.dart';
 import 'package:masa_epico_concrete_manager/elements/input_text_field.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_cylinder.dart';
-import 'package:masa_epico_concrete_manager/models/concrete_volumetric_weight.dart';
-import 'package:masa_epico_concrete_manager/service/concrete_testing_order_dao.dart';
+import 'package:masa_epico_concrete_manager/reports/report_generator.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 import '../../constants/constants.dart';
 import '../../dto/input/concrete_cylinder_input_dto.dart';
@@ -23,14 +24,6 @@ import '../../elements/quantity_form_field.dart';
 import '../../elements/value_notifier_list.dart';
 import '../../models/concrete_testing_order.dart';
 import '../../models/concrete_sample.dart';
-import '../../models/customer.dart';
-import '../../models/building_site.dart';
-import '../../models/site_resident.dart';
-import '../../service/concrete_sample_dao.dart';
-import '../../service/concrete_volumetric_weight_dao.dart';
-import '../../service/customer_dao.dart';
-import '../../service/building_site_dao.dart';
-import '../../service/site_resident_dao.dart';
 import '../../utils/component_utils.dart';
 import '../../utils/sequential_counter_generator.dart';
 import '../../utils/utils.dart';
@@ -56,37 +49,14 @@ class _ConcreteTestingOrderDetailsState
     extends State<ConcreteTestingOrderDetails> {
   final _formKey = GlobalKey<FormState>();
 
-  final CustomerDAO customerDao = CustomerDAO();
-  final BuildingSiteDAO buildingSiteDao = BuildingSiteDAO();
-  final SiteResidentDAO siteResidentDao = SiteResidentDAO();
-  final ConcreteTestingOrderDAO concreteTestingOrderDao =
-      ConcreteTestingOrderDAO();
-  final ConcreteVolumetricWeightDAO concreteVolumetricWeightDao =
-      ConcreteVolumetricWeightDAO();
-  final ConcreteSampleDAO concreteSampleDAO = ConcreteSampleDAO();
-
   // DTOs
   late final ConcreteTestingOrderDetailsDTO dto =
       ConcreteTestingOrderDetailsDTO(
     concreteVolumetricWeightDTO: ConcreteVolumetricWeightDTO(),
-    samples: [],
-    cylinders: [],
+    samplesDTOs: [],
+    cylindersDTOs: {},
   );
 
-  static List<Customer> clients = [];
-  static List<String> availableClients = [];
-
-  static List<BuildingSite> buildingSites = [];
-  static List<String> availableBuildingSites = [];
-
-  late ConcreteTestingOrder selectedConcreteTestingOrder;
-  Customer selectedCustomer = Customer(identifier: "", companyName: "");
-  BuildingSite selectedBuildingSite = BuildingSite(siteName: "");
-  SiteResident selectedSiteResident =
-      SiteResident(firstName: "", lastName: "", jobPosition: "");
-  ConcreteVolumetricWeight? selectedConcreteVolumetricWeight;
-
-  DateTime selectedDate = DateTime.now();
   int designResistanceIndex = 0;
   int designAgeIndex = 0;
 
@@ -102,9 +72,7 @@ class _ConcreteTestingOrderDetailsState
   bool setTareWeight = true;
   bool setTareVolume = true;
 
-  List<Map<String, String>> additivesRows = [];
-  List<ConcreteSample> samples = [];
-  List<ConcreteCylinder> cylinders = [];
+  ReportGenerator reportGenerator = ReportGenerator();
 
   @override
   void initState() {
@@ -113,145 +81,80 @@ class _ConcreteTestingOrderDetailsState
   }
 
   Future<void> _setConcreteTestingOrderFields() async {
-    selectedConcreteTestingOrder =
-        await concreteTestingOrderDao.findById(widget.id);
+    dto.selectedConcreteTestingOrder =
+        await dto.concreteTestingOrderDao.findById(widget.id);
 
     setState(
       () {
         // SET CUSTOMER
-        selectedCustomer = selectedConcreteTestingOrder.customer;
+        dto.selectedCustomer = dto.selectedConcreteTestingOrder.customer;
         dto.customerController.text =
             SequentialFormatter.generateSequentialFormatFromCustomer(
-                selectedConcreteTestingOrder.customer);
+                dto.selectedConcreteTestingOrder.customer);
 
         // SET BUILDING SITE
-        selectedBuildingSite = selectedConcreteTestingOrder.buildingSite;
+        dto.selectedBuildingSite =
+            dto.selectedConcreteTestingOrder.buildingSite;
         dto.buildingSiteController.text =
             SequentialFormatter.generateSequentialFormatFromBuildingSite(
-                selectedConcreteTestingOrder.buildingSite);
+                dto.selectedConcreteTestingOrder.buildingSite);
 
         // SET SITE RESIDENT
-        selectedSiteResident = selectedConcreteTestingOrder.siteResident!;
+        dto.selectedSiteResident =
+            dto.selectedConcreteTestingOrder.siteResident!;
         dto.siteResidentController.text =
             SequentialFormatter.generateSequentialFormatFromSiteResident(
-                selectedConcreteTestingOrder.siteResident);
+                dto.selectedConcreteTestingOrder.siteResident);
 
         // SET DESIGN RESISTANCE
         dto.designResistanceController.text =
-            selectedConcreteTestingOrder.designResistance!;
+            dto.selectedConcreteTestingOrder.designResistance!;
 
         designResistanceIndex = Constants.CONCRETE_COMPRESSION_RESISTANCES
-            .indexOf(selectedConcreteTestingOrder.designResistance!);
+            .indexOf(dto.selectedConcreteTestingOrder.designResistance!);
 
         dto.slumpingController.text =
-            selectedConcreteTestingOrder.slumping.toString();
+            dto.selectedConcreteTestingOrder.slumping.toString();
 
         dto.volumeController.text =
-            selectedConcreteTestingOrder.volume.toString();
+            dto.selectedConcreteTestingOrder.volume.toString();
 
-        dto.tmaController.text = selectedConcreteTestingOrder.tma.toString();
+        dto.tmaController.text =
+            dto.selectedConcreteTestingOrder.tma.toString();
 
-        dto.designAgeController.text = selectedConcreteTestingOrder.designAge!;
+        dto.designAgeController.text =
+            dto.selectedConcreteTestingOrder.designAge!;
 
         designAgeIndex = Constants.CONCRETE_DESIGN_AGES
-            .indexOf(selectedConcreteTestingOrder.designAge!);
+            .indexOf(dto.selectedConcreteTestingOrder.designAge!);
 
-        selectedDate = selectedConcreteTestingOrder.testingDate!;
+        dto.selectedDate = dto.selectedConcreteTestingOrder.testingDate!;
 
         dto.testingDateController.text = Constants.formatter
-            .format(selectedConcreteTestingOrder.testingDate!);
+            .format(dto.selectedConcreteTestingOrder.testingDate!);
 
         // final selectedConcreteVolumetricWeight = selectedConcreteTestingOrder
         //     .concreteSamples?.first.concreteVolumetricWeight;
 
-        if (selectedConcreteTestingOrder.concreteSamples != null) {
-          samples = selectedConcreteTestingOrder.concreteSamples!;
-          cylinders = selectedConcreteTestingOrder.concreteSamples!
+        if (dto.selectedConcreteTestingOrder.concreteSamples != null) {
+          dto.samples = dto.selectedConcreteTestingOrder.concreteSamples!;
+          dto.cylinders = dto.selectedConcreteTestingOrder.concreteSamples!
               .map((e) => e.concreteCylinders)
               .expand((element) => element)
               .toList();
+          dto.cylindersDTOs =
+              groupBy(generateDTO(dto.cylinders), (cy) => cy.sampleNumber);
         }
-
-        // if (selectedConcreteVolumetricWeight != null) {
-        //   dto.concreteVolumetricWeightDTO.concreteTestingOrderController.text =
-        //       SequentialFormatter
-        //           .generateSequentialFormatFromConcreteTestingOrder(
-        //               selectedConcreteTestingOrder);
-        //   dto.concreteVolumetricWeightDTO.tareWeightController.text =
-        //       (selectedConcreteVolumetricWeight.tareWeight ?? 0.0)
-        //           .toStringAsFixed(1);
-        //   dto.concreteVolumetricWeightDTO.materialTareWeightController.text =
-        //       (selectedConcreteVolumetricWeight.materialTareWeight ?? 0.0)
-        //           .toStringAsFixed(1);
-        //   dto.concreteVolumetricWeightDTO.materialWeightController.text =
-        //       (selectedConcreteVolumetricWeight.materialWeight ?? 0.0)
-        //           .toStringAsFixed(1);
-        //   dto.concreteVolumetricWeightDTO.tareVolumeController.text =
-        //       (selectedConcreteVolumetricWeight.tareVolume ?? 0.0)
-        //           .toStringAsFixed(3);
-        //   dto.concreteVolumetricWeightDTO.volumetricWeightController.text =
-        //       (selectedConcreteVolumetricWeight.volumetricWeight ?? 0.0)
-        //           .toStringAsFixed(1);
-        //   dto.concreteVolumetricWeightDTO.cementController.text =
-        //       (selectedConcreteVolumetricWeight.cementQuantity ?? 0.0)
-        //           .toStringAsFixed(1);
-        //   dto.concreteVolumetricWeightDTO.coarseAggregateController.text =
-        //       (selectedConcreteVolumetricWeight.coarseAggregateQuantity ?? 0.0)
-        //           .toStringAsFixed(1);
-        //   dto.concreteVolumetricWeightDTO.fineAggregateController.text =
-        //       (selectedConcreteVolumetricWeight.fineAggregateQuantity ?? 0.0)
-        //           .toStringAsFixed(1);
-        //   dto.concreteVolumetricWeightDTO.waterController.text =
-        //       (selectedConcreteVolumetricWeight.waterQuantity ?? 0.0)
-        //           .toStringAsFixed(1);
-        //
-        //   additivesRows =
-        //       selectedConcreteVolumetricWeight.additives.entries.map(
-        //     (e) {
-        //       Map<String, String> temp = {};
-        //       temp.putIfAbsent(
-        //         "Aditivo",
-        //         () => e.key,
-        //       );
-        //       temp.putIfAbsent(
-        //         "Cantidad (lt)",
-        //         () => e.value.toStringAsFixed(2),
-        //       );
-        //       return temp;
-        //     },
-        //   ).toList();
-        //
-        //   dto.concreteVolumetricWeightDTO.totalLoadController.text =
-        //       (selectedConcreteVolumetricWeight.totalLoad ?? 0.0)
-        //           .toStringAsFixed(1);
-        //   dto.concreteVolumetricWeightDTO.totalLoadVolumetricWeightController
-        //       .text = (selectedConcreteVolumetricWeight
-        //               .totalLoadVolumetricWeightRelation ??
-        //           0.0)
-        //       .toStringAsFixed(1);
-        //   dto.concreteVolumetricWeightDTO.percentageController.text =
-        //       (selectedConcreteVolumetricWeight.percentage ?? 0.0)
-        //           .toStringAsFixed(1);
-        //
-        //   // SET GLOBAL VARIABLES
-        //   volumetricWeight =
-        //       selectedConcreteVolumetricWeight.volumetricWeight ?? 0.0;
-        //   totalLoad = selectedConcreteVolumetricWeight.totalLoad ?? 0.0;
-        //   totalLoadVolumetricWeightRelation = selectedConcreteVolumetricWeight
-        //           .totalLoadVolumetricWeightRelation ??
-        //       0.0;
-        //   percentage = selectedConcreteVolumetricWeight.percentage ?? 0.0;
-        // }
       },
     );
   }
 
   Future<void> _loadData() async {
-    await customerDao.findAll().then((value) {
-      clients = value;
+    await dto.customerDao.findAll().then((value) {
+      dto.clients = value;
     }).whenComplete(() {
       setState(() {
-        availableClients = clients
+        dto.availableClients = dto.clients
             .map(
               (customer) =>
                   SequentialFormatter.generateSequentialFormatFromCustomer(
@@ -261,13 +164,13 @@ class _ConcreteTestingOrderDetailsState
       });
     });
 
-    await buildingSiteDao
-        .findByClientId(selectedConcreteTestingOrder.customer.id!)
+    await dto.buildingSiteDao
+        .findByClientId(dto.selectedConcreteTestingOrder.customer.id!)
         .then(
       (value) {
-        buildingSites = value;
+        dto.buildingSites = value;
         setState(() {
-          availableBuildingSites = buildingSites
+          dto.availableBuildingSites = dto.buildingSites
               .map(
                 (e) => SequentialFormatter
                     .generateSequentialFormatFromBuildingSite(e),
@@ -307,35 +210,38 @@ class _ConcreteTestingOrderDetailsState
                   children: buildConcreteSamplesInfo(),
                   onExpand: () => updateConcreteSamples(),
                 ),
-                // CustomExpansionTile(
-                //   title: "Pesos volumetricos",
-                //   children: buildVolumetricWeightInfo(),
-                //   onExpand: () => updateTotalLoad(),
-                // ),
                 const SizedBox(height: 16),
                 if (!widget.readOnly)
                   Center(
                     child: ElevatedButtonDialog(
                       title: "Confirmar cambios",
                       description: "Presiona OK para realizar la operacion",
-                      onOkPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          updateConcreteQualityOrder();
-                          concreteTestingOrderDao.findAll().then(
-                            (value) {
-                              widget.concreteTestingOrdersNotifier.value =
-                                  value;
-                            },
-                          );
-                          Navigator.popUntil(context,
-                              ModalRoute.withName(Navigator.defaultRouteName));
-                          _formKey.currentState!.reset();
-                        } else {
-                          Navigator.pop(context, 'Cancel');
-                        }
+                      onOkPressed: () {
+                        save(generateReport: false);
+                        Navigator.of(context).pop();
                       },
+                      textColor: Colors.white,
+                      icon: Icons.save,
+                      iconColor: Colors.white,
+                      buttonColor: Colors.blue,
                     ),
                   ),
+                const SizedBox(height: 16),
+                Center(
+                  child: ElevatedButtonDialog(
+                    title: "Guardar y generar formato",
+                    description:
+                        "Presiona OK para generar el formato de remision",
+                    onOkPressed: () async {
+                      save(generateReport: true);
+                      Navigator.of(context).pop();
+                    },
+                    textColor: Colors.white,
+                    icon: Icons.picture_as_pdf,
+                    iconColor: Colors.white,
+                    buttonColor: Colors.orange,
+                  ),
+                ),
                 const SizedBox(height: 16),
                 Center(
                   child: ElevatedButton.icon(
@@ -368,7 +274,7 @@ class _ConcreteTestingOrderDetailsState
       const SizedBox(height: 20),
       AutoCompleteElement(
         fieldName: "Cliente",
-        options: availableClients,
+        options: dto.availableClients,
         onChanged: (p0) => setSelectedCustomer(p0),
         controller: dto.customerController,
         readOnly: widget.readOnly,
@@ -376,7 +282,7 @@ class _ConcreteTestingOrderDetailsState
       const SizedBox(height: 20),
       AutoCompleteElement(
         fieldName: "Obra",
-        options: availableBuildingSites,
+        options: dto.availableBuildingSites,
         onChanged: (p0) => setSelectedProjectSite(p0),
         controller: dto.buildingSiteController,
         readOnly: widget.readOnly,
@@ -455,15 +361,15 @@ class _ConcreteTestingOrderDetailsState
           onPressed: () async {
             final DateTime? dateTime = await showDatePicker(
                 context: context,
-                initialDate: selectedDate,
+                initialDate: dto.selectedDate,
                 firstDate: DateTime(2000),
                 lastDate: DateTime(3000));
             if (dateTime != null) {
               setState(
                 () {
-                  selectedDate = dateTime;
+                  dto.selectedDate = dateTime;
                   dto.testingDateController.text =
-                      Constants.formatter.format(selectedDate);
+                      Constants.formatter.format(dto.selectedDate);
                 },
               );
             }
@@ -670,7 +576,7 @@ class _ConcreteTestingOrderDetailsState
               DataColumn(label: Text('Aditivo')),
               DataColumn(label: Text('Cantidad (lt)')),
             ],
-            rows: additivesRows
+            rows: dto.additivesRows
                 .map(
                   (row) => DataRow(
                     cells: [
@@ -715,263 +621,132 @@ class _ConcreteTestingOrderDetailsState
   }
 
   List<ExpansionTile> buildConcreteSamplesInfo() {
-    dto.samples = samples.map((ConcreteSample sample) {
+    dto.samplesDTOs = dto.samples.map((ConcreteSample sample) {
       return ConcreteSampleInputDTO.fromModel(sample);
     }).toList();
 
-    return Iterable.generate(samples.length).map((i) {
+    return Iterable.generate(dto.samplesDTOs.length).map((i) {
       List<Widget> widgets = [];
       widgets.addAll([
         const SizedBox(height: 20),
         CustomTextFormField(
-          controller: dto.samples[i].remissionController,
+          controller: dto.samplesDTOs[i].remissionController,
           labelText: "Remision",
           validatorText: "",
           readOnly: widget.readOnly,
         ),
         const SizedBox(height: 20),
         CustomNumberFormField(
-          controller: dto.samples[i].volumeController,
+          controller: dto.samplesDTOs[i].volumeController,
           labelText: "Volumen",
           validatorText: "",
           readOnly: widget.readOnly,
         ),
         CustomTimePickerForm(
-          timeController: dto.samples[i].plantTime,
-          timeOfDay: dto.samples[i].plantTimeOfDay,
+          timeController: dto.samplesDTOs[i].plantTime,
+          timeOfDay: dto.samplesDTOs[i].plantTimeOfDay,
           label: "Hora en planta",
           readOnly: widget.readOnly,
           orientation: PickerOrientation.horizontal,
         ),
         const SizedBox(height: 20),
         CustomTimePickerForm(
-          timeController: dto.samples[i].buildingSiteTime,
-          timeOfDay: dto.samples[i].buildingTimeOfDay,
+          timeController: dto.samplesDTOs[i].buildingSiteTime,
+          timeOfDay: dto.samplesDTOs[i].buildingTimeOfDay,
           label: "Hora en obra",
           readOnly: widget.readOnly,
           orientation: PickerOrientation.horizontal,
         ),
         const SizedBox(height: 20),
         CustomNumberFormField(
-          controller: dto.samples[i].temperature,
+          controller: dto.samplesDTOs[i].temperature,
           labelText: "Temperatura (°C)",
           validatorText: "",
           readOnly: widget.readOnly,
         ),
         CustomNumberFormField(
-          controller: dto.samples[i].realSlumpingController,
+          controller: dto.samplesDTOs[i].realSlumpingController,
           labelText: "Revenimiento real (cm)",
           validatorText: "",
           readOnly: widget.readOnly,
         ),
         CustomTextFormField(
-          controller: dto.samples[i].locationController,
+          controller: dto.samplesDTOs[i].locationController,
           labelText: "Ubicacion / Elemento",
           validatorText: "",
           readOnly: widget.readOnly,
         ),
         const SizedBox(height: 20),
       ]);
-      widgets.addAll(generateDataTable(samples[i]));
+
+      widgets.add(generateDataTable(dto.cylindersDTOs.values.elementAt(i)));
 
       return ExpansionTile(
           title: Text(
-              "${SequentialFormatter.generatePadLeftNumber(samples[i].id)} - ${samples[i].remission}"),
+              "${SequentialFormatter.generatePadLeftNumber(dto.samples[i].id)} - ${dto.samples[i].remission}"),
           children: widgets);
     }).toList();
   }
 
-  Future<void> updateConcreteQualityOrder() async {
-    // UPDATE GENERAL INFO
-    selectedConcreteTestingOrder.slumping =
-        int.tryParse(dto.slumpingController.text);
-    selectedConcreteTestingOrder.volume =
-        int.tryParse(dto.volumeController.text);
-    selectedConcreteTestingOrder.tma = int.tryParse(dto.tmaController.text);
-    selectedConcreteTestingOrder.designResistance =
-        dto.designResistanceController.text;
-    selectedConcreteTestingOrder.designAge = dto.designAgeController.text;
-    selectedConcreteTestingOrder.testingDate = selectedDate;
-    selectedConcreteTestingOrder.customer = selectedCustomer;
-    selectedConcreteTestingOrder.buildingSite = selectedBuildingSite;
-    selectedConcreteTestingOrder.siteResident = selectedSiteResident;
-
-    concreteTestingOrderDao.update(selectedConcreteTestingOrder);
-
-    // UPDATE CONCRETE SAMPLES
-    for (var samp in samples) {
-      // RETRIEVE THE INPUT ELEMENT
-      var input =
-          dto.samples.firstWhereOrNull((element) => element.id == samp.id);
-
-      // UPDATE THE SAMPLE
-      if (input != null) {
-        samp.remission = input.remissionController.text.trim();
-        samp.volume = num.tryParse(input.volumeController.text.trim());
-        samp.plantTime = Utils.convertStringToTimeOfDay(input.plantTime.text);
-        samp.buildingSiteTime =
-            Utils.convertStringToTimeOfDay(input.buildingSiteTime.text);
-        samp.temperature = num.tryParse(input.temperature.text.trim());
-        samp.realSlumping =
-            num.tryParse(input.realSlumpingController.text.trim());
-        samp.location = input.locationController.text.trim();
-      }
-    }
-
-    concreteSampleDAO.updateAllConcreteSamples(samples);
-
-    // UPDATE CONCRETE CYLINDERS
-    for (var cylinder in cylinders) {
-      var cylinderDTO = dto.cylinders
-          .expand((element) => element)
-          .firstWhereOrNull((element) => element.id == cylinder.id);
-
-      if (cylinderDTO != null) {
-        // UPDATE THE FIELDS
-        cylinder.testingAge =
-            int.tryParse(cylinderDTO.designAge.controller.text) ?? 0;
-        cylinder.testingDate =
-            Utils.convertToDateTime(cylinderDTO.testingDate.controller.text);
-        cylinder.totalLoad =
-            num.tryParse(cylinderDTO.totalLoad.controller.text.trim());
-        cylinder.diameter =
-            num.tryParse(cylinderDTO.diameter.controller.text.trim());
-        cylinder.resistance =
-            num.tryParse(cylinderDTO.resistance.controller.text.trim());
-        print(
-            "------------------------------------------------------------------------");
-        print(cylinderDTO);
-        print(cylinder);
-        print(
-            "------------------------------------------------------------------------");
-      }
-    }
-
-    concreteSampleDAO.updateAllConcreteCylinders(cylinders);
-
-    //
-    // final ConcreteVolumetricWeight? concreteVolumetricWeight =
-    //     selectedConcreteTestingOrder
-    //         .concreteSamples?.first.concreteVolumetricWeight;
-    // int volume = int.tryParse(_volumeController.text) ?? 7;
-    // num? tareWeight = num.tryParse(_tareWeightController.text);
-    // num? materialTareWeight = num.tryParse(_materialTareWeightController.text);
-    // num? materialWeight = num.tryParse(_materialWeightController.text);
-    // num? tareVolume = num.tryParse(_tareVolumeController.text);
-    // num? volumeLoad = selectedConcreteTestingOrder.volume;
-    // num volumetricWeight =
-    //     num.tryParse(_volumetricWeightController.text) ?? 1.0;
-    // num cementQuantity = num.tryParse(_cementController.text) ?? 0.0;
-    // num coarseAggregateQuantity =
-    //     num.tryParse(_coarseAggregateController.text) ?? 0.0;
-    // num fineAggregateQuantity =
-    //     num.tryParse(_fineAggregateController.text) ?? 0.0;
-    // num waterQuantity = num.tryParse(_waterController.text) ?? 0.0;
-    // Map<String, num> additives = Utils.convert(additivesRows);
-    // num additivesTotal = additivesRows.isNotEmpty
-    //     ? Utils.convert(additivesRows)
-    //         .values
-    //         .reduce((value, element) => value + element)
-    //     : 0.0;
-    //
-    // totalLoad = cementQuantity +
-    //     coarseAggregateQuantity +
-    //     fineAggregateQuantity +
-    //     waterQuantity +
-    //     additivesTotal;
-    //
-    // totalLoadVolumetricWeightRelation = totalLoad / volumetricWeight;
-    // percentage = (totalLoadVolumetricWeightRelation / volume) * 100;
-    //
-    // ConcreteVolumetricWeight? result;
-    //
-    // // If concrete volumetric weight exists, then simply updated
-    // if (concreteVolumetricWeight != null) {
-    //   concreteVolumetricWeight.tareWeight = tareWeight;
-    //   concreteVolumetricWeight.materialTareWeight = materialTareWeight;
-    //   concreteVolumetricWeight.materialWeight = materialWeight;
-    //   concreteVolumetricWeight.tareVolume = tareVolume;
-    //   concreteVolumetricWeight.volumeLoad = volumeLoad;
-    //   concreteVolumetricWeight.cementQuantity = cementQuantity;
-    //   concreteVolumetricWeight.coarseAggregateQuantity =
-    //       coarseAggregateQuantity;
-    //   concreteVolumetricWeight.fineAggregateQuantity = fineAggregateQuantity;
-    //   concreteVolumetricWeight.waterQuantity = waterQuantity;
-    //   concreteVolumetricWeight.additives = additives;
-    //
-    //   result =
-    //       await concreteVolumetricWeightDao.update(concreteVolumetricWeight);
-    // }
-    // // Otherwise, add it to the table and also update the concrete testing order
-    // else {
-    //   ConcreteVolumetricWeight concreteVolumetricWeight =
-    //       ConcreteVolumetricWeight(
-    //           null,
-    //           tareWeight,
-    //           materialTareWeight,
-    //           materialWeight,
-    //           tareVolume,
-    //           volumetricWeight,
-    //           volumeLoad,
-    //           cementQuantity,
-    //           coarseAggregateQuantity,
-    //           fineAggregateQuantity,
-    //           waterQuantity,
-    //           additives,
-    //           totalLoad,
-    //           totalLoadVolumetricWeightRelation,
-    //           percentage);
-    //   result = await concreteVolumetricWeightDao.add(concreteVolumetricWeight);
-    // }
-    //
-    // if (result != null) {
-    //   selectedConcreteTestingOrder
-    //       .concreteSamples?.firstOrNull?.concreteVolumetricWeight = result;
-    // }
-
-    // UPDATE THE CONCRETE TESTING ORDER AND SAMPLES
-
-    // return concreteTestingOrderDao
-    //     .update(selectedConcreteTestingOrder)
-    //     .then((value) {
-    //   ComponentUtils.generateSuccessMessage(
-    //       context, "Orden de muestreo actualizado con exito");
-    //   int index = widget.concreteTestingOrdersNotifier.value.indexWhere(
-    //     (element) => element.id == value.id,
-    //   );
-    //   widget.concreteTestingOrdersNotifier.updateAtIndex(index, value);
-    // }).onError((error, stackTrace) {
-    //   ComponentUtils.generateErrorMessage(context);
-    // });
-
-    // // SET THE CONCRETE SAMPLES
-    // if (selectedConcreteTestingOrder.concreteSamples != null) {
-    //   // UPDATE CONCRETE SAMPLES
-    //   concreteSampleDAO.updateAllConcreteSamples(
-    //       selectedConcreteTestingOrder.concreteSamples!);
-    //
-    //   // UPDATE CYLINDERS
-    //   var cylinders = dto.cylinders.expand((element) => element).map(
-    //     (cy) {
-    //       return ConcreteCylinder(
-    //           id: cy.id,
-    //           testingAge: int.tryParse(cy.designAge.controller.text) ?? 0,
-    //           testingDate:
-    //               Utils.convertToDateTime(cy.testingDate.controller.text));
-    //     },
-    //   ).toList();
-    // }
+  void save({required bool generateReport}) async {
+    dto
+        .updateConcreteTestingOrder()
+        .then((value) => dto.updateConcreteSamples())
+        .then((value) => dto.updateConcreteCylinders())
+        .then((value) => dto.getUpdated(dto.selectedConcreteTestingOrder.id))
+        .whenComplete(
+      () {
+        if (generateReport) {
+          QuickAlert.show(
+            title: "Exito",
+            context: context,
+            type: QuickAlertType.success,
+            text:
+                "Orden de muestreo ${SequentialFormatter.generatePadLeftNumber(dto.selectedConcreteTestingOrder.id)} actualizada con exito",
+            autoCloseDuration: const Duration(seconds: 30),
+            showConfirmBtn: true,
+            confirmBtnText: "Ver formato",
+            onConfirmBtnTap: () {
+              reportGenerator.savePdf(dto.selectedConcreteTestingOrder).then(
+                (value) {
+                  if (value != null) {
+                    reportGenerator.openPdfPath(value);
+                  }
+                  Navigator.popUntil(
+                      context, ModalRoute.withName(Navigator.defaultRouteName));
+                },
+              );
+            },
+          );
+        } else {
+          QuickAlert.show(
+            title: "Exito",
+            context: context,
+            type: QuickAlertType.success,
+            text:
+                "Orden de muestreo ${SequentialFormatter.generatePadLeftNumber(dto.selectedConcreteTestingOrder.id)} actualizada con exito con exito",
+            autoCloseDuration: const Duration(seconds: 10),
+            showConfirmBtn: true,
+            confirmBtnText: "Ok",
+            onConfirmBtnTap: () {
+              Navigator.popUntil(
+                  context, ModalRoute.withName(Navigator.defaultRouteName));
+            },
+          );
+        }
+      },
+    );
   }
 
   void setSelectedCustomer(String selected) async {
     dto.customerController.text = selected;
-    selectedCustomer = await customerDao.findById(
+    dto.selectedCustomer = await dto.customerDao.findById(
         SequentialFormatter.getIdNumberFromConsecutive(selected.split("-")[0]));
 
-    buildingSiteDao.findByClientId(selectedCustomer.id!).then((value) {
-      buildingSites = value;
+    dto.buildingSiteDao.findByClientId(dto.selectedCustomer.id!).then((value) {
+      dto.buildingSites = value;
       setState(() {
-        availableBuildingSites = buildingSites
+        dto.availableBuildingSites = dto.buildingSites
             .map((e) =>
                 "${SequentialFormatter.generatePadLeftNumber(e.id!)} - ${e.siteName}")
             .toList();
@@ -981,19 +756,19 @@ class _ConcreteTestingOrderDetailsState
 
   void setSelectedProjectSite(String selected) {
     dto.buildingSiteController.text = selected;
-    selectedBuildingSite = buildingSites.firstWhere((element) =>
+    dto.selectedBuildingSite = dto.buildingSites.firstWhere((element) =>
         element.id ==
         SequentialFormatter.getIdNumberFromConsecutive(
             selected.split("-").first));
 
-    siteResidentDao.findByBuildingSiteId(selectedBuildingSite.id!).then(
+    dto.siteResidentDao.findByBuildingSiteId(dto.selectedBuildingSite.id!).then(
       (value) {
-        selectedSiteResident = value.first;
+        dto.selectedSiteResident = value.first;
         setState(
           () {
             dto.siteResidentController.text =
                 SequentialFormatter.generateSequentialFormatFromSiteResident(
-                    selectedSiteResident);
+                    dto.selectedSiteResident);
           },
         );
       },
@@ -1007,7 +782,7 @@ class _ConcreteTestingOrderDetailsState
         dto.concreteVolumetricWeightDTO.quantityController.text.trim();
     if (type.isNotEmpty && quantity.isNotEmpty) {
       setState(() {
-        additivesRows.add({"Aditivo": type, "Cantidad (lt)": quantity});
+        dto.additivesRows.add({"Aditivo": type, "Cantidad (lt)": quantity});
       });
       dto.concreteVolumetricWeightDTO.additiveTypeController.clear();
       dto.concreteVolumetricWeightDTO.quantityController.clear();
@@ -1020,10 +795,10 @@ class _ConcreteTestingOrderDetailsState
   }
 
   void _removeRow() {
-    if (additivesRows.isNotEmpty) {
+    if (dto.additivesRows.isNotEmpty) {
       setState(
         () {
-          additivesRows.removeLast();
+          dto.additivesRows.removeLast();
         },
       );
     }
@@ -1033,7 +808,7 @@ class _ConcreteTestingOrderDetailsState
   Future<void> loadConcreteTestingOrders() async {
     concreteTestingOrderId = widget.id;
 
-    await concreteTestingOrderDao
+    await dto.concreteTestingOrderDao
         .findAll()
         .then((value) => concreteTestingOrders = value)
         .then((value) {
@@ -1043,12 +818,12 @@ class _ConcreteTestingOrderDetailsState
                 .generateSequentialFormatFromConcreteTestingOrder(e))
             .toList();
         if (concreteTestingOrderId != 0) {
-          selectedConcreteTestingOrder = concreteTestingOrders
+          dto.selectedConcreteTestingOrder = concreteTestingOrders
               .firstWhere((element) => element.id == concreteTestingOrderId);
           dto.concreteVolumetricWeightDTO.concreteTestingOrderController.text =
               SequentialFormatter
                   .generateSequentialFormatFromConcreteTestingOrder(
-                      selectedConcreteTestingOrder);
+                      dto.selectedConcreteTestingOrder);
         }
       });
     });
@@ -1057,8 +832,10 @@ class _ConcreteTestingOrderDetailsState
   void setSelectedConcreteTestingOrder(String selected) {
     dto.concreteVolumetricWeightDTO.concreteTestingOrderController.text =
         selected;
-    selectedConcreteTestingOrder = concreteTestingOrders.firstWhere((element) =>
-        element.id == SequentialFormatter.getIdNumberFromConsecutive(selected));
+    dto.selectedConcreteTestingOrder = concreteTestingOrders.firstWhere(
+        (element) =>
+            element.id ==
+            SequentialFormatter.getIdNumberFromConsecutive(selected));
   }
 
   void updateMaterialWeight(String? p0) {
@@ -1094,8 +871,8 @@ class _ConcreteTestingOrderDetailsState
     num waterQuantity =
         num.tryParse(dto.concreteVolumetricWeightDTO.waterController.text) ??
             0.0;
-    num additives = additivesRows.isNotEmpty
-        ? Utils.convert(additivesRows)
+    num additives = dto.additivesRows.isNotEmpty
+        ? Utils.convert(dto.additivesRows)
             .values
             .reduce((value, element) => value + element)
         : 0.0;
@@ -1119,119 +896,108 @@ class _ConcreteTestingOrderDetailsState
 
   void updateConcreteSamples() {}
 
-  List<Widget> generateDataTable(ConcreteSample sample) {
-    var groupBySampleNumber =
-        groupBy(sample.concreteCylinders, (cy) => cy.sampleNumber);
-
-    var cylinders = groupBySampleNumber.values.map((value) {
-      return generateDTO(value);
-    }).toList();
-
-    // SAVE THE CYLINDERS FOR REFERENCE
-    dto.cylinders.addAll(cylinders);
-
-    return cylinders.map((dto) {
-      return Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: DataTable(
-                  columnSpacing: 12,
-                  horizontalMargin: 12,
-                  dataRowMaxHeight: double.infinity,
-                  headingRowColor: WidgetStateProperty.resolveWith(
-                      (states) => Colors.grey.shade300),
-                  headingTextStyle:
-                      const TextStyle(fontWeight: FontWeight.bold),
-                  border: TableBorder.all(width: 1, color: Colors.grey),
-                  columns: const [
-                    DataColumn(
-                        label: Expanded(
-                            child: Text('EDAD DE ENSAYE',
-                                textAlign: TextAlign.center))),
-                    DataColumn(
-                        label: Expanded(
-                            child: Text('FECHA DE ENSAYE',
-                                textAlign: TextAlign.center))),
-                    DataColumn(
-                        label: Expanded(
-                            child: Text('CARGA TOTAL (KG)',
-                                textAlign: TextAlign.center))),
-                    DataColumn(
-                        label: Expanded(
-                            child: Text('DIAMETRO (CM)',
-                                textAlign: TextAlign.center))),
-                    DataColumn(
-                        label: Expanded(
-                            child: Text('RESISTENCIA (KGF/CM2)',
-                                textAlign: TextAlign.center))),
-                    DataColumn(
-                        label: Expanded(
-                            child: Text('PORCENTAJE',
-                                textAlign: TextAlign.center))),
-                    DataColumn(
-                        label: Expanded(
-                            child:
-                                Text('PROMEDIO', textAlign: TextAlign.center))),
-                  ],
-                  rows: dto
-                      .map(
-                        (entry) => DataRow(
-                          key: ValueKey(entry.id),
-                          onLongPress: () {},
-                          cells: [
-                            DataCell(
-                              Center(child: entry.designAge),
-                            ),
-                            DataCell(
-                              Center(child: entry.testingDate),
-                            ),
-                            DataCell(
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Center(child: entry.totalLoad),
+  Column generateDataTable(List<ConcreteCylinderInputDTO> selection) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: DataTable(
+                columnSpacing: 12,
+                horizontalMargin: 12,
+                dataRowMaxHeight: double.infinity,
+                headingRowColor: WidgetStateProperty.resolveWith(
+                    (states) => Colors.grey.shade300),
+                headingTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+                border: TableBorder.all(width: 1, color: Colors.grey),
+                columns: const [
+                  DataColumn(
+                      label: Expanded(
+                          child: Text('EDAD DE ENSAYE',
+                              textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child: Text('FECHA DE ENSAYE',
+                              textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child: Text('CARGA TOTAL (KG)',
+                              textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child: Text('DIAMETRO (CM)',
+                              textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child: Text('RESISTENCIA (KGF/CM2)',
+                              textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child:
+                              Text('PORCENTAJE', textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child:
+                              Text('PROMEDIO', textAlign: TextAlign.center))),
+                ],
+                rows: selection == null
+                    ? []
+                    : selection
+                        .map(
+                          (entry) => DataRow(
+                            key: ValueKey(entry.id),
+                            onLongPress: () {},
+                            cells: [
+                              DataCell(
+                                Center(child: entry.designAge),
                               ),
-                            ),
-                            DataCell(
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Center(child: entry.diameter),
+                              DataCell(
+                                Center(child: entry.testingDate),
                               ),
-                            ),
-                            DataCell(
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Center(child: entry.resistance),
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: entry.totalLoad),
+                                ),
                               ),
-                            ),
-                            DataCell(
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Center(child: entry.percentage),
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: entry.diameter),
+                                ),
                               ),
-                            ),
-                            DataCell(
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Center(child: entry.median),
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: entry.resistance),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      )
-                      .toList(),
-                ),
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: entry.percentage),
+                                ),
+                              ),
+                              DataCell(
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(child: entry.median),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                        .toList(),
               ),
-            ],
-          ),
-          const SizedBox(
-            height: 20,
-          )
-        ],
-      );
-    }).toList();
+            ),
+          ],
+        ),
+        const SizedBox(
+          height: 20,
+        )
+      ],
+    );
   }
 
   List<ConcreteCylinderInputDTO> generateDTO(List<ConcreteCylinder> value) {
@@ -1251,9 +1017,9 @@ class _ConcreteTestingOrderDetailsState
           onChange: (p0) {
             int? days = int.tryParse(p0);
             if (days != null) {
-              testingDateInput.controller.text = Constants.formatter.format(
-                  selectedConcreteTestingOrder.testingDate!
-                      .add(Duration(days: days)));
+              testingDateInput.controller.text = Constants.formatter.format(dto
+                  .selectedConcreteTestingOrder.testingDate!
+                  .add(Duration(days: days)));
             }
           },
           controller: TextEditingController(),
@@ -1293,7 +1059,7 @@ class _ConcreteTestingOrderDetailsState
               num area = (math.pi * math.pow(diameter, 2)) / 4;
               num resistance = totalLoad / area;
               num? designResistance = num.tryParse(
-                  selectedConcreteTestingOrder.designResistance ?? "");
+                  dto.selectedConcreteTestingOrder.designResistance ?? "");
 
               // SET THE FIELD
               resistanceController.text = resistance.toStringAsFixed(1);
@@ -1313,7 +1079,7 @@ class _ConcreteTestingOrderDetailsState
             num? diameter = num.tryParse(p0);
             num? totalLoad = num.tryParse(totalLoadController.text);
             num? designResistance = num.tryParse(
-                selectedConcreteTestingOrder.designResistance ?? "");
+                dto.selectedConcreteTestingOrder.designResistance ?? "");
 
             if (diameter != null && totalLoad != null) {
               // CALCULATE RESISTANCE
@@ -1347,6 +1113,7 @@ class _ConcreteTestingOrderDetailsState
 
         return ConcreteCylinderInputDTO(
             cylinder.id!,
+            cylinder.sampleNumber ?? 0,
             designAgeInput,
             testingDateInput,
             totalLoadInput,
@@ -1356,5 +1123,15 @@ class _ConcreteTestingOrderDetailsState
             median);
       },
     ).toList();
+  }
+
+  void generatePDFDocument(ConcreteTestingOrder order) {
+    reportGenerator.savePdf(order).then(
+      (value) {
+        if (value != null) {
+          reportGenerator.openPdfPath(value);
+        }
+      },
+    );
   }
 }

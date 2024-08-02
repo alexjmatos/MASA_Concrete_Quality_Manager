@@ -347,6 +347,10 @@ class _ConcreteVolumetricWeightState
                       _formKey.currentState!.reset();
                     }
                   },
+                  textColor: Colors.white,
+                  icon: Icons.save,
+                  iconColor: Colors.white,
+                  buttonColor: Colors.blue,
                 )
               ],
             ),
@@ -415,8 +419,10 @@ class _ConcreteVolumetricWeightState
 
   void updateMaterialWeight(String? p0) {
     _materialTareWeightController.text = p0 ?? "0.0";
-    num tareWeight = int.tryParse(_tareWeightController.text) ?? Constants.TARE_WEIGHT;
-    num volumeMaterial = num.tryParse(_tareVolumeController.text) ?? Constants.TARE_VOLUME;
+    num tareWeight =
+        int.tryParse(_tareWeightController.text) ?? Constants.TARE_WEIGHT;
+    num volumeMaterial =
+        num.tryParse(_tareVolumeController.text) ?? Constants.TARE_VOLUME;
     int? weightMaterialPlusTare =
         int.tryParse(_materialTareWeightController.text);
     num weightMaterial = (weightMaterialPlusTare ?? 0) - (tareWeight);
@@ -432,8 +438,9 @@ class _ConcreteVolumetricWeightState
     num fineAggregateQuantity =
         num.tryParse(_fineAggregateController.text) ?? 0.0;
     num waterQuantity = num.tryParse(_waterController.text) ?? 0.0;
-    num additives = rows.isNotEmpty ?
-        Utils.convert(rows).values.reduce((value, element) => value + element) : 0.0;
+    num additives = rows.isNotEmpty
+        ? Utils.convert(rows).values.reduce((value, element) => value + element)
+        : 0.0;
 
     totalLoad = cementQuantity +
         coarseAggregateQuantity +
@@ -482,8 +489,8 @@ class _ConcreteVolumetricWeightState
 
     // ADD THE CONCRETE VOLUMETRIC WEIGHT
     await concreteVolumetricWeightDao.add(concreteVolumetricWeight).then(
-        (value) =>
-            selectedConcreteTestingOrder?.concreteSamples?.firstOrNull?.concreteVolumetricWeight = value);
+        (value) => selectedConcreteTestingOrder
+            ?.concreteSamples?.firstOrNull?.concreteVolumetricWeight = value);
     // UPDATE THE CONCRETE TESTING ORDER
 
     await concreteTestingOrderDao

@@ -119,12 +119,13 @@ class ConcreteSampleDAO {
         concrete_cylinders cc ON cs.id = cc.concrete_sample_id
     WHERE bs.id = ?;
     """, [id]);
-    return (result.first["incremental_sample_number"] as int) + 1;
+    return (result.first["incremental_sample_number"] as int);
   }
 
   Future<void> updateAllConcreteCylinders(List<ConcreteCylinder> cylinders) async {
     var batch = db.batch();
     for (var element in cylinders) {
+      print("${element.id} - ${element.totalLoad}");
       batch.update(Constants.CONCRETE_TESTING_CYLINDERS, element.toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace,
           where: "id = ?",

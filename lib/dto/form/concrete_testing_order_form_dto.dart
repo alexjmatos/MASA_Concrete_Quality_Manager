@@ -93,11 +93,11 @@ class ConcreteTestingOrderFormDTO {
     List<int> identifiers = previousResult["CONCRETE_SAMPLES"] as List<int>;
     int id = previousResult["CONCRETE_TESTING_ORDER_ID"] as int;
     List<ConcreteCylinder> cylinders = [];
+    int sampleNumber = await concreteSampleDAO
+        .findNextCounterByBuildingSite(selectedBuildingSite?.id ?? 0);
 
     for (var i in Iterable.generate(identifiers.length, (index) => index)) {
-      int sampleNumber = await concreteSampleDAO
-          .findNextCounterByBuildingSite(selectedBuildingSite?.id ?? 0);
-
+      sampleNumber = sampleNumber + 1;
       cylinders.addAll(Iterable.generate(
         samples[i].designAges.length,
         (index) => index,

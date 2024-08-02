@@ -85,7 +85,7 @@ class ConcreteSampleDTO {
             children: cylinders
                 .map((e) => pw.Text(
                     e.totalLoad != null
-                        ? e.totalLoad!.toStringAsPrecision(1)
+                        ? e.totalLoad!.toString()
                         : "",
                     style: getStyle()))
                 .toList());
@@ -94,7 +94,7 @@ class ConcreteSampleDTO {
             children: cylinders
                 .map((e) => pw.Text(
                     e.resistance != null
-                        ? e.resistance!.toStringAsPrecision(1)
+                        ? e.resistance!.toString()
                         : "",
                     style: getStyle()))
                 .toList());
@@ -102,7 +102,7 @@ class ConcreteSampleDTO {
         return pw.Column(
             children: cylinders
                 .map((e) => pw.Text(
-                    e.median != null ? e.median!.toStringAsPrecision(1) : "",
+                    e.median != null ? e.median!.toString() : "",
                     style: getStyle()))
                 .toList());
       case 13:
@@ -110,7 +110,7 @@ class ConcreteSampleDTO {
             children: cylinders
                 .map((e) => pw.Text(
                     e.percentage != null
-                        ? e.percentage!.toStringAsPrecision(1)
+                        ? e.percentage!.toString()
                         : "",
                     style: getStyle()))
                 .toList());

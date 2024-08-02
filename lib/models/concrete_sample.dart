@@ -86,7 +86,8 @@ class ConcreteSample {
         id: map["id"] as int,
         remission: map["remission"] as String?,
         volume: map["volume"] as num?,
-        plantTime: Utils.convertStringToTimeOfDay((map["plant_time"] ?? "") as String),
+        plantTime:
+            Utils.convertStringToTimeOfDay((map["plant_time"] ?? "") as String),
         buildingSiteTime: Utils.convertStringToTimeOfDay(
             (map["building_site_time"] ?? "") as String),
         realSlumping: (map["real_slumping_cm"] ?? 0) as num,

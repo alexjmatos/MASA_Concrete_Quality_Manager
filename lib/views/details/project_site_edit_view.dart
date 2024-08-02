@@ -152,6 +152,10 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
                         _formKey.currentState!.reset();
                       }
                     },
+                    textColor: Colors.white,
+                    icon: Icons.save,
+                    iconColor: Colors.white,
+                    buttonColor: Colors.blue,
                   ),
                 ElevatedButton.icon(
                   onPressed: () => Navigator.popUntil(
@@ -252,7 +256,7 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
               (element) => element.id == selectedSiteResident?.id!,
             ));
             _siteResidentController.text =
-            selectionSiteResidents[selectedSiteResidentIndex];
+                selectionSiteResidents[selectedSiteResidentIndex];
           }
           _customerController.text = selectionCustomers[selectedCustomerIndex];
         });

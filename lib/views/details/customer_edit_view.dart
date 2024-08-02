@@ -99,6 +99,10 @@ class _CustomerDetailsState extends State<CustomerDetails> {
                             ModalRoute.withName(Navigator.defaultRouteName));
                       }
                     },
+                    textColor: Colors.white,
+                    icon: Icons.save,
+                    iconColor: Colors.white,
+                    buttonColor: Colors.blue,
                   ),
                 ElevatedButton.icon(
                   onPressed: () => Navigator.popUntil(

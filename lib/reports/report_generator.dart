@@ -1,9 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:masa_epico_concrete_manager/models/concrete_testing_order.dart';
 import 'package:masa_epico_concrete_manager/utils/sequential_counter_generator.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/widgets.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../constants/constants.dart';
 import '../dto/concrete_cylinder.dart';
@@ -83,7 +89,7 @@ class ReportGenerator {
                           ),
                           pw.SizedBox(width: 8),
                           pw.Text(
-                            dto.customerIdentifier,
+                            Utils.addBreakLine(dto.customerIdentifier, 4),
                             style: pw.TextStyle(
                                 font: pw.Font.times(),
                                 fontSize: Constants.INFO_FONT_SIZE),
@@ -377,5 +383,53 @@ class ReportGenerator {
         child: pw.Text(cellValue,
             style: pw.TextStyle(
                 font: pw.Font.times(), fontSize: Constants.TABLE_FONT_SIZE)));
+  }
+
+  void openPdfPath(String path) {
+    OpenFile.open(path);
+  }
+
+  Future<String?> savePdf(ConcreteTestingOrder order) async {
+    // Generate the PDF document
+    Document pdf =
+    await buildReport(PdfPageFormat.a4.landscape, order);
+
+    try {
+      // Request storage permissions
+      if (await _requestPermissions()) {
+        // Get the Downloads directory
+        final downloadsDir = await getDownloadsDirectory();
+        final file = File(
+            "${downloadsDir?.path}/MASA_CONCRETOS_${SequentialFormatter.generatePadLeftNumber(order.id)}.pdf");
+
+        // Save the PDF
+        await file.writeAsBytes(await pdf.save());
+        return file.path;
+      } else {
+        print("Storage permissions are denied.");
+      }
+    } catch (e) {
+      print("Error saving PDF: $e");
+      print(e);
+    }
+    return null;
+  }
+
+  Future<bool> _requestPermissions() async {
+    if (Platform.isAndroid) {
+      return await Permission.manageExternalStorage.request().isGranted;
+    }
+    return true;
+  }
+
+  Future<Directory?> getDownloadsDirectory() async {
+    if (Platform.isAndroid) {
+      if (await Permission.manageExternalStorage.request().isGranted) {
+        return Directory('/storage/emulated/0/Download');
+      }
+      return await getExternalStorageDirectory();
+    } else {
+      return await getApplicationDocumentsDirectory(); // For iOS
+    }
   }
 }

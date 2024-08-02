@@ -110,20 +110,18 @@ VALUES (1, '250', 14, 7, 20, '28', 1716319147750, 1, 1, 1),
 
 INSERT INTO concrete_samples (remission, volume, plant_time, building_site_time, real_slumping_cm, temperature_celsius,
                               location, concrete_testing_order_id, concrete_volumetric_weight_id)
-VALUES ('REM123', 7, '08:00 AM', '09:00 AM', 14.5, 25, 'EJE A', 1, null),
-       ('REM124', 7, '09:00 AM', '10:00 AM', 16.5, 28, 'EJE B', 1, null);
+VALUES ('XPJ001', 7, '08:00 AM', '09:00 AM', 14.5, 35, 'EJE A', 1, null),
+       ('XPJ002', 7, '09:00 AM', '10:00 AM', 16.5, 38, 'EJE B', 1, null);
 
 INSERT INTO concrete_cylinders (building_site_sample_number, testing_age_days, testing_date, total_load_kg, diameter_cm,
-                                resistance_kgf_cm2,
-                                median, percentage, concrete_sample_id)
+                                resistance_kgf_cm2, median, percentage, concrete_sample_id)
 VALUES (1, 3, 1716319147750, 250, 15, 300, 290, 95, 1),
        (1, 7, 1716319147751, 270, 15, 320, 310, 98, 1),
        (1, 14, 1716319147751, 270, 15, 320, 310, 98, 1),
        (1, 14, 1716319147751, 270, 15, 320, 310, 98, 1);
 
 INSERT INTO concrete_cylinders (building_site_sample_number, testing_age_days, testing_date, total_load_kg, diameter_cm,
-                                resistance_kgf_cm2,
-                                median, percentage, concrete_sample_id)
+                                resistance_kgf_cm2, median, percentage, concrete_sample_id)
 VALUES (2, 3, 1716319147750, 250, 15, 300, 290, 95, 2),
        (2, 7, 1716319147751, 270, 15, 320, 310, 98, 2),
        (2, 14, 1716319147751, 270, 15, 320, 310, 98, 2),

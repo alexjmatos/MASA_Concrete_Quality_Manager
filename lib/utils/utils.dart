@@ -42,6 +42,26 @@ class Utils {
     ).toList();
   }
 
+  static String addBreakLine(String sentence, int spaceLimit) {
+    StringBuffer buffer = StringBuffer();
+    int spaceCount = 0;
+
+    for (int i = 0; i < sentence.length; i++) {
+      buffer.write(sentence[i]);
+
+      if (sentence[i] == ' ') {
+        spaceCount++;
+      }
+
+      if (spaceCount == spaceLimit) {
+        buffer.write('\n'); // Add jumpspace
+        spaceCount = 0;
+      }
+    }
+
+    return buffer.toString();
+  }
+
   static TimeOfDay convertStringToTimeOfDay(String timeString) {
     String result = timeString.replaceAll(RegExp(r'\s'), '\u202F');
 

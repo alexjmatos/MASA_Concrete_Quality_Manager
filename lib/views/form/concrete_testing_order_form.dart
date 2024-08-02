@@ -17,17 +17,10 @@ import 'package:masa_epico_concrete_manager/reports/report_generator.dart';
 import 'package:masa_epico_concrete_manager/service/customer_dao.dart';
 import 'package:masa_epico_concrete_manager/service/building_site_dao.dart';
 import 'package:masa_epico_concrete_manager/service/site_resident_dao.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/src/widgets/document.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
-import 'dart:typed_data' as ty;
 import '../../elements/input_number_field.dart';
-import '../../utils/component_utils.dart';
 import '../../utils/sequential_counter_generator.dart';
 import '../../utils/utils.dart';
 
@@ -56,9 +49,6 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
   // SELECTION
   List<String> availableClients = [];
   List<String> availableProjectSites = [];
-
-  // PDF FILE
-  File? _pdfFile;
 
   @override
   void initState() {
@@ -353,14 +343,14 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
                             actions: [
                               ElevatedButton(
                                 onPressed: () {
-                                  save(true);
+                                  save(generateReport: true);
                                   Navigator.of(context).pop();
                                 },
                                 child: const Text('Guardar y generar reporte'),
                               ),
                               ElevatedButton(
                                 onPressed: () {
-                                  save(false);
+                                  save(generateReport: false);
                                   Navigator.of(context).pop();
                                 },
                                 child: const Text('Guardar'),
@@ -387,7 +377,7 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
     );
   }
 
-  void save(bool generateReport) {
+  void save({required bool generateReport}) {
     ConcreteTestingOrder? order;
     concreteTestingOrderFormDTO.addConcreteTestingOrder(context).then(
       (order) {
@@ -413,10 +403,10 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
             showConfirmBtn: true,
             confirmBtnText: "Ver reporte",
             onConfirmBtnTap: () {
-              savePdf(order!).then(
+              reportGenerator.savePdf(order!).then(
                 (value) {
                   if (value != null) {
-                    _openPdfPath(value);
+                    reportGenerator.openPdfPath(value);
                   }
                   Navigator.popUntil(
                       context, ModalRoute.withName(Navigator.defaultRouteName));
@@ -652,54 +642,5 @@ class _ConcreteTestingOrderFormState extends State<ConcreteTestingOrderForm> {
 
       return ConcreteCylinder(testingAge: testingAge, testingDate: testingDate);
     }).toList();
-  }
-
-  void _openPdfPath(String path) {
-    OpenFile.open(path);
-  }
-
-  Future<String?> savePdf(ConcreteTestingOrder order) async {
-    // Generate the PDF document
-    Document pdf =
-        await reportGenerator.buildReport(PdfPageFormat.a4.landscape, order);
-
-    try {
-      // Request storage permissions
-      if (await _requestPermissions()) {
-        // Get the Downloads directory
-        final downloadsDir = await getDownloadsDirectory();
-        final file = File(
-            "${downloadsDir?.path}/MASA_CONCRETOS_${SequentialFormatter.generatePadLeftNumber(order.id)}.pdf");
-
-        // Save the PDF
-        await file.writeAsBytes(await pdf.save());
-        print("PDF saved to ${file.path}");
-        return file.path;
-      } else {
-        print("Storage permissions are denied.");
-      }
-    } catch (e) {
-      print("Error saving PDF: $e");
-      print(e);
-    }
-    return null;
-  }
-
-  Future<bool> _requestPermissions() async {
-    if (Platform.isAndroid) {
-      return await Permission.manageExternalStorage.request().isGranted;
-    }
-    return true;
-  }
-
-  Future<Directory?> getDownloadsDirectory() async {
-    if (Platform.isAndroid) {
-      if (await Permission.manageExternalStorage.request().isGranted) {
-        return Directory('/storage/emulated/0/Download');
-      }
-      return await getExternalStorageDirectory();
-    } else {
-      return await getApplicationDocumentsDirectory(); // For iOS
-    }
   }
 }

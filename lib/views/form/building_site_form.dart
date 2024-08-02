@@ -135,6 +135,10 @@ class _ProjectSiteAndResidentFormState
                         Navigator.pop(context, 'Cancel');
                       }
                     },
+                    textColor: Colors.white,
+                    icon: Icons.save,
+                    iconColor: Colors.white,
+                    buttonColor: Colors.blue,
                   ),
                 ),
               ],
