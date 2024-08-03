@@ -137,40 +137,44 @@ class _BuildingSiteDetailsState extends State<BuildingSiteDetails> {
                   ),
                 const SizedBox(height: 20),
                 if (!widget.readOnly)
-                  ElevatedButtonDialog(
-                    title: "Modificar obra",
-                    description: "Presiona OK para realizar la operacion",
-                    onOkPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        updateProjectSite();
-                        projectSiteDao.findAll().then(
-                              (value) =>
-                                  widget.projectSitesNotifier.value = value,
-                            );
-                        Navigator.popUntil(context,
-                            ModalRoute.withName(Navigator.defaultRouteName));
-                        _formKey.currentState!.reset();
-                      }
-                    },
-                    textColor: Colors.white,
-                    icon: Icons.save,
-                    iconColor: Colors.white,
-                    buttonColor: Colors.blue,
+                  Center(
+                    child: ElevatedButtonDialog(
+                      title: "Modificar obra",
+                      description: "Presiona OK para realizar la operacion",
+                      onOkPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          updateProjectSite();
+                          projectSiteDao.findAll().then(
+                                (value) =>
+                                    widget.projectSitesNotifier.value = value,
+                              );
+                          Navigator.popUntil(context,
+                              ModalRoute.withName(Navigator.defaultRouteName));
+                          _formKey.currentState!.reset();
+                        }
+                      },
+                      textColor: Colors.white,
+                      icon: Icons.edit,
+                      iconColor: Colors.white,
+                      buttonColor: Colors.blue,
+                    ),
                   ),
-                ElevatedButton.icon(
-                  onPressed: () => Navigator.popUntil(
-                      context, ModalRoute.withName(Navigator.defaultRouteName)),
-                  icon: const Icon(
-                    Icons.keyboard_return_rounded,
-                    color: Colors.white,
-                  ),
-                  label: const Text(
-                    'Regresar',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lightGreen,
-                    textStyle: const TextStyle(fontSize: 16),
+                Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () => Navigator.popUntil(
+                        context, ModalRoute.withName(Navigator.defaultRouteName)),
+                    icon: const Icon(
+                      Icons.keyboard_return_rounded,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      'Regresar',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.lightGreen,
+                      textStyle: const TextStyle(fontSize: 16),
+                    ),
                   ),
                 )
               ],

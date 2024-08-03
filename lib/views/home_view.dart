@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:masa_epico_concrete_manager/elements/custom_expansion_tile.dart';
 
+import '../dto/home_view_dto.dart';
+
 class HomeView extends StatefulWidget {
 
   const HomeView({super.key});
@@ -12,7 +14,7 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   String name = "";
   Text text = const Text(
-    "Ensayes",
+    "Bienvenido",
     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
   );
 
@@ -36,20 +38,10 @@ class _HomeViewState extends State<HomeView> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CustomExpansionTile(
-                title: "Hoy",
-                children: const [],
+                title: "Trabajo pendiente",
+                children:  [],
                 onExpand: () {},
               ),
-              CustomExpansionTile(
-                title: "Proximos",
-                children: [],
-                onExpand: () {},
-              ),
-              CustomExpansionTile(
-                title: "Atrasados",
-                children: [],
-                onExpand: () {},
-              )
             ],
           ),
         ),
