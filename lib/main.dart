@@ -7,14 +7,24 @@ import 'package:masa_epico_concrete_manager/views/menu.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: "dev.env");
+
+  await Supabase.initialize(
+    url: dotenv.env["SUPABASE_URL"] as String,
+    anonKey: dotenv.env["SUPABASE_KEY"] as String,
+  );
+
+  // Get a reference your Supabase client
+  final supabase = Supabase.instance.client;
 
   // Use this static instance
   final injector = Injector.appInstance;
-  await dotenv.load(fileName: "dev.env");
 
+  injector.registerSingleton(() => supabase);
   initializeDb().then((value) => injector.registerSingleton(() => value));
   injector.registerSingleton(() => SequentialFormatter());
 

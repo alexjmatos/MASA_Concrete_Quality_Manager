@@ -25,6 +25,7 @@ dependencies:
   quickalert: ^1.1.0
   sqflite: ^2.3.2
   sqflite_common_ffi: ^2.3.3
+  supabase_flutter: ^2.5.11
   uuid: ^4.3.3
 
 dev_dependencies:
